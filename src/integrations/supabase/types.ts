@@ -14,16 +14,314 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      crew_members: {
+        Row: {
+          created_at: string
+          crew_id: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          crew_id: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          crew_id?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crew_members_crew_id_fkey"
+            columns: ["crew_id"]
+            isOneToOne: false
+            referencedRelation: "crews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crew_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crews: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          supervisor_id: string | null
+          updated_at: string
+          utility: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          supervisor_id?: string | null
+          updated_at?: string
+          utility?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          supervisor_id?: string | null
+          updated_at?: string
+          utility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crews_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exceptions: {
+        Row: {
+          created_at: string
+          description: string
+          exception_type: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["exception_status"] | null
+          submitted_by: string
+          timesheet_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          exception_type: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["exception_status"] | null
+          submitted_by: string
+          timesheet_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          exception_type?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["exception_status"] | null
+          submitted_by?: string
+          timesheet_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exceptions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exceptions_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exceptions_timesheet_id_fkey"
+            columns: ["timesheet_id"]
+            isOneToOne: false
+            referencedRelation: "timesheets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gps_tracking: {
+        Row: {
+          accuracy: number | null
+          created_at: string
+          id: string
+          latitude: number
+          longitude: number
+          timesheet_id: string
+          timestamp: string
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          timesheet_id: string
+          timestamp?: string
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          timesheet_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gps_tracking_timesheet_id_fkey"
+            columns: ["timesheet_id"]
+            isOneToOne: false
+            referencedRelation: "timesheets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      timesheets: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          break_duration: number | null
+          created_at: string
+          crew_id: string
+          date: string
+          end_time: string | null
+          id: string
+          location_end: string | null
+          location_start: string | null
+          start_time: string | null
+          status: Database["public"]["Enums"]["timesheet_status"] | null
+          submitted_at: string
+          submitted_by: string | null
+          total_hours: number | null
+          updated_at: string
+          work_description: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          break_duration?: number | null
+          created_at?: string
+          crew_id: string
+          date: string
+          end_time?: string | null
+          id?: string
+          location_end?: string | null
+          location_start?: string | null
+          start_time?: string | null
+          status?: Database["public"]["Enums"]["timesheet_status"] | null
+          submitted_at?: string
+          submitted_by?: string | null
+          total_hours?: number | null
+          updated_at?: string
+          work_description?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          break_duration?: number | null
+          created_at?: string
+          crew_id?: string
+          date?: string
+          end_time?: string | null
+          id?: string
+          location_end?: string | null
+          location_start?: string | null
+          start_time?: string | null
+          status?: Database["public"]["Enums"]["timesheet_status"] | null
+          submitted_at?: string
+          submitted_by?: string | null
+          total_hours?: number | null
+          updated_at?: string
+          work_description?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timesheets_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timesheets_crew_id_fkey"
+            columns: ["crew_id"]
+            isOneToOne: false
+            referencedRelation: "crews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timesheets_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      exception_status: "pending" | "approved" | "denied"
+      timesheet_status: "submitted" | "approved" | "rejected"
+      user_role:
+        | "admin"
+        | "usp_admin"
+        | "ep_manager"
+        | "supervisor"
+        | "crew_member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +448,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      exception_status: ["pending", "approved", "denied"],
+      timesheet_status: ["submitted", "approved", "rejected"],
+      user_role: [
+        "admin",
+        "usp_admin",
+        "ep_manager",
+        "supervisor",
+        "crew_member",
+      ],
+    },
   },
 } as const
