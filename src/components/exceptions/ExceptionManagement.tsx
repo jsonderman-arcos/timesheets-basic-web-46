@@ -39,6 +39,21 @@ export function ExceptionManagement() {
   const fetchExceptions = async () => {
     try {
       console.log('Fetching exceptions...');
+      
+      // First, let's test a simple query
+      const { data: simpleData, error: simpleError } = await supabase
+        .from('exceptions')
+        .select('*')
+        .limit(5);
+      
+      console.log('Simple query result:', { simpleData, simpleError });
+      
+      if (simpleError) {
+        console.error('Simple query failed:', simpleError);
+        throw simpleError;
+      }
+      
+      // If simple query works, try the complex one
       const { data, error } = await supabase
         .from('exceptions')
         .select(`
@@ -55,12 +70,15 @@ export function ExceptionManagement() {
         `)
         .order('created_at', { ascending: false });
 
-      console.log('Query result:', { data, error });
+      console.log('Complex query result:', { data, error, count: data?.length });
+      
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Complex query failed:', error);
         throw error;
       }
+      
       setExceptions(data || []);
+      console.log('Set exceptions:', data?.length, 'items');
     } catch (error: any) {
       console.error('Fetch exceptions error:', error);
       toast({
