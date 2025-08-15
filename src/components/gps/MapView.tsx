@@ -3,7 +3,10 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { MapPin } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface GpsPoint {
   id: string;
@@ -17,19 +20,113 @@ interface MapViewProps {
   gpsPoints: GpsPoint[];
 }
 
+interface LocationDetails {
+  timestamp: string;
+  address: string;
+  coordinates: string;
+}
+
 export function MapView({ gpsPoints }: MapViewProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [tokenInput, setTokenInput] = useState<string>('');
   const [isTokenSet, setIsTokenSet] = useState<boolean>(false);
-  const currentPopup = useRef<mapboxgl.Popup | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedLocation, setSelectedLocation] = useState<LocationDetails | null>(null);
+  const [loadingAddress, setLoadingAddress] = useState<boolean>(false);
+  const { toast } = useToast();
+
+  // Load token on component mount
+  useEffect(() => {
+    const loadMapboxToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) {
+          console.error('Error loading Mapbox token:', error);
+          return;
+        }
+
+        if (data?.token) {
+          setMapboxToken(data.token);
+          setIsTokenSet(true);
+        }
+      } catch (error) {
+        console.error('Error loading Mapbox token:', error);
+        // Fallback to localStorage for backward compatibility
+        const savedToken = localStorage.getItem('mapbox_token');
+        if (savedToken) {
+          setMapboxToken(savedToken);
+          setIsTokenSet(true);
+        }
+      }
+    };
+
+    loadMapboxToken();
+  }, []);
 
   const handleSetToken = () => {
     if (tokenInput.trim()) {
       setMapboxToken(tokenInput.trim());
       setIsTokenSet(true);
+      // Save to localStorage as backup
+      localStorage.setItem('mapbox_token', tokenInput.trim());
+      toast({
+        title: "Success",
+        description: "Mapbox token saved successfully"
+      });
     }
+  };
+
+  const handleMarkerClick = async (point: GpsPoint, pointNumber: number) => {
+    setLoadingAddress(true);
+    setShowModal(true);
+    
+    // Set initial data while loading address
+    setSelectedLocation({
+      timestamp: new Date(point.timestamp).toLocaleString(),
+      address: 'Loading address...',
+      coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`
+    });
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('reverse-geocode', {
+        body: {
+          longitude: point.longitude,
+          latitude: point.latitude
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setSelectedLocation({
+        timestamp: new Date(point.timestamp).toLocaleString(),
+        address: data?.address || 'Address not found',
+        coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`
+      });
+    } catch (error) {
+      console.error('Error getting address:', error);
+      setSelectedLocation({
+        timestamp: new Date(point.timestamp).toLocaleString(),
+        address: 'Unable to load address',
+        coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`
+      });
+      toast({
+        title: "Error",
+        description: "Failed to load address information",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingAddress(false);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedLocation(null);
   };
 
   useEffect(() => {
@@ -43,15 +140,14 @@ export function MapView({ gpsPoints }: MapViewProps) {
     let zoom = 12;
 
     if (gpsPoints.length > 0) {
-      // Calculate bounds of all GPS points
-      const bounds = new mapboxgl.LngLatBounds();
-      gpsPoints.forEach(point => {
-        bounds.extend([point.longitude, point.latitude]);
-      });
+      // Sort GPS points by timestamp for proper numbering
+      const sortedPoints = [...gpsPoints].sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
       
       // Use first point as center if only one point
-      if (gpsPoints.length === 1) {
-        center = [gpsPoints[0].longitude, gpsPoints[0].latitude];
+      if (sortedPoints.length === 1) {
+        center = [sortedPoints[0].longitude, sortedPoints[0].latitude];
         zoom = 15;
       }
     }
@@ -69,49 +165,36 @@ export function MapView({ gpsPoints }: MapViewProps) {
       'top-right'
     );
 
+    // Add click handler to close modal when clicking on map
+    map.current.on('click', (e) => {
+      // Only close modal if clicking on the map itself, not on markers
+      const target = e.originalEvent.target as HTMLElement;
+      if (showModal && !target?.closest('.mapboxgl-marker')) {
+        closeModal();
+      }
+    });
+
     map.current.on('load', () => {
       if (!map.current) return;
 
-      // Add GPS points as markers
-      gpsPoints.forEach((point, index) => {
-        if (!map.current) return;
+      // Sort GPS points by timestamp for proper numbering
+      const sortedPoints = [...gpsPoints].sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
 
-        // Create marker popup content
-        const popupContent = `
-          <div class="p-2">
-            <div class="font-semibold">Point ${index + 1}</div>
-            <div class="text-sm text-gray-600">
-              Time: ${new Date(point.timestamp).toLocaleTimeString()}
-            </div>
-            <div class="text-sm text-gray-600">
-              Lat: ${point.latitude.toFixed(6)}
-            </div>
-            <div class="text-sm text-gray-600">
-              Lng: ${point.longitude.toFixed(6)}
-            </div>
-            ${point.accuracy ? `<div class="text-xs text-gray-500">Accuracy: ±${point.accuracy.toFixed(1)}m</div>` : ''}
-          </div>
-        `;
+      // Add GPS points as markers
+      sortedPoints.forEach((point, index) => {
+        if (!map.current) return;
 
         // Create custom marker element with number
         const markerElement = document.createElement('div');
         markerElement.className = 'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white shadow-lg cursor-pointer hover:bg-blue-600 transition-colors';
         markerElement.innerHTML = `${index + 1}`;
 
-        // Create popup
-        const popup = new mapboxgl.Popup({
-          offset: 25,
-          closeButton: true,
-          closeOnClick: false
-        }).setHTML(popupContent);
-
-        // Handle popup opening - close any existing popup first
-        markerElement.addEventListener('click', () => {
-          if (currentPopup.current) {
-            currentPopup.current.remove();
-          }
-          currentPopup.current = popup;
-          popup.addTo(map.current!);
+        // Handle marker click - close any existing modal and open new one
+        markerElement.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent map click event
+          handleMarkerClick(point, index + 1);
         });
 
         // Create marker with custom element
@@ -175,19 +258,45 @@ export function MapView({ gpsPoints }: MapViewProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div 
-        ref={mapContainer} 
-        className="w-full h-96 rounded-lg border"
-      />
-      <div className="text-sm text-muted-foreground">
-        Total GPS points: {gpsPoints.length}
-        {gpsPoints.length > 0 && (
-          <span className="ml-2">
-            • Click markers for details
-          </span>
-        )}
+    <>
+      <div className="space-y-4">
+        <div 
+          ref={mapContainer} 
+          className="w-full h-96 rounded-lg border"
+        />
+        <div className="text-sm text-muted-foreground">
+          Total GPS points: {gpsPoints.length}
+          {gpsPoints.length > 0 && (
+            <span className="ml-2">
+              • Click numbered markers for location details
+            </span>
+          )}
+        </div>
       </div>
-    </div>
+
+      <Dialog open={showModal} onOpenChange={closeModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>GPS Location Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-sm text-muted-foreground">Date & Time</h4>
+              <p className="text-sm">{selectedLocation?.timestamp}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm text-muted-foreground">Street Address</h4>
+              <p className="text-sm">
+                {loadingAddress ? 'Loading address...' : selectedLocation?.address}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm text-muted-foreground">Coordinates</h4>
+              <p className="text-sm font-mono">{selectedLocation?.coordinates}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
