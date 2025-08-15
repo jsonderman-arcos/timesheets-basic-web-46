@@ -41,6 +41,7 @@ export function GpsTracking() {
 
   const fetchTimesheets = async () => {
     try {
+      console.log('Fetching timesheets for GPS...');
       const { data, error } = await supabase
         .from('timesheets')
         .select(`
@@ -51,9 +52,11 @@ export function GpsTracking() {
         .order('date', { ascending: false })
         .limit(50);
 
+      console.log('Timesheets result:', { data, error, count: data?.length });
       if (error) throw error;
       setTimesheets(data || []);
     } catch (error: any) {
+      console.error('Error fetching timesheets:', error);
       toast({
         title: "Error loading timesheets",
         description: error.message,
@@ -65,15 +68,18 @@ export function GpsTracking() {
   const fetchGpsData = async (timesheetId: string) => {
     setLoading(true);
     try {
+      console.log('Fetching GPS data for timesheet:', timesheetId);
       const { data, error } = await supabase
         .from('gps_tracking')
         .select('*')
         .eq('timesheet_id', timesheetId)
         .order('timestamp');
 
+      console.log('GPS data result:', { data, error, count: data?.length });
       if (error) throw error;
       setGpsPoints(data || []);
     } catch (error: any) {
+      console.error('Error fetching GPS data:', error);
       toast({
         title: "Error loading GPS data",
         description: error.message,
