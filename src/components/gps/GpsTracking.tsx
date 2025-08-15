@@ -139,68 +139,71 @@ export function GpsTracking() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Crew Selector */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Select Crew</label>
-              <Select value={selectedCrew} onValueChange={setSelectedCrew}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a crew to view GPS trail" />
-                </SelectTrigger>
-                <SelectContent>
-                  {crews.map((crew) => (
-                    <SelectItem key={crew.id} value={crew.id}>
-                      {crew.name} - {crew.utility}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Crew and Date Selectors */}
+            <div className="flex gap-4 items-end">
+              {/* Crew Selector */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2">Select Crew</label>
+                <Select value={selectedCrew} onValueChange={setSelectedCrew}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a crew to view GPS trail" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {crews.map((crew) => (
+                      <SelectItem key={crew.id} value={crew.id}>
+                        {crew.name} - {crew.utility}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Date Selector */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Select Date</label>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={goToPreviousDay}
-                  className="px-3"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "min-w-[200px] justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
+              {/* Date Selector */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2">Select Date</label>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousDay}
+                    className="px-3"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "min-w-[200px] justify-start text-left font-normal flex-1",
+                          !selectedDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={(date) => date && setSelectedDate(date)}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={goToNextDay}
-                  className="px-3"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextDay}
+                    className="px-3"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
 
