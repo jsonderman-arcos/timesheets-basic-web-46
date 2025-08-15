@@ -17,6 +17,7 @@ import {
   Download, 
   AlertTriangle, 
   Navigation,
+  FileBarChart,
   Users
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,6 +48,11 @@ const menuItems = [
     title: 'GPS Tracking',
     url: '/gps',
     icon: Navigation,
+  },
+  {
+    title: 'Reports',
+    url: '/reports',
+    icon: FileBarChart,
   },
 ];
 

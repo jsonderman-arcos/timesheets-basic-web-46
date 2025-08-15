@@ -9,6 +9,7 @@ import TimesheetPage from "./pages/TimesheetPage";
 import ExportPage from "./pages/ExportPage";
 import ExceptionsPage from "./pages/ExceptionsPage";
 import GpsPage from "./pages/GpsPage";
+import ReportsPage from "./pages/ReportsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/export" element={<AppLayout><ExportPage /></AppLayout>} />
           <Route path="/exceptions" element={<AppLayout><ExceptionsPage /></AppLayout>} />
           <Route path="/gps" element={<AppLayout><GpsPage /></AppLayout>} />
+          <Route path="/reports" element={<AppLayout><ReportsPage /></AppLayout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
