@@ -46,7 +46,7 @@ export function ExceptionManagement() {
             date,
             crews (name, utility)
           ),
-          profiles!exceptions_submitted_by_fkey (full_name)
+          profiles!submitted_by (full_name)
         `)
         .order('created_at', { ascending: false });
 
