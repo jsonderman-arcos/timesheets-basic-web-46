@@ -38,38 +38,6 @@ export function ExceptionManagement() {
 
   const fetchExceptions = async () => {
     try {
-      console.log('Fetching exceptions...');
-      
-      // Check auth status
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      console.log('Auth session:', { session: !!session, user: session?.user?.id, error: sessionError });
-      
-      // Test RLS bypass (this should work if RLS is the issue)
-      const { data: testData, error: testError } = await supabase
-        .rpc('get_user_role', { _user_id: session?.user?.id || '00000000-0000-0000-0000-000000000000' });
-      console.log('User role test:', { testData, testError });
-      
-      // First, let's test a simple query
-      const { data: simpleData, error: simpleError } = await supabase
-        .from('exceptions')
-        .select('*')
-        .limit(5);
-      
-      console.log('Simple query result:', { simpleData, simpleError });
-      
-      if (simpleError) {
-        console.error('Simple query failed:', simpleError);
-        throw simpleError;
-      }
-      
-      // If no data, let's check if it's an RLS issue by checking total count
-      const { count, error: countError } = await supabase
-        .from('exceptions')
-        .select('*', { count: 'exact', head: true });
-      
-      console.log('Total count check:', { count, countError });
-      
-      // If simple query works, try the complex one
       const { data, error } = await supabase
         .from('exceptions')
         .select(`
@@ -86,17 +54,9 @@ export function ExceptionManagement() {
         `)
         .order('created_at', { ascending: false });
 
-      console.log('Complex query result:', { data, error, count: data?.length });
-      
-      if (error) {
-        console.error('Complex query failed:', error);
-        throw error;
-      }
-      
+      if (error) throw error;
       setExceptions(data || []);
-      console.log('Set exceptions:', data?.length, 'items');
     } catch (error: any) {
-      console.error('Fetch exceptions error:', error);
       toast({
         title: "Error loading exceptions",
         description: error.message,
