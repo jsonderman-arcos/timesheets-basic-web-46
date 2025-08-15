@@ -164,7 +164,7 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Hours (Week)</p>
-                <p className="text-3xl font-bold">{stats.totalHours}</p>
+                <p className="text-3xl font-bold">{stats.totalHours.toFixed(1)}</p>
               </div>
               <Clock className="h-8 w-8 text-primary" />
             </div>
