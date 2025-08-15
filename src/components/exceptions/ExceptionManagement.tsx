@@ -38,21 +38,27 @@ export function ExceptionManagement() {
 
   const fetchExceptions = async () => {
     try {
+      console.log('Fetching exceptions...');
       const { data, error } = await supabase
         .from('exceptions')
         .select(`
           *,
-          timesheets (
+          timesheets!inner (
             date,
-            crews (name, utility)
+            crews!inner (name, utility)
           ),
           profiles!submitted_by (full_name)
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Query result:', { data, error });
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       setExceptions(data || []);
     } catch (error: any) {
+      console.error('Fetch exceptions error:', error);
       toast({
         title: "Error loading exceptions",
         description: error.message,
