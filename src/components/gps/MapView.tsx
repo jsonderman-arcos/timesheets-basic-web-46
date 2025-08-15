@@ -3,8 +3,8 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { MapPin } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { MapPin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,6 +24,7 @@ interface LocationDetails {
   timestamp: string;
   address: string;
   coordinates: string;
+  position: { x: number; y: number };
 }
 
 export function MapView({ gpsPoints }: MapViewProps) {
@@ -32,7 +33,6 @@ export function MapView({ gpsPoints }: MapViewProps) {
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [tokenInput, setTokenInput] = useState<string>('');
   const [isTokenSet, setIsTokenSet] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedLocation, setSelectedLocation] = useState<LocationDetails | null>(null);
   const [loadingAddress, setLoadingAddress] = useState<boolean>(false);
   const { toast } = useToast();
@@ -79,15 +79,26 @@ export function MapView({ gpsPoints }: MapViewProps) {
     }
   };
 
-  const handleMarkerClick = async (point: GpsPoint, pointNumber: number) => {
+  const handleMarkerClick = async (point: GpsPoint, markerElement: HTMLElement) => {
     setLoadingAddress(true);
-    setShowModal(true);
+    
+    // Get marker position on screen
+    const rect = markerElement.getBoundingClientRect();
+    const mapRect = mapContainer.current?.getBoundingClientRect();
+    
+    if (!mapRect) return;
+    
+    const position = {
+      x: rect.left - mapRect.left + rect.width / 2,
+      y: rect.top - mapRect.top
+    };
     
     // Set initial data while loading address
     setSelectedLocation({
       timestamp: new Date(point.timestamp).toLocaleString(),
       address: 'Loading address...',
-      coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`
+      coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`,
+      position
     });
     
     try {
@@ -102,18 +113,16 @@ export function MapView({ gpsPoints }: MapViewProps) {
         throw error;
       }
 
-      setSelectedLocation({
-        timestamp: new Date(point.timestamp).toLocaleString(),
-        address: data?.address || 'Address not found',
-        coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`
-      });
+      setSelectedLocation(prev => prev ? {
+        ...prev,
+        address: data?.address || 'Address not found'
+      } : null);
     } catch (error) {
       console.error('Error getting address:', error);
-      setSelectedLocation({
-        timestamp: new Date(point.timestamp).toLocaleString(),
-        address: 'Unable to load address',
-        coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`
-      });
+      setSelectedLocation(prev => prev ? {
+        ...prev,
+        address: 'Unable to load address'
+      } : null);
       toast({
         title: "Error",
         description: "Failed to load address information",
@@ -124,8 +133,7 @@ export function MapView({ gpsPoints }: MapViewProps) {
     }
   };
 
-  const closeModal = () => {
-    setShowModal(false);
+  const closePopover = () => {
     setSelectedLocation(null);
   };
 
@@ -165,12 +173,12 @@ export function MapView({ gpsPoints }: MapViewProps) {
       'top-right'
     );
 
-    // Add click handler to close modal when clicking on map
+    // Add click handler to close popover when clicking on map
     map.current.on('click', (e) => {
-      // Only close modal if clicking on the map itself, not on markers
+      // Only close popover if clicking on the map itself, not on markers
       const target = e.originalEvent.target as HTMLElement;
-      if (showModal && !target?.closest('.mapboxgl-marker')) {
-        closeModal();
+      if (selectedLocation && !target?.closest('.mapboxgl-marker') && !target?.closest('.gps-popover')) {
+        closePopover();
       }
     });
 
@@ -191,10 +199,10 @@ export function MapView({ gpsPoints }: MapViewProps) {
         markerElement.className = 'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white shadow-lg cursor-pointer hover:bg-blue-600 transition-colors';
         markerElement.innerHTML = `${index + 1}`;
 
-        // Handle marker click - close any existing modal and open new one
+        // Handle marker click - close any existing popover and open new one
         markerElement.addEventListener('click', (e) => {
           e.stopPropagation(); // Prevent map click event
-          handleMarkerClick(point, index + 1);
+          handleMarkerClick(point, markerElement);
         });
 
         // Create marker with custom element
@@ -258,11 +266,11 @@ export function MapView({ gpsPoints }: MapViewProps) {
   }
 
   return (
-    <>
+    <div className="relative">
       <div className="space-y-4">
         <div 
           ref={mapContainer} 
-          className="w-full h-96 rounded-lg border"
+          className="w-full h-96 rounded-lg border relative"
         />
         <div className="text-sm text-muted-foreground">
           Total GPS points: {gpsPoints.length}
@@ -274,29 +282,51 @@ export function MapView({ gpsPoints }: MapViewProps) {
         </div>
       </div>
 
-      <Dialog open={showModal} onOpenChange={closeModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>GPS Location Details</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-semibold text-sm text-muted-foreground">Date & Time</h4>
-              <p className="text-sm">{selectedLocation?.timestamp}</p>
+      {/* GPS Location Popover */}
+      {selectedLocation && (
+        <Card 
+          className="gps-popover absolute z-50 w-72 shadow-lg border"
+          style={{
+            left: `${selectedLocation.position.x - 144}px`, // Center the 288px (w-72) card
+            top: `${selectedLocation.position.y - 10}px`, // Position above the marker
+            transform: 'translateY(-100%)'
+          }}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between mb-3">
+              <h4 className="font-semibold text-sm">GPS Location Details</h4>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 w-6 p-0"
+                onClick={closePopover}
+              >
+                <X className="h-3 w-3" />
+              </Button>
             </div>
-            <div>
-              <h4 className="font-semibold text-sm text-muted-foreground">Street Address</h4>
-              <p className="text-sm">
-                {loadingAddress ? 'Loading address...' : selectedLocation?.address}
-              </p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Date & Time</p>
+                <p className="text-sm">{selectedLocation.timestamp}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Street Address</p>
+                <p className="text-sm">
+                  {loadingAddress ? 'Loading address...' : selectedLocation.address}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Coordinates</p>
+                <p className="text-xs font-mono">{selectedLocation.coordinates}</p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold text-sm text-muted-foreground">Coordinates</h4>
-              <p className="text-sm font-mono">{selectedLocation?.coordinates}</p>
+            {/* Arrow pointing to marker */}
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+              <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-border"></div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }
