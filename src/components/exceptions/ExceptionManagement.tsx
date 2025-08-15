@@ -42,12 +42,16 @@ export function ExceptionManagement() {
       const { data, error } = await supabase
         .from('exceptions')
         .select(`
-          *,
+          id,
+          exception_type,
+          description,
+          status,
+          created_at,
           timesheets!inner (
             date,
             crews!inner (name, utility)
           ),
-          profiles!submitted_by (full_name)
+          profiles!submitted_by!inner (full_name)
         `)
         .order('created_at', { ascending: false });
 
