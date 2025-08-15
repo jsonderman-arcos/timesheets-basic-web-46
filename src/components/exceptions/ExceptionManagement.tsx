@@ -40,6 +40,15 @@ export function ExceptionManagement() {
     try {
       console.log('Fetching exceptions...');
       
+      // Check auth status
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('Auth session:', { session: !!session, user: session?.user?.id, error: sessionError });
+      
+      // Test RLS bypass (this should work if RLS is the issue)
+      const { data: testData, error: testError } = await supabase
+        .rpc('get_user_role', { _user_id: session?.user?.id || '00000000-0000-0000-0000-000000000000' });
+      console.log('User role test:', { testData, testError });
+      
       // First, let's test a simple query
       const { data: simpleData, error: simpleError } = await supabase
         .from('exceptions')
@@ -52,6 +61,13 @@ export function ExceptionManagement() {
         console.error('Simple query failed:', simpleError);
         throw simpleError;
       }
+      
+      // If no data, let's check if it's an RLS issue by checking total count
+      const { count, error: countError } = await supabase
+        .from('exceptions')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log('Total count check:', { count, countError });
       
       // If simple query works, try the complex one
       const { data, error } = await supabase
