@@ -23,6 +23,7 @@ export function MapView({ gpsPoints }: MapViewProps) {
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [tokenInput, setTokenInput] = useState<string>('');
   const [isTokenSet, setIsTokenSet] = useState<boolean>(false);
+  const currentPopup = useRef<mapboxgl.Popup | null>(null);
 
   const handleSetToken = () => {
     if (tokenInput.trim()) {
@@ -92,6 +93,11 @@ export function MapView({ gpsPoints }: MapViewProps) {
           </div>
         `;
 
+        // Create custom marker element with number
+        const markerElement = document.createElement('div');
+        markerElement.className = 'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white shadow-lg cursor-pointer hover:bg-blue-600 transition-colors';
+        markerElement.innerHTML = `${index + 1}`;
+
         // Create popup
         const popup = new mapboxgl.Popup({
           offset: 25,
@@ -99,13 +105,20 @@ export function MapView({ gpsPoints }: MapViewProps) {
           closeOnClick: false
         }).setHTML(popupContent);
 
-        // Create marker
+        // Handle popup opening - close any existing popup first
+        markerElement.addEventListener('click', () => {
+          if (currentPopup.current) {
+            currentPopup.current.remove();
+          }
+          currentPopup.current = popup;
+          popup.addTo(map.current!);
+        });
+
+        // Create marker with custom element
         const marker = new mapboxgl.Marker({
-          color: '#3B82F6',
-          scale: 0.8
+          element: markerElement
         })
           .setLngLat([point.longitude, point.latitude])
-          .setPopup(popup)
           .addTo(map.current);
       });
 
