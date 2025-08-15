@@ -59,12 +59,19 @@ export function AppSidebar() {
   useEffect(() => {
     fetchPendingExceptionsCount();
     
-    // Set up real-time subscription for exceptions
+    // Set up real-time subscription for exceptions table changes
     const channel = supabase
-      .channel('exceptions_count')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'exceptions' },
-        () => {
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'exceptions' 
+        },
+        (payload) => {
+          console.log('Exception table change detected:', payload);
+          // Refetch count whenever exceptions table changes
           fetchPendingExceptionsCount();
         }
       )
