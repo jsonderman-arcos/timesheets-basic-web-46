@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +19,8 @@ import {
   Navigation,
   Users
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
 
 const menuItems = [
   {
@@ -51,6 +54,44 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === 'collapsed';
+  const [pendingExceptionsCount, setPendingExceptionsCount] = useState(0);
+
+  useEffect(() => {
+    fetchPendingExceptionsCount();
+    
+    // Set up real-time subscription for exceptions
+    const channel = supabase
+      .channel('exceptions_count')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'exceptions' },
+        () => {
+          fetchPendingExceptionsCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchPendingExceptionsCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('exceptions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      if (error) {
+        console.error('Error fetching pending exceptions count:', error);
+        return;
+      }
+
+      setPendingExceptionsCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching pending exceptions count:', error);
+    }
+  };
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -65,6 +106,34 @@ export function AppSidebar() {
       : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground";
   };
 
+  const renderMenuItem = (item: typeof menuItems[0]) => {
+    const isExceptions = item.url === '/exceptions';
+    const hasPendingExceptions = isExceptions && pendingExceptionsCount > 0;
+
+    return (
+      <SidebarMenuItem key={item.title}>
+        <SidebarMenuButton asChild>
+          <NavLink to={item.url} className={getNavClasses(item.url)}>
+            <div className="relative flex items-center">
+              <item.icon 
+                className={cn(
+                  "w-4 h-4",
+                  hasPendingExceptions && "text-yellow-500"
+                )} 
+              />
+              {hasPendingExceptions && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {pendingExceptionsCount > 99 ? '99+' : pendingExceptionsCount}
+                </div>
+              )}
+            </div>
+            {!isCollapsed && <span>{item.title}</span>}
+          </NavLink>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  };
+
   return (
     <Sidebar className={isCollapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarContent>
@@ -74,16 +143,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavClasses(item.url)}>
-                      <item.icon className="w-4 h-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item) => renderMenuItem(item))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
