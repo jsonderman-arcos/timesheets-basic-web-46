@@ -114,20 +114,22 @@ export function AppSidebar() {
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild>
           <NavLink to={item.url} className={getNavClasses(item.url)}>
-            <div className="relative flex items-center">
-              <item.icon 
-                className={cn(
-                  "w-4 h-4",
-                  hasPendingExceptions && "text-yellow-500"
-                )} 
-              />
-              {hasPendingExceptions && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                  {pendingExceptionsCount > 99 ? '99+' : pendingExceptionsCount}
-                </div>
-              )}
-            </div>
-            {!isCollapsed && <span>{item.title}</span>}
+            <item.icon 
+              className={cn(
+                "w-4 h-4",
+                hasPendingExceptions && "text-yellow-500"
+              )} 
+            />
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span>{item.title}</span>
+                {hasPendingExceptions && (
+                  <div className="min-w-[22px] h-[22px] bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold px-1.5">
+                    {pendingExceptionsCount > 99 ? '99+' : pendingExceptionsCount}
+                  </div>
+                )}
+              </div>
+            )}
           </NavLink>
         </SidebarMenuButton>
       </SidebarMenuItem>
