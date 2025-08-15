@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Navigation, Clock } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { MapView } from './MapView';
 
 interface GpsPoint {
   id: string;
@@ -126,69 +127,14 @@ export function GpsTracking() {
             </div>
 
             {selectedTimesheet && (
-              <div className="border rounded-lg p-4 bg-muted/10">
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  GPS Trail Points
-                </h3>
-                
+              <div className="space-y-4">
                 {loading ? (
-                  <div className="text-center py-4">Loading GPS data...</div>
-                ) : gpsPoints.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <MapPin className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>No GPS tracking data available for this timesheet.</p>
-                    <p className="text-sm">GPS tracking is recorded from the mobile app during work hours.</p>
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-2 text-muted-foreground">Loading GPS data...</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {gpsPoints.map((point, index) => (
-                        <div key={point.id} className="bg-background border rounded-lg p-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">Point {index + 1}</span>
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {formatTime(point.timestamp)}
-                            </span>
-                          </div>
-                          <div className="text-sm space-y-1">
-                            <div>Lat: {point.latitude.toFixed(6)}</div>
-                            <div>Lng: {point.longitude.toFixed(6)}</div>
-                            {point.accuracy && (
-                              <div className="text-xs text-muted-foreground">
-                                Accuracy: ±{point.accuracy.toFixed(1)}m
-                              </div>
-                            )}
-                          </div>
-                          <a
-                            href={`https://www.google.com/maps?q=${point.latitude},${point.longitude}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline mt-2 inline-block"
-                          >
-                            View on Maps →
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="pt-4 border-t">
-                      <p className="text-sm text-muted-foreground">
-                        Total GPS points recorded: {gpsPoints.length}
-                      </p>
-                      {gpsPoints.length > 1 && (
-                        <a
-                          href={`https://www.google.com/maps/dir/${gpsPoints.map(p => `${p.latitude},${p.longitude}`).join('/')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline"
-                        >
-                          View complete route on Google Maps →
-                        </a>
-                      )}
-                    </div>
-                  </div>
+                  <MapView gpsPoints={gpsPoints} />
                 )}
               </div>
             )}
