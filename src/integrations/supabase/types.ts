@@ -14,24 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      crew_members: {
+      companies: {
         Row: {
-          created_at: string
-          crew_id: string
+          active: boolean | null
+          created_at: string | null
           id: string
-          profile_id: string
+          name: string
+          slug: string
         }
         Insert: {
-          created_at?: string
-          crew_id: string
+          active?: boolean | null
+          created_at?: string | null
           id?: string
-          profile_id: string
+          name: string
+          slug: string
         }
         Update: {
-          created_at?: string
-          crew_id?: string
+          active?: boolean | null
+          created_at?: string | null
           id?: string
-          profile_id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      crew_members: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          crew_id: string | null
+          hourly_rate: number | null
+          id: string
+          name: string
+          role: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          crew_id?: string | null
+          hourly_rate?: number | null
+          id?: string
+          name: string
+          role: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          crew_id?: string | null
+          hourly_rate?: number | null
+          id?: string
+          name?: string
+          role?: string
         }
         Relationships: [
           {
@@ -41,257 +74,328 @@ export type Database = {
             referencedRelation: "crews"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "crew_members_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       crews: {
         Row: {
-          created_at: string
+          active: boolean | null
+          company_id: string | null
+          created_at: string | null
+          crew_name: string
+          equipment_assigned: string[] | null
           id: string
-          name: string
+          storm_event_id: string | null
           supervisor_id: string | null
-          updated_at: string
-          utility: string | null
+          utility_contract_id: string | null
         }
         Insert: {
-          created_at?: string
+          active?: boolean | null
+          company_id?: string | null
+          created_at?: string | null
+          crew_name: string
+          equipment_assigned?: string[] | null
           id?: string
-          name: string
+          storm_event_id?: string | null
           supervisor_id?: string | null
-          updated_at?: string
-          utility?: string | null
+          utility_contract_id?: string | null
         }
         Update: {
-          created_at?: string
+          active?: boolean | null
+          company_id?: string | null
+          created_at?: string | null
+          crew_name?: string
+          equipment_assigned?: string[] | null
           id?: string
-          name?: string
+          storm_event_id?: string | null
           supervisor_id?: string | null
-          updated_at?: string
-          utility?: string | null
+          utility_contract_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "crews_supervisor_id_fkey"
-            columns: ["supervisor_id"]
+            foreignKeyName: "crews_company_id_fkey"
+            columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crews_storm_event_id_fkey"
+            columns: ["storm_event_id"]
+            isOneToOne: false
+            referencedRelation: "storm_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crews_utility_contract_id_fkey"
+            columns: ["utility_contract_id"]
+            isOneToOne: false
+            referencedRelation: "utility_contracts"
             referencedColumns: ["id"]
           },
         ]
       }
       exceptions: {
         Row: {
-          created_at: string
+          admin_notes: string | null
+          created_at: string | null
           description: string
-          exception_type: string
+          flagged_by: string
           id: string
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: Database["public"]["Enums"]["exception_status"] | null
-          submitted_by: string
-          timesheet_id: string
-          updated_at: string
+          reason: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          time_entry_id: string | null
         }
         Insert: {
-          created_at?: string
+          admin_notes?: string | null
+          created_at?: string | null
           description: string
-          exception_type: string
+          flagged_by: string
           id?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["exception_status"] | null
-          submitted_by: string
-          timesheet_id: string
-          updated_at?: string
+          reason: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          time_entry_id?: string | null
         }
         Update: {
-          created_at?: string
+          admin_notes?: string | null
+          created_at?: string | null
           description?: string
-          exception_type?: string
+          flagged_by?: string
           id?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["exception_status"] | null
-          submitted_by?: string
-          timesheet_id?: string
-          updated_at?: string
+          reason?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          time_entry_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "exceptions_reviewed_by_fkey"
-            columns: ["reviewed_by"]
+            foreignKeyName: "exceptions_time_entry_id_fkey"
+            columns: ["time_entry_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "exceptions_submitted_by_fkey"
-            columns: ["submitted_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "exceptions_timesheet_id_fkey"
-            columns: ["timesheet_id"]
-            isOneToOne: false
-            referencedRelation: "timesheets"
+            referencedRelation: "time_entries"
             referencedColumns: ["id"]
           },
         ]
       }
-      gps_tracking: {
+      storm_events: {
         Row: {
-          accuracy: number | null
-          created_at: string
+          active: boolean | null
+          actual_cost: number | null
+          created_at: string | null
+          end_date: string | null
+          estimated_cost: number | null
+          event_type: string
           id: string
-          latitude: number
-          longitude: number
-          timesheet_id: string
-          timestamp: string
+          phase: string
+          start_date: string
+          status: string
+          storm_name: string
+          utility_contract_id: string | null
         }
         Insert: {
-          accuracy?: number | null
-          created_at?: string
+          active?: boolean | null
+          actual_cost?: number | null
+          created_at?: string | null
+          end_date?: string | null
+          estimated_cost?: number | null
+          event_type?: string
           id?: string
-          latitude: number
-          longitude: number
-          timesheet_id: string
-          timestamp?: string
+          phase?: string
+          start_date: string
+          status?: string
+          storm_name: string
+          utility_contract_id?: string | null
         }
         Update: {
-          accuracy?: number | null
-          created_at?: string
+          active?: boolean | null
+          actual_cost?: number | null
+          created_at?: string | null
+          end_date?: string | null
+          estimated_cost?: number | null
+          event_type?: string
           id?: string
-          latitude?: number
-          longitude?: number
-          timesheet_id?: string
-          timestamp?: string
+          phase?: string
+          start_date?: string
+          status?: string
+          storm_name?: string
+          utility_contract_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "gps_tracking_timesheet_id_fkey"
-            columns: ["timesheet_id"]
+            foreignKeyName: "storm_events_utility_contract_id_fkey"
+            columns: ["utility_contract_id"]
             isOneToOne: false
-            referencedRelation: "timesheets"
+            referencedRelation: "utility_contracts"
             referencedColumns: ["id"]
           },
         ]
       }
-      profiles: {
+      time_entries: {
         Row: {
-          created_at: string
-          email: string
-          full_name: string
-          id: string
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          full_name: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          full_name?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      timesheets: {
-        Row: {
-          approved_at: string | null
-          approved_by: string | null
-          break_duration: number | null
-          created_at: string
-          crew_id: string
+          comments: string | null
+          created_at: string | null
+          crew_id: string | null
           date: string
-          end_time: string | null
+          end_time: string
+          gps_locations: Json | null
+          hours_overtime: number | null
+          hours_regular: number | null
           id: string
-          location_end: string | null
-          location_start: string | null
-          start_time: string | null
-          status: Database["public"]["Enums"]["timesheet_status"] | null
-          submitted_at: string
+          location: string | null
+          member_id: string | null
+          start_time: string
+          status: string
+          submitted_at: string | null
           submitted_by: string | null
-          total_hours: number | null
-          updated_at: string
           work_description: string | null
+          work_package_id: string | null
         }
         Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          break_duration?: number | null
-          created_at?: string
-          crew_id: string
+          comments?: string | null
+          created_at?: string | null
+          crew_id?: string | null
           date: string
-          end_time?: string | null
+          end_time: string
+          gps_locations?: Json | null
+          hours_overtime?: number | null
+          hours_regular?: number | null
           id?: string
-          location_end?: string | null
-          location_start?: string | null
-          start_time?: string | null
-          status?: Database["public"]["Enums"]["timesheet_status"] | null
-          submitted_at?: string
+          location?: string | null
+          member_id?: string | null
+          start_time: string
+          status?: string
+          submitted_at?: string | null
           submitted_by?: string | null
-          total_hours?: number | null
-          updated_at?: string
           work_description?: string | null
+          work_package_id?: string | null
         }
         Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          break_duration?: number | null
-          created_at?: string
-          crew_id?: string
+          comments?: string | null
+          created_at?: string | null
+          crew_id?: string | null
           date?: string
-          end_time?: string | null
+          end_time?: string
+          gps_locations?: Json | null
+          hours_overtime?: number | null
+          hours_regular?: number | null
           id?: string
-          location_end?: string | null
-          location_start?: string | null
-          start_time?: string | null
-          status?: Database["public"]["Enums"]["timesheet_status"] | null
-          submitted_at?: string
+          location?: string | null
+          member_id?: string | null
+          start_time?: string
+          status?: string
+          submitted_at?: string | null
           submitted_by?: string | null
-          total_hours?: number | null
-          updated_at?: string
           work_description?: string | null
+          work_package_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "timesheets_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "timesheets_crew_id_fkey"
+            foreignKeyName: "time_entries_crew_id_fkey"
             columns: ["crew_id"]
             isOneToOne: false
             referencedRelation: "crews"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "timesheets_submitted_by_fkey"
-            columns: ["submitted_by"]
+            foreignKeyName: "time_entries_member_id_fkey"
+            columns: ["member_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "crew_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          active: boolean | null
+          company_id: string | null
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          last_login: string | null
+          role: string
+          username: string
+        }
+        Insert: {
+          active?: boolean | null
+          company_id?: string | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          id: string
+          last_login?: string | null
+          role: string
+          username: string
+        }
+        Update: {
+          active?: boolean | null
+          company_id?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          last_login?: string | null
+          role?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      utility_contracts: {
+        Row: {
+          active: boolean | null
+          company_id: string | null
+          contract_number: string
+          created_at: string | null
+          end_date: string | null
+          id: string
+          region: string
+          start_date: string
+          storm_event: string
+          utility_name: string
+        }
+        Insert: {
+          active?: boolean | null
+          company_id?: string | null
+          contract_number: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          region: string
+          start_date: string
+          storm_event: string
+          utility_name: string
+        }
+        Update: {
+          active?: boolean | null
+          company_id?: string | null
+          contract_number?: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          region?: string
+          start_date?: string
+          storm_event?: string
+          utility_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "utility_contracts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -301,27 +405,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["user_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      exception_status: "pending" | "approved" | "denied"
-      timesheet_status: "submitted" | "approved" | "rejected"
-      user_role:
-        | "admin"
-        | "usp_admin"
-        | "ep_manager"
-        | "supervisor"
-        | "crew_member"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -448,16 +535,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      exception_status: ["pending", "approved", "denied"],
-      timesheet_status: ["submitted", "approved", "rejected"],
-      user_role: [
-        "admin",
-        "usp_admin",
-        "ep_manager",
-        "supervisor",
-        "crew_member",
-      ],
-    },
+    Enums: {},
   },
 } as const
