@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { MuiAppLayout } from "@/components/layout/MuiAppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import TimesheetPage from "./pages/TimesheetPage";
 import ExportPage from "./pages/ExportPage";
@@ -21,12 +21,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<AppLayout><DashboardPage /></AppLayout>} />
-          <Route path="/timesheets" element={<AppLayout><TimesheetPage /></AppLayout>} />
-          <Route path="/export" element={<AppLayout><ExportPage /></AppLayout>} />
-          <Route path="/exceptions" element={<AppLayout><ExceptionsPage /></AppLayout>} />
-          <Route path="/gps" element={<AppLayout><GpsPage /></AppLayout>} />
-          <Route path="/reports" element={<AppLayout><ReportsPage /></AppLayout>} />
+          <Route path="/" element={<MuiAppLayout><DashboardPage /></MuiAppLayout>} />
+          <Route path="/timesheets" element={<MuiAppLayout><TimesheetPage /></MuiAppLayout>} />
+          <Route path="/export" element={<MuiAppLayout><ExportPage /></MuiAppLayout>} />
+          <Route path="/exceptions" element={<MuiAppLayout><ExceptionsPage /></MuiAppLayout>} />
+          <Route path="/gps" element={<MuiAppLayout><GpsPage /></MuiAppLayout>} />
+          <Route path="/reports" element={<MuiAppLayout><ReportsPage /></MuiAppLayout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
