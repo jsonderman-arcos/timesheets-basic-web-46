@@ -50,29 +50,30 @@ export default function ReportsPage() {
     queryKey: ['company-reports', startDate, endDate],
     queryFn: async (): Promise<CompanyReport[]> => {
       const { data, error } = await supabase
-        .from('timesheets')
+        .from('time_entries')
         .select(`
-          total_hours,
-          crews!inner(utility, name)
+          hours_regular,
+          hours_overtime,
+          crews!inner(crew_name, companies!inner(name))
         `)
         .gte('date', startDate)
         .lte('date', endDate)
-        .not('total_hours', 'is', null);
+        .not('hours_regular', 'is', null);
 
       if (error) throw error;
 
       const companyMap = new Map<string, { totalHours: number; crewCount: Set<string> }>();
       
-      data.forEach((timesheet: any) => {
-        const utility = timesheet.crews.utility || 'Unknown Company';
-        const existing = companyMap.get(utility) || { totalHours: 0, crewCount: new Set() };
-        existing.totalHours += Number(timesheet.total_hours || 0);
-        existing.crewCount.add(timesheet.crews.name);
-        companyMap.set(utility, existing);
+      data.forEach((entry: any) => {
+        const company = entry.crews.companies?.name || 'Unknown Company';
+        const existing = companyMap.get(company) || { totalHours: 0, crewCount: new Set() };
+        existing.totalHours += Number(entry.hours_regular || 0) + Number(entry.hours_overtime || 0);
+        existing.crewCount.add(entry.crews.crew_name);
+        companyMap.set(company, existing);
       });
 
-      return Array.from(companyMap.entries()).map(([utility, data]) => ({
-        utility,
+      return Array.from(companyMap.entries()).map(([company, data]) => ({
+        utility: company,
         totalHours: data.totalHours,
         crewCount: data.crewCount.size
       }));
@@ -85,25 +86,26 @@ export default function ReportsPage() {
     queryKey: ['team-reports', startDate, endDate, drillDown.company],
     queryFn: async (): Promise<TeamReport[]> => {
       const { data, error } = await supabase
-        .from('timesheets')
+        .from('time_entries')
         .select(`
-          total_hours,
+          hours_regular,
+          hours_overtime,
           crew_id,
-          crews!inner(name, utility)
+          crews!inner(crew_name, companies!inner(name))
         `)
         .gte('date', startDate)
         .lte('date', endDate)
-        .eq('crews.utility', drillDown.company)
-        .not('total_hours', 'is', null);
+        .eq('crews.companies.name', drillDown.company)
+        .not('hours_regular', 'is', null);
 
       if (error) throw error;
 
       const teamMap = new Map<string, { totalHours: number; timesheetCount: number; crewName: string }>();
       
-      data.forEach((timesheet: any) => {
-        const crewId = timesheet.crew_id;
-        const existing = teamMap.get(crewId) || { totalHours: 0, timesheetCount: 0, crewName: timesheet.crews.name };
-        existing.totalHours += Number(timesheet.total_hours || 0);
+      data.forEach((entry: any) => {
+        const crewId = entry.crew_id;
+        const existing = teamMap.get(crewId) || { totalHours: 0, timesheetCount: 0, crewName: entry.crews.crew_name };
+        existing.totalHours += Number(entry.hours_regular || 0) + Number(entry.hours_overtime || 0);
         existing.timesheetCount += 1;
         teamMap.set(crewId, existing);
       });
@@ -123,28 +125,29 @@ export default function ReportsPage() {
     queryKey: ['daily-reports', startDate, endDate, drillDown.teamId],
     queryFn: async (): Promise<DailyReport[]> => {
       const { data, error } = await supabase
-        .from('timesheets')
+        .from('time_entries')
         .select(`
           id,
           date,
-          total_hours,
+          hours_regular,
+          hours_overtime,
           work_description,
           status
         `)
         .gte('date', startDate)
         .lte('date', endDate)
         .eq('crew_id', drillDown.teamId)
-        .not('total_hours', 'is', null)
+        .not('hours_regular', 'is', null)
         .order('date', { ascending: false });
 
       if (error) throw error;
 
-      return data.map((timesheet: any) => ({
-        date: timesheet.date,
-        timesheetId: timesheet.id,
-        hours: Number(timesheet.total_hours || 0),
-        workDescription: timesheet.work_description || 'No description',
-        status: timesheet.status
+      return data.map((entry: any) => ({
+        date: entry.date,
+        timesheetId: entry.id,
+        hours: Number(entry.hours_regular || 0) + Number(entry.hours_overtime || 0),
+        workDescription: entry.work_description || 'No description',
+        status: entry.status
       }));
     },
     enabled: drillDown.level === 'daily' && !!drillDown.teamId

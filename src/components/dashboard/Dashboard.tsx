@@ -54,16 +54,16 @@ export function Dashboard() {
         .from('crews')
         .select('id');
 
-      // Timesheets submitted today
-      const { data: todayTimesheets } = await supabase
-        .from('timesheets')
+      // Time entries submitted today
+      const { data: todayEntries } = await supabase
+        .from('time_entries')
         .select('id')
         .eq('date', today);
 
       // Total hours this week
-      const { data: weeklyTimesheets } = await supabase
-        .from('timesheets')
-        .select('total_hours')
+      const { data: weeklyEntries } = await supabase
+        .from('time_entries')
+        .select('hours_regular, hours_overtime')
         .gte('date', lastWeekDate);
 
       // Pending exceptions
@@ -72,19 +72,19 @@ export function Dashboard() {
         .select('id')
         .eq('status', 'pending');
 
-      const totalHours = (weeklyTimesheets || []).reduce((sum, t) => sum + (t.total_hours || 0), 0);
+      const totalHours = (weeklyEntries || []).reduce((sum, t) => sum + (t.hours_regular || 0) + (t.hours_overtime || 0), 0);
 
       setStats({
         totalHours,
         totalCrews: crewsData?.length || 0,
-        submittedToday: todayTimesheets?.length || 0,
+        submittedToday: todayEntries?.length || 0,
         pendingExceptions: exceptions?.length || 0,
       });
 
       // Hours by day of week
       const { data: dailyHours } = await supabase
-        .from('timesheets')
-        .select('date, total_hours')
+        .from('time_entries')
+        .select('date, hours_regular, hours_overtime')
         .gte('date', lastWeekDate);
 
       const dayMap: { [key: string]: number } = {};
@@ -92,10 +92,10 @@ export function Dashboard() {
       
       days.forEach(day => dayMap[day] = 0);
 
-      (dailyHours || []).forEach(timesheet => {
-        const date = new Date(timesheet.date);
+      (dailyHours || []).forEach(entry => {
+        const date = new Date(entry.date);
         const dayName = days[date.getDay()];
-        dayMap[dayName] += timesheet.total_hours || 0;
+        dayMap[dayName] += (entry.hours_regular || 0) + (entry.hours_overtime || 0);
       });
 
       const dayData = days.map(day => ({
@@ -105,16 +105,16 @@ export function Dashboard() {
 
       setHoursByDay(dayData);
 
-      // Hours by utility
-      const { data: utilityHours } = await supabase
-        .from('timesheets')
-        .select('total_hours, crews(utility)')
+      // Hours by company (since we don't have utility in the current schema)
+      const { data: companyHours } = await supabase
+        .from('time_entries')
+        .select('hours_regular, hours_overtime, crews!inner(crew_name, companies!inner(name))')
         .gte('date', lastWeekDate);
 
       const utilityMap: { [key: string]: number } = {};
-      (utilityHours || []).forEach(timesheet => {
-        const utility = timesheet.crews?.utility || 'Unknown';
-        utilityMap[utility] = (utilityMap[utility] || 0) + (timesheet.total_hours || 0);
+      (companyHours || []).forEach(entry => {
+        const company = entry.crews?.companies?.name || 'Unknown';
+        utilityMap[company] = (utilityMap[company] || 0) + (entry.hours_regular || 0) + (entry.hours_overtime || 0);
       });
 
       const utilityData = Object.entries(utilityMap).map(([utility, hours], index) => ({

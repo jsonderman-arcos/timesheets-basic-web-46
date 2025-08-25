@@ -5,8 +5,8 @@ import { Clock, MapPin, User, Calendar } from 'lucide-react';
 
 interface Crew {
   id: string;
-  name: string;
-  utility: string;
+  crew_name: string;
+  company_id: string;
 }
 
 interface Timesheet {
@@ -15,7 +15,8 @@ interface Timesheet {
   date: string;
   start_time: string;
   end_time: string;
-  total_hours: number;
+  hours_regular: number;
+  hours_overtime: number;
   work_description: string;
   status: string;
 }
@@ -78,7 +79,7 @@ export function TimesheetDetailModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            {crew.name} - {formatDate(modalDate)}
+            {crew.crew_name} - {formatDate(modalDate)}
           </DialogTitle>
         </DialogHeader>
 
@@ -91,11 +92,11 @@ export function TimesheetDetailModal({
             <CardContent className="space-y-2">
               <div className="flex justify-between">
                 <span className="font-medium">Crew Name:</span>
-                <span>{crew.name}</span>
+                <span>{crew.crew_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">Utility:</span>
-                <span>{crew.utility}</span>
+                <span className="font-medium">Company ID:</span>
+                <span>{crew.company_id}</span>
               </div>
             </CardContent>
           </Card>
@@ -123,7 +124,7 @@ export function TimesheetDetailModal({
                   </div>
                   <div>
                     <span className="font-medium text-sm text-muted-foreground">Total Hours</span>
-                    <p className="text-2xl font-bold text-primary">{timesheet.total_hours} hours</p>
+                    <p className="text-2xl font-bold text-primary">{(timesheet.hours_regular + timesheet.hours_overtime).toFixed(1)} hours</p>
                   </div>
                   <div className="pt-2">
                     <Badge className={getStatusColor(timesheet.status)}>
@@ -158,7 +159,7 @@ export function TimesheetDetailModal({
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">No Timesheet Submitted</h3>
                     <p className="text-muted-foreground">
-                      {crew.name} has not submitted a timesheet for {formatDate(modalDate)}.
+                      {crew.crew_name} has not submitted a timesheet for {formatDate(modalDate)}.
                     </p>
                   </div>
                 </div>

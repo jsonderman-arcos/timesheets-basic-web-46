@@ -10,20 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Exception {
   id: string;
-  exception_type: string;
   description: string;
-  status: 'pending' | 'approved' | 'denied';
+  status: string;
   created_at: string;
-  timesheets: {
-    date: string;
-    crews: {
-      name: string;
-      utility: string;
-    };
-  };
-  profiles: {
-    full_name: string;
-  };
 }
 
 export function ExceptionManagement() {
@@ -42,15 +31,9 @@ export function ExceptionManagement() {
         .from('exceptions')
         .select(`
           id,
-          exception_type,
           description,
           status,
-          created_at,
-          timesheets!inner (
-            date,
-            crews!inner (name, utility)
-          ),
-          profiles!submitted_by!inner (full_name)
+          created_at
         `)
         .order('created_at', { ascending: false });
 
@@ -167,20 +150,20 @@ export function ExceptionManagement() {
                   {exceptions.map((exception) => (
                     <TableRow key={exception.id}>
                       <TableCell className="font-medium">
-                        {exception.exception_type}
+                        General Exception
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-semibold">{exception.timesheets?.crews?.name}</div>
+                          <div className="font-semibold">N/A</div>
                           <div className="text-sm text-muted-foreground">
-                            {exception.timesheets?.crews?.utility}
+                            N/A
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {new Date(exception.timesheets?.date || '').toLocaleDateString()}
+                        N/A
                       </TableCell>
-                      <TableCell>{exception.profiles?.full_name}</TableCell>
+                      <TableCell>N/A</TableCell>
                       <TableCell>{getStatusBadge(exception.status)}</TableCell>
                       <TableCell>{formatDate(exception.created_at)}</TableCell>
                       <TableCell>
@@ -213,7 +196,7 @@ export function ExceptionManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Exception Type</h4>
-                  <p>{selectedException.exception_type}</p>
+                  <p>General Exception</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Status</h4>
@@ -231,14 +214,14 @@ export function ExceptionManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Crew Information</h4>
-                  <p>{selectedException.timesheets?.crews?.name}</p>
+                  <p>N/A</p>
                   <p className="text-sm text-muted-foreground">
-                    {selectedException.timesheets?.crews?.utility}
+                    N/A
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Timesheet Date</h4>
-                  <p>{new Date(selectedException.timesheets?.date || '').toLocaleDateString()}</p>
+                  <h4 className="font-semibold mb-2">Date Created</h4>
+                  <p>{formatDate(selectedException.created_at)}</p>
                 </div>
               </div>
 

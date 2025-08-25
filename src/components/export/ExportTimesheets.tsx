@@ -21,11 +21,10 @@ export function ExportTimesheets() {
     setLoading(true);
     try {
       const { data: timesheets, error } = await supabase
-        .from('timesheets')
+        .from('time_entries')
         .select(`
           *,
-          crews (name, utility),
-          profiles!timesheets_submitted_by_fkey (full_name)
+          crews!inner (crew_name, companies!inner(name))
         `)
         .gte('date', dateRange.start)
         .lte('date', dateRange.end)
@@ -55,16 +54,16 @@ export function ExportTimesheets() {
         'Submitted By'
       ];
 
-      const csvData = timesheets.map(timesheet => [
-        timesheet.date,
-        timesheet.crews?.name || '',
-        timesheet.crews?.utility || '',
-        timesheet.start_time || '',
-        timesheet.end_time || '',
-        timesheet.total_hours || 0,
-        timesheet.work_description || '',
-        timesheet.status,
-        timesheet.profiles?.full_name || ''
+      const csvData = timesheets.map(entry => [
+        entry.date,
+        entry.crews?.crew_name || '',
+        entry.crews?.companies?.name || '',
+        entry.start_time || '',
+        entry.end_time || '',
+        (entry.hours_regular || 0) + (entry.hours_overtime || 0),
+        entry.work_description || '',
+        entry.status,
+        'N/A'
       ]);
 
       const csvContent = [

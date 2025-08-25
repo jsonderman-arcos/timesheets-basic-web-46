@@ -8,8 +8,8 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Crew {
   id: string;
-  name: string;
-  utility: string;
+  crew_name: string;
+  company_id: string;
 }
 
 interface Timesheet {
@@ -18,7 +18,8 @@ interface Timesheet {
   date: string;
   start_time: string;
   end_time: string;
-  total_hours: number;
+  hours_regular: number;
+  hours_overtime: number;
   work_description: string;
   status: string;
 }
@@ -53,8 +54,8 @@ export function TimesheetGrid() {
       // Fetch crews
       const { data: crewData, error: crewError } = await supabase
         .from('crews')
-        .select('*')
-        .order('name');
+        .select('id, crew_name, company_id')
+        .order('crew_name');
 
       if (crewError) throw crewError;
       setCrews(crewData || []);
@@ -64,7 +65,7 @@ export function TimesheetGrid() {
       const endDate = dates[dates.length - 1];
 
       const { data: timesheetData, error: timesheetError } = await supabase
-        .from('timesheets')
+        .from('time_entries')
         .select('*')
         .gte('date', startDate)
         .lte('date', endDate);
@@ -137,8 +138,8 @@ export function TimesheetGrid() {
                   <TableRow key={crew.id}>
                     <TableCell className="font-medium">
                       <div>
-                        <div className="font-semibold">{crew.name}</div>
-                        <div className="text-sm text-muted-foreground">{crew.utility}</div>
+                        <div className="font-semibold">{crew.crew_name}</div>
+                        <div className="text-sm text-muted-foreground">Company</div>
                       </div>
                     </TableCell>
                     {dates.map((date) => {
