@@ -408,9 +408,7 @@ export function TimesheetGrid() {
                         ? 'hsl(var(--table-row-odd))' 
                         : 'hsl(var(--table-row-even))',
                       '&:hover': {
-                        backgroundColor: index % 2 === 0 
-                          ? 'hsl(var(--muted))' 
-                          : 'hsl(var(--muted))',
+                        backgroundColor: 'hsl(var(--table-cell-hover))',
                       }
                     }}
                   >
@@ -428,7 +426,12 @@ export function TimesheetGrid() {
                         <TableCell
                           key={date}
                           align="center"
-                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          className="cursor-pointer transition-colors"
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'hsl(var(--table-cell-hover)) !important',
+                            }
+                          }}
                           onClick={() => handleCellClick(crew, date)}
                         >
                           {hasTimesheet ? (
