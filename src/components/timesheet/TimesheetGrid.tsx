@@ -88,6 +88,13 @@ export function TimesheetGrid() {
   
   const companyFilter = searchParams.get('company');
 
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (selectedCompany) count++;
+    if (selectedCrewFilter) count++;
+    return count;
+  };
+
   // Generate dates for the current week (Monday to Sunday)
   const dates = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(currentWeek, i);
@@ -221,13 +228,6 @@ export function TimesheetGrid() {
 
   const refreshData = () => {
     fetchTimesheets();
-  };
-
-  const getActiveFiltersCount = () => {
-    let count = 0;
-    if (selectedCompany) count++;
-    if (selectedCrewFilter) count++;
-    return count;
   };
 
   const handleCellClick = (crew: Crew, date: string) => {
