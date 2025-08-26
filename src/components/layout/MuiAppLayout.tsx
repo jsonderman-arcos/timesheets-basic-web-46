@@ -45,9 +45,17 @@ const theme = createTheme({
 
 interface MuiAppLayoutProps {
   children: React.ReactNode;
+  [key: string]: any; // Allow Lovable's data attributes
 }
 
-export function MuiAppLayout({ children }: MuiAppLayoutProps) {
+export function MuiAppLayout({ children, ...props }: MuiAppLayoutProps) {
+  // Filter out Lovable's data attributes
+  const filteredProps = Object.keys(props).reduce((acc, key) => {
+    if (!key.startsWith('data-lov-') && !key.startsWith('data-component-')) {
+      acc[key] = props[key];
+    }
+    return acc;
+  }, {} as any);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleToggleSidebar = () => {
