@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Card,
@@ -51,6 +52,7 @@ interface TimesheetGridData {
 }
 
 export function TimesheetGrid() {
+  const [searchParams] = useSearchParams();
   const [crews, setCrews] = useState<Crew[]>([]);
   const [timesheets, setTimesheets] = useState<TimesheetGridData>({});
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null);
@@ -58,6 +60,8 @@ export function TimesheetGrid() {
   const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const { toast } = useToast();
+  
+  const companyFilter = searchParams.get('company');
 
   // Generate dates for the current week (Monday to Sunday)
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -68,15 +72,21 @@ export function TimesheetGrid() {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentWeek]);
+  }, [currentWeek, companyFilter]);
 
   const fetchData = async () => {
     try {
-      const { data: crewData, error: crewError } = await supabase
+      let crewQuery = supabase
         .from('crews')
-        .select('id, crew_name, company_id')
+        .select('id, crew_name, company_id, companies!inner(name)')
         .order('crew_name');
+      
+      // Filter by company if specified
+      if (companyFilter) {
+        crewQuery = crewQuery.eq('companies.name', companyFilter);
+      }
 
+      const { data: crewData, error: crewError } = await crewQuery;
       if (crewError) throw crewError;
       setCrews(crewData || []);
 
@@ -154,7 +164,16 @@ export function TimesheetGrid() {
     <>
       <Card>
         <CardHeader 
-          title={<Typography variant="h6">Timesheet Overview</Typography>}
+          title={
+            <Box>
+              <Typography variant="h6">Timesheet Overview</Typography>
+              {companyFilter && (
+                <Typography variant="body2" color="text.secondary">
+                  Filtered by: {companyFilter}
+                </Typography>
+              )}
+            </Box>
+          }
           action={
             <Box className="flex items-center gap-2">
               <IconButton onClick={goToPreviousWeek} size="small">
@@ -199,7 +218,9 @@ export function TimesheetGrid() {
                     <TableCell>
                       <div>
                         <Typography variant="body2" fontWeight={600}>{crew.crew_name}</Typography>
-                        <Typography variant="caption" color="text.secondary">Company</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {(crew as any).companies?.name || 'Company'}
+                        </Typography>
                       </div>
                     </TableCell>
                     {dates.map((date) => {

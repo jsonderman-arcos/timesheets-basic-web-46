@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Card,
@@ -51,6 +52,7 @@ const UTILITY_COLORS = ['#2563eb', '#dc2626', '#16a34a', '#ca8a04', '#9333ea'];
 
 export function Dashboard() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalHours: 0,
     totalCrews: 0,
@@ -164,6 +166,18 @@ export function Dashboard() {
     }
   };
 
+  const handleBarClick = (data: any) => {
+    if (data && data.activeLabel) {
+      navigate('/timesheets');
+    }
+  };
+
+  const handlePieClick = (data: any) => {
+    if (data && data.utility) {
+      navigate(`/timesheets?company=${encodeURIComponent(data.utility)}`);
+    }
+  };
+
   if (loading) {
     return (
       <Box>
@@ -253,12 +267,12 @@ export function Dashboard() {
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hoursByDay}>
+                  <BarChart data={hoursByDay} onClick={handleBarClick}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" />
                     <YAxis />
                     <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                    <Bar dataKey="hours" fill={theme.palette.primary.main} />
+                    <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
@@ -282,6 +296,8 @@ export function Dashboard() {
                       label={(d: any) => `${d.utility} ${(d.percent * 100).toFixed(0)}%`}
                       outerRadius={80}
                       dataKey="hours"
+                      onClick={handlePieClick}
+                      style={{ cursor: 'pointer' }}
                     >
                       {hoursByUtility.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
