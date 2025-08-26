@@ -50,7 +50,7 @@ All colors MUST be HSL.
     --table-row-even: 210 40% 98%;
     --table-row-odd: 0 0% 100%;
     --table-header: 220 14.3% 95.9%;
-    --table-cell-hover: 215 25% 97%;
+    --table-cell-hover: 215 25% 90%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -106,7 +106,7 @@ All colors MUST be HSL.
     --table-row-even: 240 3.7% 15.9%;
     --table-row-odd: 222.2 84% 4.9%;
     --table-header: 215 27.9% 16.9%;
-    --table-cell-hover: 215 20% 25%;
+    --table-cell-hover: 215 30% 30%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
