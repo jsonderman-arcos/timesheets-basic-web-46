@@ -388,7 +388,7 @@ export function TimesheetGrid() {
           </Box>
           <TableContainer component={Paper} className="overflow-x-auto">
             <Table size="small">
-              <TableHead>
+              <TableHead sx={{ backgroundColor: 'hsl(var(--table-header))' }}>
                 <TableRow>
                   <TableCell className="w-48"><Typography variant="subtitle2">Crew</Typography></TableCell>
                   {dates.map((date) => (

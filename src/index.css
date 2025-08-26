@@ -49,6 +49,7 @@ All colors MUST be HSL.
     /* Table row colors */
     --table-row-even: 210 40% 98%;
     --table-row-odd: 0 0% 100%;
+    --table-header: 220 14.3% 95.9%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -103,6 +104,7 @@ All colors MUST be HSL.
     /* Table row colors for dark mode */
     --table-row-even: 240 3.7% 15.9%;
     --table-row-odd: 222.2 84% 4.9%;
+    --table-header: 215 27.9% 16.9%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
