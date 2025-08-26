@@ -14,11 +14,17 @@ import {
   Paper,
   Box,
   CircularProgress,
+  IconButton,
+  Button,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import TodayIcon from '@mui/icons-material/Today';
 import { TimesheetDetailModal } from './TimesheetDetailModal';
 import { useToast } from '@/hooks/use-toast';
+import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 
 interface Crew {
   id: string;
@@ -50,19 +56,19 @@ export function TimesheetGrid() {
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null);
   const [selectedCrew, setSelectedCrew] = useState<Crew | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentWeek, setCurrentWeek] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const { toast } = useToast();
 
-  // Generate last 7 days
+  // Generate dates for the current week (Monday to Sunday)
   const dates = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    return date.toISOString().split('T')[0];
-  }).reverse();
+    const date = addDays(currentWeek, i);
+    return format(date, 'yyyy-MM-dd');
+  });
 
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentWeek]);
 
   const fetchData = async () => {
     try {
@@ -114,6 +120,23 @@ export function TimesheetGrid() {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
+  const goToPreviousWeek = () => {
+    setCurrentWeek(prev => subWeeks(prev, 1));
+  };
+
+  const goToNextWeek = () => {
+    setCurrentWeek(prev => addWeeks(prev, 1));
+  };
+
+  const goToCurrentWeek = () => {
+    setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  };
+
+  const getWeekRange = () => {
+    const endOfWeek = addDays(currentWeek, 6);
+    return `${format(currentWeek, 'MMM d')} - ${format(endOfWeek, 'MMM d, yyyy')}`;
+  };
+
   if (loading) {
     return (
       <Card>
@@ -130,8 +153,34 @@ export function TimesheetGrid() {
   return (
     <>
       <Card>
-        <CardHeader title={<Typography variant="h6">Timesheet Overview</Typography>} />
+        <CardHeader 
+          title={<Typography variant="h6">Timesheet Overview</Typography>}
+          action={
+            <Box className="flex items-center gap-2">
+              <IconButton onClick={goToPreviousWeek} size="small">
+                <ChevronLeftIcon />
+              </IconButton>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={goToCurrentWeek}
+                startIcon={<TodayIcon />}
+                className="min-w-[140px]"
+              >
+                This Week
+              </Button>
+              <IconButton onClick={goToNextWeek} size="small">
+                <ChevronRightIcon />
+              </IconButton>
+            </Box>
+          }
+        />
         <CardContent>
+          <Box className="mb-4">
+            <Typography variant="subtitle1" className="text-center font-medium">
+              {getWeekRange()}
+            </Typography>
+          </Box>
           <TableContainer component={Paper} className="overflow-x-auto">
             <Table size="small">
               <TableHead>
