@@ -1,9 +1,7 @@
 // Auto-generated Tailwind config from flattened token files
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{
-    js,ts,jsx,tsx,mdx
-  }"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     screens: {
   "sm": "640px",
