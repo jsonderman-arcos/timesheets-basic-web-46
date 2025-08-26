@@ -46,6 +46,10 @@ All colors MUST be HSL.
     --error: 0 84% 60%;
     --error-foreground: 0 0% 100%;
 
+    /* Table row colors */
+    --table-row-even: 210 40% 98%;
+    --table-row-odd: 0 0% 100%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -95,6 +99,10 @@ All colors MUST be HSL.
     --warning-foreground: 0 0% 100%;
     --error: 0 84% 60%;
     --error-foreground: 0 0% 100%;
+
+    /* Table row colors for dark mode */
+    --table-row-even: 240 3.7% 15.9%;
+    --table-row-odd: 222.2 84% 4.9%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;

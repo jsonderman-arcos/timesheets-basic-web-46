@@ -399,8 +399,21 @@ export function TimesheetGrid() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {crews.map((crew) => (
-                  <TableRow key={crew.id} hover>
+                {crews.map((crew, index) => (
+                  <TableRow 
+                    key={crew.id} 
+                    hover
+                    sx={{
+                      backgroundColor: index % 2 === 0 
+                        ? 'hsl(var(--table-row-odd))' 
+                        : 'hsl(var(--table-row-even))',
+                      '&:hover': {
+                        backgroundColor: index % 2 === 0 
+                          ? 'hsl(var(--muted))' 
+                          : 'hsl(var(--muted))',
+                      }
+                    }}
+                  >
                     <TableCell>
                       <div>
                         <Typography variant="body2" fontWeight={600}>{crew.crew_name}</Typography>
