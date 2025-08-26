@@ -49,6 +49,8 @@ interface MuiAppLayoutProps {
 }
 
 export function MuiAppLayout({ children, ...props }: MuiAppLayoutProps) {
+  console.log('MuiAppLayout props:', props);
+  
   // Filter out Lovable's data attributes
   const filteredProps = Object.keys(props).reduce((acc, key) => {
     if (!key.startsWith('data-lov-') && !key.startsWith('data-component-')) {

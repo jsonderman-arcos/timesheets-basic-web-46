@@ -102,6 +102,8 @@ interface MuiAppSidebarProps {
 }
 
 export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProps) {
+  console.log('MuiAppSidebar rendered with collapsed:', collapsed);
+  
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
