@@ -186,7 +186,7 @@ export function Dashboard() {
   return (
     <Box>
       {/* Stats Cards */}
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
