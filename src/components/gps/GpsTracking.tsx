@@ -1,11 +1,22 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Navigation, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  CircularProgress
+} from '@mui/material';
+import NavigationIcon from '@mui/icons-material/Navigation';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -126,10 +137,10 @@ export function GpsTracking() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Navigation className="w-5 h-5" />
-            GPS Breadcrumb Tracking
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <NavigationIcon fontSize="small" />
+            <Typography variant="h6">GPS Breadcrumb Tracking</Typography>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -138,64 +149,43 @@ export function GpsTracking() {
               {/* Crew Selector */}
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-2">Select Crew</label>
-                <Select value={selectedCrew} onValueChange={setSelectedCrew}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a crew to view GPS trail" />
-                  </SelectTrigger>
-                  <SelectContent>
+                <FormControl size="small" className="w-full">
+                  <InputLabel id="crew-label">Crew</InputLabel>
+                  <Select
+                    labelId="crew-label"
+                    id="crew-select"
+                    value={selectedCrew}
+                    label="Crew"
+                    onChange={(e) => setSelectedCrew(e.target.value as string)}
+                  >
                     {crews.map((crew) => (
-                      <SelectItem key={crew.id} value={crew.id}>
+                      <MenuItem key={crew.id} value={crew.id}>
                         {crew.crew_name}
-                      </SelectItem>
+                      </MenuItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </Select>
+                </FormControl>
               </div>
 
               {/* Date Selector */}
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-2">Select Date</label>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToPreviousDay}
-                    className="px-3"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
+                  <Button variant="outlined" size="small" onClick={goToPreviousDay} className="px-3">
+                    <ChevronLeftIcon fontSize="small" />
                   </Button>
-                  
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "min-w-[200px] justify-start text-left font-normal flex-1",
-                          !selectedDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={(date) => date && setSelectedDate(date)}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToNextDay}
-                    className="px-3"
-                  >
-                    <ChevronRight className="h-4 w-4" />
+                  <TextField
+                    type="date"
+                    size="small"
+                    value={format(selectedDate, 'yyyy-MM-dd')}
+                    onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                    InputLabelProps={{ shrink: true }}
+                    className="min-w-[200px]"
+                  />
+
+                  <Button variant="outlined" size="small" onClick={goToNextDay} className="px-3">
+                    <ChevronRightIcon fontSize="small" />
                   </Button>
                 </div>
               </div>
@@ -204,9 +194,9 @@ export function GpsTracking() {
             {selectedCrew && selectedDate && (
               <div className="space-y-4">
                 {loading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    <p className="mt-2 text-muted-foreground">Loading GPS data...</p>
+                  <div className="text-center py-8 flex flex-col items-center gap-2">
+                    <CircularProgress size={24} />
+                    <p className="text-muted-foreground">Loading GPS data...</p>
                   </div>
                 ) : gpsPoints.length > 0 ? (
                   <MapView gpsPoints={gpsPoints} />

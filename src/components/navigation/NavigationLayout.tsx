@@ -5,44 +5,11 @@ import {
   Toolbar, 
   Typography, 
   IconButton,
-  CssBaseline,
-  ThemeProvider,
-  createTheme
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { MuiAppSidebar } from '@/components/layout/MuiAppSidebar';
 import { NavigationProvider, useNavigation } from './NavigationProvider';
-
-const theme = createTheme({
-  palette: {
-    background: {
-      default: 'hsl(var(--background))',
-      paper: 'hsl(var(--card))',
-    },
-    text: {
-      primary: 'hsl(var(--foreground))',
-      secondary: 'hsl(var(--muted-foreground))',
-    },
-    primary: {
-      main: 'hsl(var(--primary))',
-      contrastText: 'hsl(var(--primary-foreground))',
-    },
-    secondary: {
-      main: 'hsl(var(--secondary))',
-      contrastText: 'hsl(var(--secondary-foreground))',
-    },
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          backgroundColor: 'hsl(var(--background))',
-          color: 'hsl(var(--foreground))',
-        },
-      },
-    },
-  },
-});
+import { useTheme } from '@mui/material/styles';
 
 interface NavigationLayoutContentProps {
   children: ReactNode;
@@ -56,11 +23,11 @@ function NavigationLayoutContent({
   showMobileToggle = true 
 }: NavigationLayoutContentProps) {
   const { collapsed, toggleCollapsed } = useNavigation();
+  const theme = useTheme();
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <>
+      <Box sx={{ display: 'flex', minHeight: '100vh' }} className="min-h-screen">
         <MuiAppSidebar 
           collapsed={collapsed}
           onToggleCollapse={toggleCollapsed}
@@ -71,12 +38,12 @@ function NavigationLayoutContent({
             position="sticky"
             elevation={0}
             sx={{ 
-              backgroundColor: 'hsl(var(--background))',
-              borderBottom: '1px solid hsl(var(--border))',
-              color: 'hsl(var(--foreground))',
+              backgroundColor: theme.palette.background.default,
+              borderBottom: `1px solid ${theme.palette.divider}` as const,
+              color: theme.palette.text.primary,
             }}
           >
-            <Toolbar sx={{ minHeight: '64px !important' }}>
+            <Toolbar sx={{ minHeight: '64px !important' }} className="min-h-16">
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 {showMobileToggle && (
                   <IconButton
@@ -84,7 +51,7 @@ function NavigationLayoutContent({
                     onClick={toggleCollapsed}
                     sx={{ 
                       display: { sm: 'none' },
-                      color: 'hsl(var(--foreground))'
+                      color: theme.palette.text.primary
                     }}
                   >
                     <MenuIcon />
@@ -95,7 +62,7 @@ function NavigationLayoutContent({
                   component="h1"
                   sx={{ 
                     fontWeight: 600,
-                    color: 'hsl(var(--foreground))'
+                    color: theme.palette.text.primary
                   }}
                 >
                   {title}
@@ -108,16 +75,16 @@ function NavigationLayoutContent({
             component="main" 
             sx={{ 
               flexGrow: 1, 
-              p: 3,
-              backgroundColor: 'hsl(var(--muted) / 0.1)',
+              backgroundColor: theme.palette.background.paper,
               minHeight: 'calc(100vh - 64px)'
             }}
+            className="p-3 md:p-6"
           >
             {children}
           </Box>
         </Box>
       </Box>
-    </ThemeProvider>
+    </>
   );
 }
 
@@ -127,7 +94,7 @@ interface NavigationLayoutProps extends NavigationLayoutContentProps {
 
 export function NavigationLayout({ 
   children, 
-  defaultCollapsed = false,
+  defaultCollapsed = true,
   ...props 
 }: NavigationLayoutProps) {
   return (

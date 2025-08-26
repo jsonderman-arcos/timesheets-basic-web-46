@@ -1,73 +1,104 @@
+const core = require("./src/styles/core.flat.json");
+const CORE_MODE = "Default";
 // Auto-generated Tailwind config from flattened token files
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     screens: {
-  "sm": "640px",
-  "md": "768px",
-  "lg": "1024px",
-  "xl": "1280px"
-},
+      sm: `${core["core-breakpoints-breakpoint-sm"].valuesByMode[CORE_MODE]}px`,
+      md: `${core["core-breakpoints-breakpoint-md"].valuesByMode[CORE_MODE]}px`,
+      lg: `${core["core-breakpoints-breakpoint-lg"].valuesByMode[CORE_MODE]}px`,
+      xl: `${core["core-breakpoints-breakpoint-xl"].valuesByMode[CORE_MODE]}px`,
+    },
     extend: {
       colors: {
         // Standard shadcn color mappings
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "var(--theme-base-border-default)",
+        input: "var(--theme-base-components-input-outlined-enabled-border)",
+        ring: "var(--theme-base-border-focus-ring)",
+        background: "var(--theme-base-background-default)",
+        foreground: "var(--theme-base-text-default)",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "var(--theme-base-primary-main)",
+          foreground: "var(--theme-base-primary-contrast-text)",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "var(--theme-base-secondary-main)",
+          foreground: "var(--theme-base-secondary-contrast-text)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "var(--theme-base-feedback-error-main)",
+          foreground: "var(--theme-base-feedback-error-contrast-text)",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "var(--theme-base-surface-light-hover)",
+          foreground: "var(--theme-base-text-secondary)",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "var(--theme-base-surface-light-selected)",
+          foreground: "var(--theme-base-text-primary)",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "var(--theme-base-background-paper-elevation-1)",
+          foreground: "var(--theme-base-text-primary)",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "var(--theme-base-background-surface)",
+          foreground: "var(--theme-base-text-primary)",
+        },
+        // Lighthouse Core brand palette (from core.flat.json)
+        brand: {
+          50: "var(--core-lighthouse-colors-brand-default-50)",
+          100: "var(--core-lighthouse-colors-brand-default-100)",
+          200: "var(--core-lighthouse-colors-brand-default-200)",
+          300: "var(--core-lighthouse-colors-brand-default-300)",
+          400: "var(--core-lighthouse-colors-brand-default-400)",
+          500: "var(--core-lighthouse-colors-brand-default-500)",
+          600: "var(--core-lighthouse-colors-brand-default-600)",
+          700: "var(--core-lighthouse-colors-brand-default-700)",
+          800: "var(--core-lighthouse-colors-brand-default-800)",
+          900: "var(--core-lighthouse-colors-brand-default-900)",
         },
         // Timesheet status colors
         success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
+          DEFAULT: "var(--theme-base-feedback-success-main)",
+          foreground: "var(--theme-base-feedback-success-contrast-text)",
         },
         warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
+          DEFAULT: "var(--theme-base-feedback-warning-main)",
+          foreground: "var(--theme-base-feedback-warning-contrast-text)",
         },
         error: {
-          DEFAULT: "hsl(var(--error))",
-          foreground: "hsl(var(--error-foreground))",
+          DEFAULT: "var(--theme-base-feedback-error-main)",
+          foreground: "var(--theme-base-feedback-error-contrast-text)",
         },
         // Sidebar colors
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          DEFAULT: "rgba(var(--sidebar-background))",
+          foreground: "rgba(var(--sidebar-foreground))",
+          primary: "rgba(var(--sidebar-primary))",
+          "primary-foreground": "rgba(var(--sidebar-primary-foreground))",
+          accent: "rgba(var(--sidebar-accent))",
+          "accent-foreground": "rgba(var(--sidebar-accent-foreground))",
+          border: "rgba(var(--sidebar-border))",
+          ring: "rgba(var(--sidebar-ring))",
+        },
+        overlay: {
+          6: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-06)",
+          8: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-08)",
+          12: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-12)",
+          16: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-16)",
+          30: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-30)",
+          38: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-38)",
+          50: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-50)",
+          56: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-56)",
+          87: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-87)",
+        },
+        shadow: {
+          1: "var(--core-lighthouse-effects-shadow-level-1)",
+          2: "var(--core-lighthouse-effects-shadow-level-2)",
+          3: "var(--core-lighthouse-effects-shadow-level-3)",
         },
         // MUI Theme colors (keep existing)
   "border-size-default": "var(--theme-base-border-size-default)",
@@ -329,7 +360,10 @@ module.exports = {
   "label-active": "var(--theme-base-label-active)",
   "text-link": "var(--theme-base-text-link)",
   "background-surface": "var(--theme-base-background-surface)",
-  "background-surface-alt": "var(--theme-base-background-surface-alt)"
+  "background-surface-alt": "var(--theme-base-background-surface-alt)",
+  "navigation-topbar-background-fill": "var(--theme-component-navigation-topbar-background-fill)",
+  "navigation-topbar-text-fill": "var(--theme-component-navigation-topbar-text-fill-default)",
+  "text-primary-contrast":"var(--theme-base-primary-contrast-text)",
 },
       spacing: {
   "spacing-none": "var(--core-spacing-spacing-none)",

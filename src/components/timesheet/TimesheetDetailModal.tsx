@@ -1,7 +1,21 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin, User, Calendar } from 'lucide-react';
+import * as React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@mui/material';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Chip,
+  Box,
+  Divider,
+} from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import PersonIcon from '@mui/icons-material/Person';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 interface Crew {
   id: string;
@@ -29,6 +43,19 @@ interface TimesheetDetailModalProps {
   onUpdate: () => void;
 }
 
+const statusToChipColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  switch (status) {
+    case 'submitted':
+      return 'warning';
+    case 'approved':
+      return 'success';
+    case 'rejected':
+      return 'error';
+    default:
+      return 'default';
+  }
+};
+
 export function TimesheetDetailModal({
   timesheet,
   crew,
@@ -39,128 +66,127 @@ export function TimesheetDetailModal({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
   const formatTime = (timeString: string) => {
     if (!timeString) return 'Not recorded';
     const time = new Date(`2000-01-01T${timeString}`);
-    return time.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    return time.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true 
+      hour12: true,
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return 'bg-warning text-warning-foreground';
-      case 'approved':
-        return 'bg-success text-success-foreground';
-      case 'rejected':
-        return 'bg-error text-error-foreground';
-      default:
-        return 'bg-muted text-muted-foreground';
-    }
-  };
-
-  // Get the date for the modal (either from timesheet or we'll need to pass it)
   const modalDate = timesheet?.date || new Date().toISOString().split('T')[0];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            {crew.crew_name} - {formatDate(modalDate)}
-          </DialogTitle>
-        </DialogHeader>
-
+    <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md" fullWidth>
+      <DialogTitle>
+        <Box className="flex items-center gap-2">
+          <PersonIcon fontSize="small" />
+          <Typography component="span" variant="h6" fontWeight={600}>
+            {crew.crew_name} – {formatDate(modalDate)}
+          </Typography>
+        </Box>
+      </DialogTitle>
+      <DialogContent dividers>
         <div className="space-y-6">
           {/* Crew Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Crew Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between">
-                <span className="font-medium">Crew Name:</span>
-                <span>{crew.crew_name}</span>
+          <Card variant="outlined">
+            <CardHeader
+              title={<Typography variant="subtitle1">Crew Information</Typography>}
+            />
+            <CardContent>
+              <div className="flex justify-between py-1">
+                <Typography variant="body2" fontWeight={600}>Crew Name:</Typography>
+                <Typography variant="body2">{crew.crew_name}</Typography>
               </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Company ID:</span>
-                <span>{crew.company_id}</span>
+              <Divider className="my-2" />
+              <div className="flex justify-between py-1">
+                <Typography variant="body2" fontWeight={600}>Company ID:</Typography>
+                <Typography variant="body2">{crew.company_id}</Typography>
               </div>
             </CardContent>
           </Card>
 
           {timesheet ? (
-            /* Timesheet Details */
             <>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Clock className="w-5 h-5" />
-                    Work Hours
-                  </CardTitle>
-                </CardHeader>
+              {/* Timesheet Details */}
+              <Card variant="outlined">
+                <CardHeader
+                  title={
+                    <Box className="flex items-center gap-2">
+                      <AccessTimeIcon fontSize="small" />
+                      <Typography variant="subtitle1">Work Hours</Typography>
+                    </Box>
+                  }
+                />
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span className="font-medium text-sm text-muted-foreground">Start Time</span>
-                      <p className="text-lg">{formatTime(timesheet.start_time)}</p>
+                      <Typography variant="caption" color="text.secondary">Start Time</Typography>
+                      <Typography variant="body1">{formatTime(timesheet.start_time)}</Typography>
                     </div>
                     <div>
-                      <span className="font-medium text-sm text-muted-foreground">End Time</span>
-                      <p className="text-lg">{formatTime(timesheet.end_time)}</p>
+                      <Typography variant="caption" color="text.secondary">End Time</Typography>
+                      <Typography variant="body1">{formatTime(timesheet.end_time)}</Typography>
                     </div>
                   </div>
                   <div>
-                    <span className="font-medium text-sm text-muted-foreground">Total Hours</span>
-                    <p className="text-2xl font-bold text-primary">{(timesheet.hours_regular + timesheet.hours_overtime).toFixed(1)} hours</p>
+                    <Typography variant="caption" color="text.secondary">Total Hours</Typography>
+                    <Typography variant="h5" fontWeight={700} color="primary">
+                      {(timesheet.hours_regular + timesheet.hours_overtime).toFixed(1)} hours
+                    </Typography>
                   </div>
                   <div className="pt-2">
-                    <Badge className={getStatusColor(timesheet.status)}>
-                      {timesheet.status.charAt(0).toUpperCase() + timesheet.status.slice(1)}
-                    </Badge>
+                    <Chip
+                      label={timesheet.status.charAt(0).toUpperCase() + timesheet.status.slice(1)}
+                      color={statusToChipColor(timesheet.status)}
+                      variant="filled"
+                      size="small"
+                    />
                   </div>
                 </CardContent>
               </Card>
 
               {timesheet.work_description && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Calendar className="w-5 h-5" />
-                      Work Description
-                    </CardTitle>
-                  </CardHeader>
+                <Card variant="outlined">
+                  <CardHeader
+                    title={
+                      <Box className="flex items-center gap-2">
+                        <CalendarMonthIcon fontSize="small" />
+                        <Typography variant="subtitle1">Work Description</Typography>
+                      </Box>
+                    }
+                  />
                   <CardContent>
-                    <p className="text-sm leading-relaxed">{timesheet.work_description}</p>
+                    <Typography variant="body2" lineHeight={1.7}>
+                      {timesheet.work_description}
+                    </Typography>
                   </CardContent>
                 </Card>
               )}
             </>
           ) : (
             /* No Timesheet Submitted */
-            <Card>
+            <Card variant="outlined">
               <CardContent className="p-8 text-center">
                 <div className="space-y-4">
-                  <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto">
-                    <Calendar className="w-8 h-8 text-error" />
-                  </div>
+                  <Box className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" sx={{ backgroundColor: 'rgba(211, 47, 47, 0.1)' }}>
+                    <CalendarMonthIcon sx={{ color: 'rgba(211, 47, 47, 1)' }} fontSize="large" />
+                  </Box>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">No Timesheet Submitted</h3>
-                    <p className="text-muted-foreground">
+                    <Typography variant="subtitle1" fontWeight={600}>No Timesheet Submitted</Typography>
+                    <Typography variant="body2" color="text.secondary">
                       {crew.crew_name} has not submitted a timesheet for {formatDate(modalDate)}.
-                    </p>
+                    </Typography>
                   </div>
                 </div>
               </CardContent>

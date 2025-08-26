@@ -1,10 +1,20 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Download, FileSpreadsheet, Calendar } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  CircularProgress
+} from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
+import TableViewIcon from '@mui/icons-material/TableView';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -101,58 +111,59 @@ export function ExportTimesheets() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileSpreadsheet className="w-5 h-5" />
-          Export Timesheets
-        </CardTitle>
+        <div className="flex items-center gap-2">
+          <TableViewIcon fontSize="small" />
+          <Typography variant="h6">Export Timesheets</Typography>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="start-date">Start Date</Label>
-            <Input
-              id="start-date"
-              type="date"
-              value={dateRange.start}
-              onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="end-date">End Date</Label>
-            <Input
-              id="end-date"
-              type="date"
-              value={dateRange.end}
-              onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-            />
-          </div>
+          <TextField
+            id="start-date"
+            label="Start Date"
+            type="date"
+            value={dateRange.start}
+            onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+            InputLabelProps={{ shrink: true }}
+            size="small"
+          />
+          <TextField
+            id="end-date"
+            label="End Date"
+            type="date"
+            value={dateRange.end}
+            onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+            InputLabelProps={{ shrink: true }}
+            size="small"
+          />
         </div>
 
-        <div className="space-y-2">
-          <Label>Export Format</Label>
-          <Select value={exportType} onValueChange={(value: 'csv' | 'excel') => setExportType(value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="csv">CSV Format</SelectItem>
-              <SelectItem value="excel">Excel Format (Coming Soon)</SelectItem>
-            </SelectContent>
+        <FormControl size="small" className="w-full md:w-1/2">
+          <InputLabel id="export-type-label">Export Format</InputLabel>
+          <Select
+            labelId="export-type-label"
+            id="export-type"
+            value={exportType}
+            label="Export Format"
+            onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
+          >
+            <MenuItem value="csv">CSV Format</MenuItem>
+            <MenuItem value="excel" disabled>Excel Format (Coming Soon)</MenuItem>
           </Select>
-        </div>
+        </FormControl>
 
         <div className="flex items-center gap-4">
-          <Button 
-            onClick={exportTimesheets} 
+          <Button
+            onClick={exportTimesheets}
             disabled={loading || exportType === 'excel'}
-            className="flex items-center gap-2"
+            variant="contained"
+            startIcon={loading ? <CircularProgress size={16} /> : <DownloadIcon />}
           >
-            <Download className="w-4 h-4" />
-            {loading ? 'Exporting...' : 'Export Timesheets'}
+            {loading ? 'Exporting…' : 'Export Timesheets'}
           </Button>
           
           <div className="text-sm text-muted-foreground flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
+            <CalendarMonthIcon fontSize="small" />
             {dateRange.start} to {dateRange.end}
           </div>
         </div>

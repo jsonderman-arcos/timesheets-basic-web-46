@@ -1,8 +1,22 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Check, X } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableContainer,
+  Paper,
+  Box,
+  CircularProgress,
+} from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { TimesheetDetailModal } from './TimesheetDetailModal';
 import { useToast } from '@/hooks/use-toast';
 
@@ -47,11 +61,11 @@ export function TimesheetGrid() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
     try {
-      // Fetch crews
       const { data: crewData, error: crewError } = await supabase
         .from('crews')
         .select('id, crew_name, company_id')
@@ -60,7 +74,6 @@ export function TimesheetGrid() {
       if (crewError) throw crewError;
       setCrews(crewData || []);
 
-      // Fetch timesheets for the last 7 days
       const startDate = dates[0];
       const endDate = dates[dates.length - 1];
 
@@ -72,21 +85,18 @@ export function TimesheetGrid() {
 
       if (timesheetError) throw timesheetError;
 
-      // Organize timesheets by crew and date
       const organized: TimesheetGridData = {};
-      (timesheetData || []).forEach((timesheet) => {
-        if (!organized[timesheet.crew_id]) {
-          organized[timesheet.crew_id] = {};
-        }
-        organized[timesheet.crew_id][timesheet.date] = timesheet;
+      (timesheetData || []).forEach((t) => {
+        if (!organized[t.crew_id]) organized[t.crew_id] = {};
+        organized[t.crew_id][t.date] = t;
       });
 
       setTimesheets(organized);
     } catch (error: any) {
       toast({
-        title: "Error loading data",
+        title: 'Error loading data',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -108,7 +118,10 @@ export function TimesheetGrid() {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading timesheet data...</div>
+          <Box className="flex items-center justify-center">
+            <CircularProgress size={24} className="mr-2" />
+            <Typography>Loading timesheet data...</Typography>
+          </Box>
         </CardContent>
       </Card>
     );
@@ -117,29 +130,27 @@ export function TimesheetGrid() {
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>Timesheet Overview</CardTitle>
-        </CardHeader>
+        <CardHeader title={<Typography variant="h6">Timesheet Overview</Typography>} />
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
+          <TableContainer component={Paper} className="overflow-x-auto">
+            <Table size="small">
+              <TableHead>
                 <TableRow>
-                  <TableHead className="w-48">Crew</TableHead>
+                  <TableCell className="w-48"><Typography variant="subtitle2">Crew</Typography></TableCell>
                   {dates.map((date) => (
-                    <TableHead key={date} className="text-center min-w-24">
-                      {formatDate(date)}
-                    </TableHead>
+                    <TableCell key={date} align="center">
+                      <Typography variant="caption">{formatDate(date)}</Typography>
+                    </TableCell>
                   ))}
                 </TableRow>
-              </TableHeader>
+              </TableHead>
               <TableBody>
                 {crews.map((crew) => (
-                  <TableRow key={crew.id}>
-                    <TableCell className="font-medium">
+                  <TableRow key={crew.id} hover>
+                    <TableCell>
                       <div>
-                        <div className="font-semibold">{crew.crew_name}</div>
-                        <div className="text-sm text-muted-foreground">Company</div>
+                        <Typography variant="body2" fontWeight={600}>{crew.crew_name}</Typography>
+                        <Typography variant="caption" color="text.secondary">Company</Typography>
                       </div>
                     </TableCell>
                     {dates.map((date) => {
@@ -147,13 +158,14 @@ export function TimesheetGrid() {
                       return (
                         <TableCell
                           key={date}
-                          className="text-center cursor-pointer hover:bg-muted/50 transition-colors"
+                          align="center"
+                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                           onClick={() => handleCellClick(crew, date)}
                         >
                           {hasTimesheet ? (
-                            <Check className="w-6 h-6 text-success mx-auto" />
+                            <CheckCircleIcon color="success" fontSize="small" />
                           ) : (
-                            <X className="w-6 h-6 text-error mx-auto" />
+                            <CancelIcon color="error" fontSize="small" />
                           )}
                         </TableCell>
                       );
@@ -162,7 +174,7 @@ export function TimesheetGrid() {
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </TableContainer>
         </CardContent>
       </Card>
 

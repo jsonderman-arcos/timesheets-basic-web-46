@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, X } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  Button,
+  TextField,
+  Typography,
+  CircularProgress
+} from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CloseIcon from '@mui/icons-material/Close';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -235,7 +241,7 @@ export function MapView({ gpsPoints }: MapViewProps) {
     return (
       <div className="border rounded-lg p-6 bg-muted/10">
         <div className="text-center space-y-4">
-          <MapPin className="w-12 h-12 mx-auto text-muted-foreground" />
+          <LocationOnIcon fontSize="large" className="mx-auto text-muted-foreground" />
           <h3 className="font-semibold">Mapbox Token Required</h3>
           <p className="text-sm text-muted-foreground">
             Please enter your Mapbox public token to view the GPS tracking map.
@@ -252,13 +258,15 @@ export function MapView({ gpsPoints }: MapViewProps) {
             </a>
           </p>
           <div className="flex gap-2 max-w-md mx-auto">
-            <Input
+            <TextField
               type="text"
               placeholder="Enter Mapbox public token"
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
+              size="small"
+              className="flex-1"
             />
-            <Button onClick={handleSetToken}>Set Token</Button>
+            <Button variant="contained" onClick={handleSetToken}>Set Token</Button>
           </div>
         </div>
       </div>
@@ -295,13 +303,13 @@ export function MapView({ gpsPoints }: MapViewProps) {
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
               <h4 className="font-semibold text-sm">GPS Location Details</h4>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 w-6 p-0"
+              <Button
+                variant="text"
+                size="small"
+                className="h-6 w-6 min-w-0 p-0"
                 onClick={closePopover}
               >
-                <X className="h-3 w-3" />
+                <CloseIcon fontSize="inherit" />
               </Button>
             </div>
             <div className="space-y-3">
@@ -311,7 +319,8 @@ export function MapView({ gpsPoints }: MapViewProps) {
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Street Address</p>
-                <p className="text-sm">
+                <p className="text-sm flex items-center gap-2">
+                  {loadingAddress && <CircularProgress size={12} />}
                   {loadingAddress ? 'Loading address...' : selectedLocation.address}
                 </p>
               </div>

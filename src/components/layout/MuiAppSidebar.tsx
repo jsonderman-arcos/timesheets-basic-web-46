@@ -38,9 +38,15 @@ const StyledDrawer = styled(Drawer, {
   '& .MuiDrawer-paper': {
     width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
     boxSizing: 'border-box',
-    backgroundColor: 'hsl(var(--sidebar-background))',
-    color: 'hsl(var(--sidebar-foreground))',
-    borderRight: '1px solid hsl(var(--sidebar-border))',
+    backgroundColor: 'var(--theme-component-navigation-topbar-background-fill)',
+    color: 'var(--theme-component-navigation-topbar-text-fill-default)',
+    '& .MuiListItemIcon-root': {
+      color: 'var(--theme-component-navigation-topbar-text-fill)',
+    },
+    '& .MuiTypography-root': {
+      color: 'var(--theme-component-navigation-topbar-text-fill)',
+    },
+    borderRight: '1px solid var(--sidebar-border)',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -54,12 +60,12 @@ const StyledListItemButton = styled(ListItemButton, {
   minHeight: 48,
   borderRadius: '6px',
   margin: '2px 8px',
-  color: active ? 'hsl(var(--sidebar-accent-foreground))' : 'hsl(var(--sidebar-foreground))',
-  backgroundColor: active ? 'hsl(var(--sidebar-accent))' : 'transparent',
+  color: 'var(--theme-base-primary-contrast-text)',
+  backgroundColor: active ? 'var( --core-lighthouse-colors-reds-punchy-red-darkly-500-alpha-50)' : 'transparent',
   fontWeight: active ? 600 : 400,
   '&:hover': {
     backgroundColor: active ? 'hsl(var(--sidebar-accent))' : 'hsl(var(--sidebar-accent))',
-    color: 'hsl(var(--sidebar-accent-foreground))',
+    color: 'var(--theme-component-navigation-topbar-text-fill)',
   },
 }));
 
@@ -169,22 +175,11 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
       collapsed={collapsed}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', p: 1 }}>
-        {!collapsed && (
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              color: 'hsl(var(--sidebar-foreground))',
-              fontWeight: 600,
-              px: 1
-            }}
-          >
-            Navigation
-          </Typography>
-        )}
+ 
         <IconButton 
           onClick={onToggleCollapse}
           sx={{ 
-            color: 'hsl(var(--sidebar-foreground))',
+            color: '(var(--theme-navigation-topbar-text-fill-default))',
             '&:hover': {
               backgroundColor: 'hsl(var(--sidebar-accent))',
             }
@@ -193,8 +188,7 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
           {collapsed ? <MenuIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </Box>
-      
-      <Divider sx={{ borderColor: 'hsl(var(--sidebar-border))' }} />
+    
       
       <List sx={{ pt: 1 }}>
         {menuItems.map((item) => {
@@ -212,7 +206,7 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
                 <ListItemIcon
                   sx={{
                     minWidth: collapsed ? 'auto' : 40,
-                    color: hasPendingExceptions ? 'hsl(var(--warning))' : 'inherit',
+                    color: hasPendingExceptions ? 'hsl(var(--warning))' : 'var(--theme-component-navigation-topbar-text-fill)',
                     mr: collapsed ? 0 : 1,
                   }}
                 >

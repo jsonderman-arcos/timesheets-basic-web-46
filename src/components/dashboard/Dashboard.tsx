@@ -1,8 +1,32 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Clock, Users, TrendingUp, AlertCircle } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Box,
+  Skeleton,
+  Divider,
+} from '@mui/material';
+import Grid from '@mui/material/Grid';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import GroupIcon from '@mui/icons-material/Group';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { useTheme } from '@mui/material/styles';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardStats {
@@ -26,6 +50,7 @@ interface HoursByUtility {
 const UTILITY_COLORS = ['#2563eb', '#dc2626', '#16a34a', '#ca8a04', '#9333ea'];
 
 export function Dashboard() {
+  const theme = useTheme();
   const [stats, setStats] = useState<DashboardStats>({
     totalHours: 0,
     totalCrews: 0,
@@ -72,7 +97,10 @@ export function Dashboard() {
         .select('id')
         .eq('status', 'pending');
 
-      const totalHours = (weeklyEntries || []).reduce((sum, t) => sum + (t.hours_regular || 0) + (t.hours_overtime || 0), 0);
+      const totalHours = (weeklyEntries || []).reduce(
+        (sum, t) => sum + (t.hours_regular || 0) + (t.hours_overtime || 0),
+        0
+      );
 
       setStats({
         totalHours,
@@ -89,8 +117,8 @@ export function Dashboard() {
 
       const dayMap: { [key: string]: number } = {};
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      
-      days.forEach(day => dayMap[day] = 0);
+
+      days.forEach(day => (dayMap[day] = 0));
 
       (dailyHours || []).forEach(entry => {
         const date = new Date(entry.date);
@@ -113,8 +141,9 @@ export function Dashboard() {
 
       const utilityMap: { [key: string]: number } = {};
       (companyHours || []).forEach(entry => {
-        const company = entry.crews?.companies?.name || 'Unknown';
-        utilityMap[company] = (utilityMap[company] || 0) + (entry.hours_regular || 0) + (entry.hours_overtime || 0);
+        const company = (entry as any).crews?.companies?.name || 'Unknown';
+        utilityMap[company] =
+          (utilityMap[company] || 0) + (entry.hours_regular || 0) + (entry.hours_overtime || 0);
       });
 
       const utilityData = Object.entries(utilityMap).map(([utility, hours], index) => ({
@@ -124,12 +153,11 @@ export function Dashboard() {
       }));
 
       setHoursByUtility(utilityData);
-
     } catch (error: any) {
       toast({
-        title: "Error loading dashboard",
+        title: 'Error loading dashboard',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -138,122 +166,135 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <Box>
+        <Grid container spacing={3}>
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-muted rounded w-1/2"></div>
-                </div>
-              </CardContent>
-            </Card>
+            <Grid size={{ xs: 12, md: 6, lg: 3 }} key={i}>
+              <Card>
+                <CardContent sx={{ p: 3 }}>
+                  <Skeleton variant="text" width="75%" sx={{ mb: 1 }} />
+                  <Skeleton variant="rounded" width="50%" height={32} />
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </div>
-      </div>
+        </Grid>
+      </Box>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Box>
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Hours (Week)</p>
-                <p className="text-3xl font-bold">{stats.totalHours.toFixed(1)}</p>
-              </div>
-              <Clock className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+          <Card>
+            <CardContent sx={{ p: 3 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">Total Hours (Week)</Typography>
+                  <Typography variant="h4" fontWeight={700}>{stats.totalHours.toFixed(1)}</Typography>
+                </Box>
+                <AccessTimeIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Crews</p>
-                <p className="text-3xl font-bold">{stats.totalCrews}</p>
-              </div>
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+          <Card>
+            <CardContent sx={{ p: 3 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">Active Crews</Typography>
+                  <Typography variant="h4" fontWeight={700}>{stats.totalCrews}</Typography>
+                </Box>
+                <GroupIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Submitted Today</p>
-                <p className="text-3xl font-bold">{stats.submittedToday}</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-success" />
-            </div>
-          </CardContent>
-        </Card>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+          <Card>
+            <CardContent sx={{ p: 3 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">Submitted Today</Typography>
+                  <Typography variant="h4" fontWeight={700}>{stats.submittedToday}</Typography>
+                </Box>
+                <TrendingUpIcon sx={{ fontSize: 32, color: 'success.main' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Pending Exceptions</p>
-                <p className="text-3xl font-bold">{stats.pendingExceptions}</p>
-              </div>
-              <AlertCircle className="h-8 w-8 text-warning" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+          <Card>
+            <CardContent sx={{ p: 3 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">Pending Exceptions</Typography>
+                  <Typography variant="h4" fontWeight={700}>{stats.pendingExceptions}</Typography>
+                </Box>
+                <WarningAmberIcon sx={{ fontSize: 32, color: 'warning.main' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Hours by Day of Week</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hoursByDay}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`${value} hours`, 'Total Hours']} />
-                <Bar dataKey="hours" fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <Grid container spacing={3} sx={{ mt: 0 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Hours by Day of Week</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={hoursByDay}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                    <Bar dataKey="hours" fill={theme.palette.primary.main} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Hours by Utility</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={hoursByUtility}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ utility, percent }) => `${utility} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="hours"
-                >
-                  {hoursByUtility.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [`${value} hours`, 'Total Hours']} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={hoursByUtility}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(d: any) => `${d.utility} ${(d.percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="hours"
+                    >
+                      {hoursByUtility.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

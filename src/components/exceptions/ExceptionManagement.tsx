@@ -1,11 +1,26 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AlertTriangle, CheckCircle, XCircle, Eye } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Chip,
+  CircularProgress
+} from '@mui/material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useToast } from '@/hooks/use-toast';
 
 interface Exception {
@@ -85,16 +100,37 @@ export function ExceptionManagement() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusChip = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning">Pending</Badge>;
+        return (
+          <Chip
+            label="Pending"
+            variant="outlined"
+            className="bg-warning/10 text-warning border-warning"
+            size="small"
+          />
+        );
       case 'approved':
-        return <Badge variant="outline" className="bg-success/10 text-success border-success">Approved</Badge>;
+        return (
+          <Chip
+            label="Approved"
+            variant="outlined"
+            className="bg-success/10 text-success border-success"
+            size="small"
+          />
+        );
       case 'denied':
-        return <Badge variant="outline" className="bg-error/10 text-error border-error">Denied</Badge>;
+        return (
+          <Chip
+            label="Denied"
+            variant="outlined"
+            className="bg-error/10 text-error border-error"
+            size="small"
+          />
+        );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Chip label={status} variant="outlined" size="small" />;
     }
   };
 
@@ -111,8 +147,9 @@ export function ExceptionManagement() {
   if (loading) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <div className="text-center">Loading exceptions...</div>
+        <CardContent className="p-6 flex items-center justify-center gap-3">
+          <CircularProgress size={20} />
+          <Typography variant="body2">Loading exceptions...</Typography>
         </CardContent>
       </Card>
     );
@@ -122,10 +159,10 @@ export function ExceptionManagement() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            Exception Management
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <WarningAmberIcon fontSize="small" />
+            <Typography variant="h6">Exception Management</Typography>
+          </div>
         </CardHeader>
         <CardContent>
           {exceptions.length === 0 ? (
@@ -135,44 +172,38 @@ export function ExceptionManagement() {
           ) : (
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader>
+                <TableHead>
                   <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Crew</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Submitted By</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableCell>Type</TableCell>
+                    <TableCell>Crew</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Submitted By</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Created</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
-                </TableHeader>
+                </TableHead>
                 <TableBody>
                   {exceptions.map((exception) => (
-                    <TableRow key={exception.id}>
-                      <TableCell className="font-medium">
-                        General Exception
-                      </TableCell>
+                    <TableRow key={exception.id} hover>
+                      <TableCell className="font-medium">General Exception</TableCell>
                       <TableCell>
                         <div>
                           <div className="font-semibold">N/A</div>
-                          <div className="text-sm text-muted-foreground">
-                            N/A
-                          </div>
+                          <div className="text-sm text-muted-foreground">N/A</div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        N/A
-                      </TableCell>
                       <TableCell>N/A</TableCell>
-                      <TableCell>{getStatusBadge(exception.status)}</TableCell>
+                      <TableCell>N/A</TableCell>
+                      <TableCell>{getStatusChip(exception.status)}</TableCell>
                       <TableCell>{formatDate(exception.created_at)}</TableCell>
                       <TableCell>
                         <Button
-                          variant="outline"
-                          size="sm"
+                          variant="outlined"
+                          size="small"
                           onClick={() => setSelectedException(exception)}
+                          startIcon={<VisibilityIcon fontSize="small" />}
                         >
-                          <Eye className="w-4 h-4 mr-1" />
                           View
                         </Button>
                       </TableCell>
@@ -185,14 +216,11 @@ export function ExceptionManagement() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedException} onOpenChange={() => setSelectedException(null)}>
+      <Dialog open={!!selectedException} onClose={() => setSelectedException(null)}>
+        <DialogTitle>Exception Details</DialogTitle>
         <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Exception Details</DialogTitle>
-          </DialogHeader>
-          
           {selectedException && (
-            <div className="space-y-6">
+            <div className="space-y-6 py-2">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Exception Type</h4>
@@ -200,7 +228,7 @@ export function ExceptionManagement() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Status</h4>
-                  {getStatusBadge(selectedException.status)}
+                  {getStatusChip(selectedException.status)}
                 </div>
               </div>
 
@@ -215,9 +243,7 @@ export function ExceptionManagement() {
                 <div>
                   <h4 className="font-semibold mb-2">Crew Information</h4>
                   <p>N/A</p>
-                  <p className="text-sm text-muted-foreground">
-                    N/A
-                  </p>
+                  <p className="text-sm text-muted-foreground">N/A</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Date Created</h4>
@@ -229,17 +255,18 @@ export function ExceptionManagement() {
                 <div className="flex gap-3 pt-4">
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'approved')}
-                    className="flex items-center gap-2 bg-success hover:bg-success/90"
+                    color="success"
+                    variant="contained"
+                    startIcon={<CheckCircleIcon fontSize="small" />}
                   >
-                    <CheckCircle className="w-4 h-4" />
                     Approve
                   </Button>
                   <Button
-                    variant="destructive"
                     onClick={() => updateExceptionStatus(selectedException.id, 'denied')}
-                    className="flex items-center gap-2"
+                    color="error"
+                    variant="contained"
+                    startIcon={<CancelIcon fontSize="small" />}
                   >
-                    <XCircle className="w-4 h-4" />
                     Deny
                   </Button>
                 </div>

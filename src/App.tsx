@@ -11,25 +11,41 @@ import ExceptionsPage from "./pages/ExceptionsPage";
 import GpsPage from "./pages/GpsPage";
 import ReportsPage from "./pages/ReportsPage";
 import NotFound from "./pages/NotFound";
+import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
+// Strip unknown props injected by tooling from provider boundaries
+function SafeStyledEngineProvider({ children }: { children: React.ReactNode }) {
+  return <StyledEngineProvider injectFirst>{children}</StyledEngineProvider>;
+}
+
+function SafeThemeProvider({ theme, children }: { theme: any; children: React.ReactNode }) {
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+}
+import { createMuiThemeFromTokens } from "@/theme/createMuiTheme";
 
 const queryClient = new QueryClient();
+const theme = createMuiThemeFromTokens();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<NavigationLayout><DashboardPage /></NavigationLayout>} />
-          <Route path="/timesheets" element={<NavigationLayout><TimesheetPage /></NavigationLayout>} />
-          <Route path="/export" element={<NavigationLayout><ExportPage /></NavigationLayout>} />
-          <Route path="/exceptions" element={<NavigationLayout><ExceptionsPage /></NavigationLayout>} />
-          <Route path="/gps" element={<NavigationLayout><GpsPage /></NavigationLayout>} />
-          <Route path="/reports" element={<NavigationLayout><ReportsPage /></NavigationLayout>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <SafeStyledEngineProvider>
+        <SafeThemeProvider theme={theme}>
+          {/* Keep Tailwind Preflight; omit CssBaseline */}
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<NavigationLayout><DashboardPage /></NavigationLayout>} />
+              <Route path="/timesheets" element={<NavigationLayout><TimesheetPage /></NavigationLayout>} />
+              <Route path="/export" element={<NavigationLayout><ExportPage /></NavigationLayout>} />
+              <Route path="/exceptions" element={<NavigationLayout><ExceptionsPage /></NavigationLayout>} />
+              <Route path="/gps" element={<NavigationLayout><GpsPage /></NavigationLayout>} />
+              <Route path="/reports" element={<NavigationLayout><ReportsPage /></NavigationLayout>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </SafeThemeProvider>
+      </SafeStyledEngineProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
