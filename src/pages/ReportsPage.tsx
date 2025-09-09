@@ -214,7 +214,7 @@ export default function ReportsPage() {
             </Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 bg-white">
           <div className="flex gap-4">
             <div className="space-y-2">
               <Label htmlFor="start-date">Start Date</Label>
