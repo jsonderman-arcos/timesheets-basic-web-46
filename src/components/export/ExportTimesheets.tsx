@@ -126,6 +126,7 @@ export function ExportTimesheets() {
             onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
             InputLabelProps={{ shrink: true }}
             size="small"
+            className="w-64"
           />
           <TextField
             id="end-date"
@@ -135,11 +136,12 @@ export function ExportTimesheets() {
             onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
             InputLabelProps={{ shrink: true }}
             size="small"
+            className="w-64"
           />
         </div>
 
         <div className="flex items-end gap-4">
-          <FormControl size="small" className="flex-1">
+          <FormControl size="small" className="w-64">
             <InputLabel id="export-type-label">Export Format</InputLabel>
             <Select
               labelId="export-type-label"
