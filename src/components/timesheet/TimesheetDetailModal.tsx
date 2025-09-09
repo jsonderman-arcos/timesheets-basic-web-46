@@ -112,7 +112,7 @@ export function TimesheetDetailModal({
     start_time: '08:00',
     end_time: '17:00',
     work_description: '',
-    working_hours: 8,
+    working_hours: 0,
     traveling_hours: 0,
     standby_hours: 0,
   });
@@ -144,7 +144,7 @@ export function TimesheetDetailModal({
         start_time: '08:00',
         end_time: '17:00',
         work_description: '',
-        working_hours: 8,
+        working_hours: 0,
         traveling_hours: 0,
         standby_hours: 0,
       }));
@@ -161,7 +161,7 @@ export function TimesheetDetailModal({
         start_time: timesheet.start_time || '08:00',
         end_time: timesheet.end_time || '17:00',
         work_description: timesheet.work_description || '',
-        working_hours: timesheet.hours_regular || 8,
+        working_hours: 0,
         traveling_hours: 0,
         standby_hours: 0,
       });
@@ -170,7 +170,7 @@ export function TimesheetDetailModal({
         start_time: '08:00',
         end_time: '17:00',
         work_description: '',
-        working_hours: 8,
+        working_hours: 0,
         traveling_hours: 0,
         standby_hours: 0,
       });
@@ -358,7 +358,7 @@ export function TimesheetDetailModal({
         start_time: timesheet.start_time || '08:00',
         end_time: timesheet.end_time || '17:00',
         work_description: timesheet.work_description || '',
-        working_hours: timesheet.hours_regular || 8,
+        working_hours: 0,
         traveling_hours: 0,
         standby_hours: 0,
       });
