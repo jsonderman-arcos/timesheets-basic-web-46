@@ -190,7 +190,7 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileBarChart className="w-6 h-6" />
@@ -202,29 +202,6 @@ export default function ReportsPage() {
         <CardHeader>
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
-          <div className="flex gap-4 bg-white">
-            <TextField
-              id="start-date"
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              size="small"
-              className="w-64"
-            />
-            <TextField
-              id="end-date"
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              size="small"
-              className="w-64"
-            />
-          </div>
-
           {drillDown.level === 'company' && (
             <Table className="bg-white">
               <TableHeader>
@@ -333,6 +310,6 @@ export default function ReportsPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

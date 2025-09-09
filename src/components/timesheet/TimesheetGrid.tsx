@@ -59,7 +59,7 @@ interface Timesheet {
   hours_regular: number;
   hours_overtime: number;
   work_description: string;
-  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+  status: string;
 }
 
 interface TimesheetGridData {
@@ -207,10 +207,7 @@ export function TimesheetGrid() {
       const organized: TimesheetGridData = {};
       (timesheetData || []).forEach((t) => {
         if (!organized[t.crew_id]) organized[t.crew_id] = {};
-        organized[t.crew_id][t.date] = {
-          ...t,
-          status: t.status as 'draft' | 'submitted' | 'approved' | 'rejected'
-        };
+        organized[t.crew_id][t.date] = t;
       });
 
       setTimesheets(organized);
