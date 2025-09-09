@@ -118,43 +118,6 @@ export function TimesheetDetailModal({
 
           {timesheet ? (
             <>
-              {/* Timesheet Details */}
-              <Card variant="outlined">
-                <CardHeader
-                  title={
-                    <Box className="flex items-center gap-2">
-                      <AccessTimeIcon fontSize="small" />
-                      <Typography variant="subtitle1">Work Hours</Typography>
-                    </Box>
-                  }
-                />
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Typography variant="caption" color="text.secondary">Start Time</Typography>
-                      <Typography variant="body1">{formatTime(timesheet.start_time)}</Typography>
-                    </div>
-                    <div>
-                      <Typography variant="caption" color="text.secondary">End Time</Typography>
-                      <Typography variant="body1">{formatTime(timesheet.end_time)}</Typography>
-                    </div>
-                  </div>
-                  <div>
-                    <Typography variant="caption" color="text.secondary">Total Hours</Typography>
-                    <Typography variant="h5" fontWeight={700} color="primary">
-                      {(timesheet.hours_regular + timesheet.hours_overtime).toFixed(1)} hours
-                    </Typography>
-                  </div>
-                  <div className="pt-2">
-                    <Chip
-                      label={timesheet.status.charAt(0).toUpperCase() + timesheet.status.slice(1)}
-                      color={statusToChipColor(timesheet.status)}
-                      variant="filled"
-                      size="small"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
 
               {timesheet.work_description && (
                 <Card variant="outlined">
