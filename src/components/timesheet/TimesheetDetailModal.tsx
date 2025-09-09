@@ -58,7 +58,6 @@ interface Timesheet {
   hours_regular: number;
   hours_overtime: number;
   work_description: string;
-  status: string;
 }
 
 interface MemberFormData {
@@ -74,27 +73,16 @@ interface MemberFormData {
 interface TimesheetDetailModalProps {
   timesheet: Timesheet | null;
   crew: Crew | null;
+  selectedDate: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: () => void;
 }
 
-const statusToChipColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
-  switch (status) {
-    case 'submitted':
-      return 'warning';
-    case 'approved':
-      return 'success';
-    case 'rejected':
-      return 'error';
-    default:
-      return 'default';
-  }
-};
-
 export function TimesheetDetailModal({
   timesheet,
   crew,
+  selectedDate,
   open,
   onOpenChange,
   onUpdate,
@@ -105,7 +93,7 @@ export function TimesheetDetailModal({
   const [editMode, setEditMode] = useState<'crew' | 'individual'>('crew');
   const [crewMembers, setCrewMembers] = useState<CrewMember[]>([]);
   
-  const modalDate = timesheet?.date || new Date().toISOString().split('T')[0];
+  const modalDate = selectedDate;
   
   // Form state for crew-level editing
   const [formData, setFormData] = useState({
@@ -237,7 +225,6 @@ export function TimesheetDetailModal({
           hours_regular: totalHours,
           hours_overtime: 0,
           work_description: formData.work_description,
-          status: 'draft',
         };
 
         if (timesheet) {
@@ -269,6 +256,7 @@ export function TimesheetDetailModal({
         
         setIsEditing(false);
         onUpdate();
+        onOpenChange(false); // Close the modal
       } catch (error: any) {
         toast({
           title: 'Error',
@@ -306,7 +294,6 @@ export function TimesheetDetailModal({
             hours_regular: totalHours,
             hours_overtime: 0,
             work_description: memberData.work_description,
-            status: 'draft',
           };
         });
 
@@ -332,6 +319,7 @@ export function TimesheetDetailModal({
         
         setIsEditing(false);
         onUpdate();
+        onOpenChange(false); // Close the modal
       } catch (error: any) {
         toast({
           title: 'Error',
@@ -392,13 +380,6 @@ export function TimesheetDetailModal({
             <Typography component="span" variant="h6" fontWeight={600}>
               {formatDate(modalDate)}
             </Typography>
-            {timesheet && (
-              <Chip 
-                label={timesheet.status} 
-                color={statusToChipColor(timesheet.status)} 
-                size="small" 
-              />
-            )}
           </Box>
         </Box>
       </DialogTitle>

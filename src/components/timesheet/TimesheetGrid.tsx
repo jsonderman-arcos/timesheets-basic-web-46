@@ -59,7 +59,6 @@ interface Timesheet {
   hours_regular: number;
   hours_overtime: number;
   work_description: string;
-  status: string;
 }
 
 interface TimesheetGridData {
@@ -76,6 +75,7 @@ export function TimesheetGrid() {
   const [timesheets, setTimesheets] = useState<TimesheetGridData>({});
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null);
   const [selectedCrew, setSelectedCrew] = useState<Crew | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   
@@ -234,6 +234,7 @@ export function TimesheetGrid() {
     const timesheet = timesheets[crew.id]?.[date];
     setSelectedCrew(crew);
     setSelectedTimesheet(timesheet || null);
+    setSelectedDate(date);
   };
 
   const formatDate = (dateString: string) => {
@@ -453,10 +454,12 @@ export function TimesheetGrid() {
       <TimesheetDetailModal
         timesheet={selectedTimesheet}
         crew={selectedCrew}
+        selectedDate={selectedDate}
         open={!!selectedCrew}
         onOpenChange={() => {
           setSelectedCrew(null);
           setSelectedTimesheet(null);
+          setSelectedDate('');
         }}
         onUpdate={refreshData}
       />
