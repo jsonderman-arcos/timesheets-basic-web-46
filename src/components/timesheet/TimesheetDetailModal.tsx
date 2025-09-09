@@ -27,6 +27,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -239,6 +240,16 @@ export function TimesheetDetailModal({
           toast({
             title: 'Success',
             description: 'Timesheet updated successfully.',
+            className: 'bg-white border-green-200',
+            action: (
+              <CheckCircleIcon 
+                sx={{ 
+                  color: 'green', 
+                  fontSize: 20,
+                  marginLeft: 'auto'
+                }} 
+              />
+            ),
           });
         } else {
           // Create new timesheet
@@ -251,6 +262,16 @@ export function TimesheetDetailModal({
           toast({
             title: 'Success',
             description: 'Timesheet created successfully.',
+            className: 'bg-white border-green-200',
+            action: (
+              <CheckCircleIcon 
+                sx={{ 
+                  color: 'green', 
+                  fontSize: 20,
+                  marginLeft: 'auto'
+                }} 
+              />
+            ),
           });
         }
         
@@ -315,6 +336,16 @@ export function TimesheetDetailModal({
         toast({
           title: 'Success',
           description: 'Member timesheets saved successfully.',
+          className: 'bg-white border-green-200',
+          action: (
+            <CheckCircleIcon 
+              sx={{ 
+                color: 'green', 
+                fontSize: 20,
+                marginLeft: 'auto'
+              }} 
+            />
+          ),
         });
         
         setIsEditing(false);
