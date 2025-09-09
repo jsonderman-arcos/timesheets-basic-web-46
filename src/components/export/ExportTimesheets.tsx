@@ -118,18 +118,17 @@ export function ExportTimesheets() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <TextField
-            id="start-date"
-            label="Start Date"
-            type="date"
-            value={dateRange.start}
-            onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-            InputLabelProps={{ shrink: true }}
-            size="small"
-            className="w-64"
-          />
-          
           <div className="flex items-end gap-4">
+            <TextField
+              id="start-date"
+              label="Start Date"
+              type="date"
+              value={dateRange.start}
+              onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              className="w-64"
+            />
             <TextField
               id="end-date"
               label="End Date"
@@ -140,7 +139,9 @@ export function ExportTimesheets() {
               size="small"
               className="w-64"
             />
-            
+          </div>
+          
+          <div className="flex items-end gap-4">
             <FormControl size="small" className="w-64">
               <InputLabel id="export-type-label">Export Format</InputLabel>
               <Select
