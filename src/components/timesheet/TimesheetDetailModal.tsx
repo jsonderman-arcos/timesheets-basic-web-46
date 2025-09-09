@@ -30,6 +30,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 interface Crew {
   id: string;
@@ -206,11 +207,10 @@ export function TimesheetDetailModal({
     if (editMode === 'crew') {
       // Crew-level editing logic
       if (!formData.start_time || !formData.end_time) {
-        toast({
-          title: 'Missing Information',
-          description: 'Please provide both start and end times.',
-          variant: 'destructive',
-        });
+        showErrorToast(
+          'Missing Information',
+          'Please provide both start and end times.'
+        );
         return;
       }
 
@@ -240,20 +240,10 @@ export function TimesheetDetailModal({
           
           if (error) throw error;
           
-          toast({
-            title: 'Success',
-            description: 'Timesheet updated successfully.',
-            className: 'bg-white border-green-200',
-            action: (
-              <CheckCircleIcon 
-                sx={{ 
-                  color: 'green', 
-                  fontSize: 20,
-                  marginLeft: 'auto'
-                }} 
-              />
-            ),
-          });
+          showSuccessToast(
+            'Success',
+            'Timesheet updated successfully.'
+          );
         } else {
           // Create new timesheet
           const { error } = await supabase
@@ -262,31 +252,20 @@ export function TimesheetDetailModal({
           
           if (error) throw error;
           
-          toast({
-            title: 'Success',
-            description: 'Timesheet created successfully.',
-            className: 'bg-white border-green-200',
-            action: (
-              <CheckCircleIcon 
-                sx={{ 
-                  color: 'green', 
-                  fontSize: 20,
-                  marginLeft: 'auto'
-                }} 
-              />
-            ),
-          });
+          showSuccessToast(
+            'Success',
+            'Timesheet created successfully.'
+          );
         }
         
         setIsEditing(false);
         onUpdate();
         onOpenChange(false); // Close the modal
       } catch (error: any) {
-        toast({
-          title: 'Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        showErrorToast(
+          'Error',
+          error.message
+        );
       } finally {
         setLoading(false);
       }
@@ -297,11 +276,10 @@ export function TimesheetDetailModal({
       );
 
       if (validMembers.length === 0) {
-        toast({
-          title: 'Missing Information',
-          description: 'Please provide start and end times for at least one member.',
-          variant: 'destructive',
-        });
+        showErrorToast(
+          'Missing Information',
+          'Please provide start and end times for at least one member.'
+        );
         return;
       }
 
@@ -339,30 +317,19 @@ export function TimesheetDetailModal({
 
         if (error) throw error;
 
-        toast({
-          title: 'Success',
-          description: 'Member timesheets saved successfully.',
-          className: 'bg-white border-green-200',
-          action: (
-            <CheckCircleIcon 
-              sx={{ 
-                color: 'green', 
-                fontSize: 20,
-                marginLeft: 'auto'
-              }} 
-            />
-          ),
-        });
+        showSuccessToast(
+          'Success',
+          'Member timesheets saved successfully.'
+        );
         
         setIsEditing(false);
         onUpdate();
         onOpenChange(false); // Close the modal
       } catch (error: any) {
-        toast({
-          title: 'Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        showErrorToast(
+          'Error',
+          error.message
+        );
       } finally {
         setLoading(false);
       }

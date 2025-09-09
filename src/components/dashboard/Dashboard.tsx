@@ -29,6 +29,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useTheme } from '@mui/material/styles';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/toast-utils';
 
 interface DashboardStats {
   totalHours: number;
@@ -208,11 +209,10 @@ export function Dashboard() {
 
       setHoursByType(typeData);
     } catch (error: any) {
-      toast({
-        title: 'Error loading dashboard',
-        description: error.message,
-        variant: 'destructive',
-      });
+      showErrorToast(
+        'Error loading dashboard',
+        error.message
+      );
     } finally {
       setLoading(false);
     }

@@ -13,6 +13,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CloseIcon from '@mui/icons-material/Close';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 interface GpsPoint {
   id: string;
@@ -78,10 +79,10 @@ export function MapView({ gpsPoints }: MapViewProps) {
       setIsTokenSet(true);
       // Save to localStorage as backup
       localStorage.setItem('mapbox_token', tokenInput.trim());
-      toast({
-        title: "Success",
-        description: "Mapbox token saved successfully"
-      });
+      showSuccessToast(
+        "Success",
+        "Mapbox token saved successfully"
+      );
     }
   };
 
@@ -129,11 +130,10 @@ export function MapView({ gpsPoints }: MapViewProps) {
         ...prev,
         address: 'Unable to load address'
       } : null);
-      toast({
-        title: "Error",
-        description: "Failed to load address information",
-        variant: "destructive"
-      });
+      showErrorToast(
+        "Error",
+        "Failed to load address information"
+      );
     } finally {
       setLoadingAddress(false);
     }

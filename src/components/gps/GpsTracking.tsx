@@ -20,6 +20,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/toast-utils';
 import { MapView } from './MapView';
 
 interface GpsPoint {
@@ -67,11 +68,10 @@ export function GpsTracking() {
       setCrews(data || []);
     } catch (error: any) {
       console.error('Error fetching crews:', error);
-      toast({
-        title: "Error loading crews",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Error loading crews",
+        error.message
+      );
     }
   };
 
@@ -102,11 +102,10 @@ export function GpsTracking() {
       setGpsPoints([]);
     } catch (error: any) {
       console.error('Error fetching GPS data:', error);
-      toast({
-        title: "Error loading GPS data",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Error loading GPS data",
+        error.message
+      );
       setGpsPoints([]);
     } finally {
       setLoading(false);

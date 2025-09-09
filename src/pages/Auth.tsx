@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 export default function Auth() {
   const { user, signIn, signUp } = useAuth();
@@ -28,11 +29,10 @@ export default function Auth() {
     const { error } = await signIn(email, password);
     
     if (error) {
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Sign in failed",
+        error.message
+      );
     }
     
     setLoading(false);
@@ -50,16 +50,15 @@ export default function Auth() {
     const { error } = await signUp(email, password, fullName);
     
     if (error) {
-      toast({
-        title: "Sign up failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Sign up failed",
+        error.message
+      );
     } else {
-      toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account.",
-      });
+      showSuccessToast(
+        "Account created!",
+        "Please check your email to verify your account."
+      );
     }
     
     setLoading(false);

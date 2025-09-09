@@ -22,6 +22,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useToast } from '@/hooks/use-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 interface Exception {
   id: string;
@@ -55,11 +56,10 @@ export function ExceptionManagement() {
       if (error) throw error;
       setExceptions(data || []);
     } catch (error: any) {
-      toast({
-        title: "Error loading exceptions",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Error loading exceptions",
+        error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -85,18 +85,17 @@ export function ExceptionManagement() {
         )
       );
 
-      toast({
-        title: "Exception updated",
-        description: `Exception has been ${status}.`,
-      });
+      showSuccessToast(
+        "Exception updated",
+        `Exception has been ${status}.`
+      );
 
       setSelectedException(null);
     } catch (error: any) {
-      toast({
-        title: "Error updating exception",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Error updating exception",
+        error.message
+      );
     }
   };
 

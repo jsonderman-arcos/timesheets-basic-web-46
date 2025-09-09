@@ -17,6 +17,7 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 export function ExportTimesheets() {
   const [exportType, setExportType] = useState<'csv' | 'excel'>('csv');
@@ -92,11 +93,10 @@ export function ExportTimesheets() {
       if (error) throw error;
 
       if (!timesheets || timesheets.length === 0) {
-        toast({
-          title: "No data found",
-          description: "No timesheets found for the selected date range.",
-          variant: "destructive",
-        });
+        showErrorToast(
+          "No data found",
+          "No timesheets found for the selected date range."
+        );
         return;
       }
 
@@ -141,17 +141,16 @@ export function ExportTimesheets() {
       link.click();
       document.body.removeChild(link);
 
-      toast({
-        title: "Export successful",
-        description: `Exported ${timesheets.length} timesheet records.`,
-      });
+      showSuccessToast(
+        "Export successful",
+        `Exported ${timesheets.length} timesheet records.`
+      );
 
     } catch (error: any) {
-      toast({
-        title: "Export failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      showErrorToast(
+        "Export failed",
+        error.message
+      );
     } finally {
       setLoading(false);
     }

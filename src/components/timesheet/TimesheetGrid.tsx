@@ -34,6 +34,7 @@ import SortIcon from '@mui/icons-material/Sort';
 import ClearIcon from '@mui/icons-material/Clear';
 import { TimesheetDetailModal } from './TimesheetDetailModal';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/toast-utils';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 
 interface Crew {
@@ -139,11 +140,10 @@ export function TimesheetGrid() {
       if (crewError) throw crewError;
       setAllCrews(crewData || []);
     } catch (error: any) {
-      toast({
-        title: 'Error loading data',
-        description: error.message,
-        variant: 'destructive',
-      });
+      showErrorToast(
+        'Error loading data',
+        error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -212,11 +212,10 @@ export function TimesheetGrid() {
 
       setTimesheets(organized);
     } catch (error: any) {
-      toast({
-        title: 'Error loading timesheets',
-        description: error.message,
-        variant: 'destructive',
-      });
+      showErrorToast(
+        'Error loading timesheets',
+        error.message
+      );
     }
   };
 
