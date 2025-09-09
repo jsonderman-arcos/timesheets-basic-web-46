@@ -217,16 +217,18 @@ export default function ReportsPage() {
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
           <div className="flex gap-4 bg-white">
-            <TextField
-              id="start-date"
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              size="small"
-              className="w-64"
-            />
+            <div className="bg-white">
+              <TextField
+                id="start-date"
+                label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                className="w-64"
+              />
+            </div>
             <TextField
               id="end-date"
               label="End Date"
