@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { TextField } from '@mui/material';
 import { supabase } from '@/integrations/supabase/client';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 
@@ -216,24 +217,26 @@ export default function ReportsPage() {
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
           <div className="flex gap-4 bg-white">
-            <div className="space-y-2 bg-white">
-              <Label htmlFor="start-date">Start Date</Label>
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2 bg-white">
-              <Label htmlFor="end-date">End Date</Label>
-              <Input
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
+            <TextField
+              id="start-date"
+              label="Start Date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              className="w-64"
+            />
+            <TextField
+              id="end-date"
+              label="End Date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              className="w-64"
+            />
           </div>
 
           {drillDown.level === 'company' && (
