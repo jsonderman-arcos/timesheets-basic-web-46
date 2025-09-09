@@ -200,20 +200,6 @@ export default function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {drillDown.level !== 'company' && (
-                <Button variant="ghost" size="sm" onClick={handleBack}>
-                  <ChevronLeft className="w-4 h-4" />
-                  Back
-                </Button>
-              )}
-              <span>{getBreadcrumb()}</span>
-            </div>
-            <Badge variant="secondary">
-              Total: {getTotalHours().toFixed(1)} hours
-            </Badge>
-          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
           <div className="flex gap-4 bg-white">
