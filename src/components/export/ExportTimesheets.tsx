@@ -161,11 +161,6 @@ export function ExportTimesheets() {
           >
             {loading ? 'Exporting…' : 'Export Timesheets'}
           </Button>
-          
-          <div className="text-sm text-muted-foreground flex items-center gap-1">
-            <CalendarMonthIcon fontSize="small" />
-            {dateRange.start} {dateRange.end}
-          </div>
         </div>
 
         {exportType === 'excel' && (
