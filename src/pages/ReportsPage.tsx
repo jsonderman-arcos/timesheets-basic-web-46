@@ -215,7 +215,7 @@ export default function ReportsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
-          <div className="flex gap-4">
+          <div className="flex gap-4 bg-white">
             <div className="space-y-2">
               <Label htmlFor="start-date">Start Date</Label>
               <Input
@@ -237,7 +237,7 @@ export default function ReportsPage() {
           </div>
 
           {drillDown.level === 'company' && (
-            <Table>
+            <Table className="bg-white">
               <TableHeader>
                 <TableRow>
                   <TableHead>Company</TableHead>
@@ -274,7 +274,7 @@ export default function ReportsPage() {
           )}
 
           {drillDown.level === 'team' && (
-            <Table>
+            <Table className="bg-white">
               <TableHeader>
                 <TableRow>
                   <TableHead>Team Name</TableHead>
@@ -311,7 +311,7 @@ export default function ReportsPage() {
           )}
 
           {drillDown.level === 'daily' && (
-            <Table>
+            <Table className="bg-white">
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
