@@ -15,14 +15,9 @@ import {
   Box,
   Button,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  Divider,
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PersonIcon from '@mui/icons-material/Person';
@@ -71,8 +66,9 @@ interface MemberFormData {
   start_time: string;
   end_time: string;
   work_description: string;
-  status: string;
-  location: string;
+  working_hours: number;
+  traveling_hours: number;
+  standby_hours: number;
 }
 
 interface TimesheetDetailModalProps {
@@ -108,17 +104,17 @@ export function TimesheetDetailModal({
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState<'crew' | 'individual'>('crew');
   const [crewMembers, setCrewMembers] = useState<CrewMember[]>([]);
-  const [memberTimesheets, setMemberTimesheets] = useState<Timesheet[]>([]);
   
   const modalDate = timesheet?.date || new Date().toISOString().split('T')[0];
   
   // Form state for crew-level editing
   const [formData, setFormData] = useState({
-    start_time: '',
-    end_time: '',
+    start_time: '08:00',
+    end_time: '17:00',
     work_description: '',
-    status: 'draft' as string,
-    location: '',
+    working_hours: 8,
+    traveling_hours: 0,
+    standby_hours: 0,
   });
 
   // Form state for individual member editing
@@ -142,98 +138,41 @@ export function TimesheetDetailModal({
       
       setCrewMembers(data || []);
       
-      // Initialize member forms with empty data
+      // Initialize member forms with default scheduled hours
       const initialMemberForms = (data || []).map(member => ({
         member_id: member.id,
-        start_time: '',
-        end_time: '',
+        start_time: '08:00',
+        end_time: '17:00',
         work_description: '',
-        status: 'draft',
-        location: '',
+        working_hours: 8,
+        traveling_hours: 0,
+        standby_hours: 0,
       }));
       setMemberFormsData(initialMemberForms);
     };
 
-    const fetchMemberTimesheets = async () => {
-      if (!crew?.id || !open) return;
-      
-      const { data, error } = await supabase
-        .from('time_entries')
-        .select('*')
-        .eq('crew_id', crew.id)
-        .eq('date', modalDate)
-        .not('member_id', 'is', null);
-      
-      if (error) {
-        console.error('Error fetching member timesheets:', error);
-        return;
-      }
-      
-      setMemberTimesheets(data || []);
-      
-      // Update member forms with existing timesheet data
-      if (data && data.length > 0 && crewMembers.length > 0) {
-        const updatedForms = crewMembers.map(member => {
-          const existingTimesheet = data.find(ts => ts.member_id === member.id);
-          return existingTimesheet ? {
-            member_id: member.id,
-            start_time: existingTimesheet.start_time || '',
-            end_time: existingTimesheet.end_time || '',
-            work_description: existingTimesheet.work_description || '',
-            status: existingTimesheet.status || 'draft',
-            location: (existingTimesheet as any).location || '',
-          } : {
-            member_id: member.id,
-            start_time: '',
-            end_time: '',
-            work_description: '',
-            status: 'draft',
-            location: '',
-          };
-        });
-        setMemberFormsData(updatedForms);
-      }
-    };
-
-    fetchCrewMembers().then(() => {
-      if (crewMembers.length > 0) {
-        fetchMemberTimesheets();
-      }
-    });
+    fetchCrewMembers();
   }, [crew?.id, open, modalDate]);
-
-  // Update member forms when crew members change
-  useEffect(() => {
-    if (crewMembers.length > 0 && memberFormsData.length === 0) {
-      const initialMemberForms = crewMembers.map(member => ({
-        member_id: member.id,
-        start_time: '',
-        end_time: '',
-        work_description: '',
-        status: 'draft',
-        location: '',
-      }));
-      setMemberFormsData(initialMemberForms);
-    }
-  }, [crewMembers, memberFormsData.length]);
 
   // Reset form when timesheet or crew changes
   useEffect(() => {
     if (timesheet) {
       setFormData({
-        start_time: timesheet.start_time || '',
-        end_time: timesheet.end_time || '',
+        start_time: timesheet.start_time || '08:00',
+        end_time: timesheet.end_time || '17:00',
         work_description: timesheet.work_description || '',
-        status: timesheet.status || 'draft',
-        location: (timesheet as any).location || '',
+        working_hours: timesheet.hours_regular || 8,
+        traveling_hours: 0,
+        standby_hours: 0,
       });
     } else {
       setFormData({
-        start_time: '',
-        end_time: '',
+        start_time: '08:00',
+        end_time: '17:00',
         work_description: '',
-        status: 'draft',
-        location: '',
+        working_hours: 8,
+        traveling_hours: 0,
+        standby_hours: 0,
       });
     }
     setIsEditing(false);
@@ -261,20 +200,18 @@ export function TimesheetDetailModal({
     });
   };
 
-  const calculateHours = (startTime: string, endTime: string) => {
-    if (!startTime || !endTime) return { regular: 0, overtime: 0 };
+  const calculateTotalHours = (startTime: string, endTime: string) => {
+    if (!startTime || !endTime) return 0;
     
     const start = new Date(`2000-01-01T${startTime}`);
     const end = new Date(`2000-01-01T${endTime}`);
     
-    if (end <= start) return { regular: 0, overtime: 0 };
+    if (end <= start) return 0;
     
-    const totalHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-    const regular = Math.min(totalHours, 8);
-    const overtime = Math.max(0, totalHours - 8);
-    
-    return { regular, overtime };
+    return (end.getTime() - start.getTime()) / (1000 * 60 * 60);
   };
+
+  const currentTotalHours = calculateTotalHours(formData.start_time, formData.end_time);
 
   const handleSave = async () => {
     if (editMode === 'crew') {
@@ -290,18 +227,17 @@ export function TimesheetDetailModal({
 
       setLoading(true);
       try {
-        const { regular, overtime } = calculateHours(formData.start_time, formData.end_time);
+        const totalHours = calculateTotalHours(formData.start_time, formData.end_time);
         
         const timesheetData = {
           crew_id: crew.id,
           date: modalDate,
           start_time: formData.start_time,
           end_time: formData.end_time,
-          hours_regular: regular,
-          hours_overtime: overtime,
+          hours_regular: totalHours,
+          hours_overtime: 0,
           work_description: formData.work_description,
-          status: formData.status,
-          location: formData.location,
+          status: 'draft',
         };
 
         if (timesheet) {
@@ -360,18 +296,17 @@ export function TimesheetDetailModal({
       setLoading(true);
       try {
         const timesheetEntries = validMembers.map(memberData => {
-          const { regular, overtime } = calculateHours(memberData.start_time, memberData.end_time);
+          const totalHours = calculateTotalHours(memberData.start_time, memberData.end_time);
           return {
             crew_id: crew.id,
             member_id: memberData.member_id,
             date: modalDate,
             start_time: memberData.start_time,
             end_time: memberData.end_time,
-            hours_regular: regular,
-            hours_overtime: overtime,
+            hours_regular: totalHours,
+            hours_overtime: 0,
             work_description: memberData.work_description,
-            status: memberData.status,
-            location: memberData.location,
+            status: 'draft',
           };
         });
 
@@ -409,7 +344,7 @@ export function TimesheetDetailModal({
     }
   };
 
-  const updateMemberFormData = (memberIndex: number, field: keyof MemberFormData, value: string) => {
+  const updateMemberFormData = (memberIndex: number, field: keyof MemberFormData, value: string | number) => {
     setMemberFormsData(prev => 
       prev.map((member, index) => 
         index === memberIndex ? { ...member, [field]: value } : member
@@ -420,17 +355,16 @@ export function TimesheetDetailModal({
   const handleCancel = () => {
     if (timesheet) {
       setFormData({
-        start_time: timesheet.start_time || '',
-        end_time: timesheet.end_time || '',
+        start_time: timesheet.start_time || '08:00',
+        end_time: timesheet.end_time || '17:00',
         work_description: timesheet.work_description || '',
-        status: timesheet.status || 'draft',
-        location: (timesheet as any).location || '',
+        working_hours: timesheet.hours_regular || 8,
+        traveling_hours: 0,
+        standby_hours: 0,
       });
     }
     setIsEditing(false);
   };
-
-  const currentHours = calculateHours(formData.start_time, formData.end_time);
 
   return (
     <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md" fullWidth>
@@ -547,35 +481,43 @@ export function TimesheetDetailModal({
                         
                         <Box>
                           <Typography variant="body2" color="text.secondary">
-                            Regular Hours: {currentHours.regular.toFixed(2)} | Overtime Hours: {currentHours.overtime.toFixed(2)}
+                            Total Hours: {currentTotalHours.toFixed(2)}
                           </Typography>
                         </Box>
-                        
-                        <FormControl fullWidth size="small">
-                          <InputLabel>Status</InputLabel>
-                          <Select
-                            value={formData.status}
-                            label="Status"
-                            onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                          >
-                            <MenuItem value="draft">Draft</MenuItem>
-                            <MenuItem value="submitted">Submitted</MenuItem>
-                            <MenuItem value="approved">Approved</MenuItem>
-                            <MenuItem value="rejected">Rejected</MenuItem>
-                          </Select>
-                        </FormControl>
+
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <TextField
+                            fullWidth
+                            label="Working Hours"
+                            type="number"
+                            size="small"
+                            inputProps={{ min: 0, step: 0.5 }}
+                            value={formData.working_hours}
+                            onChange={(e) => setFormData(prev => ({ ...prev, working_hours: parseFloat(e.target.value) || 0 }))}
+                          />
+                          <TextField
+                            fullWidth
+                            label="Traveling Hours"
+                            type="number"
+                            size="small"
+                            inputProps={{ min: 0, step: 0.5 }}
+                            value={formData.traveling_hours}
+                            onChange={(e) => setFormData(prev => ({ ...prev, traveling_hours: parseFloat(e.target.value) || 0 }))}
+                          />
+                          <TextField
+                            fullWidth
+                            label="Standby Hours"
+                            type="number"
+                            size="small"
+                            inputProps={{ min: 0, step: 0.5 }}
+                            value={formData.standby_hours}
+                            onChange={(e) => setFormData(prev => ({ ...prev, standby_hours: parseFloat(e.target.value) || 0 }))}
+                          />
+                        </Box>
                         
                         <TextField
                           fullWidth
-                          label="Location"
-                          size="small"
-                          value={formData.location}
-                          onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                        />
-                        
-                        <TextField
-                          fullWidth
-                          label="Work Description"
+                          label="Notes"
                           multiline
                           rows={3}
                           size="small"
@@ -593,7 +535,7 @@ export function TimesheetDetailModal({
                           const memberData = memberFormsData[memberIndex];
                           if (!memberData) return null;
                           
-                          const memberHours = calculateHours(memberData.start_time, memberData.end_time);
+                          const memberTotalHours = calculateTotalHours(memberData.start_time, memberData.end_time);
                           
                           return (
                             <Card key={member.id} variant="outlined" sx={{ p: 2 }}>
@@ -629,37 +571,43 @@ export function TimesheetDetailModal({
                                 
                                 {memberData.start_time && memberData.end_time && (
                                   <Typography variant="body2" color="text.secondary">
-                                    Regular: {memberHours.regular.toFixed(2)}h | Overtime: {memberHours.overtime.toFixed(2)}h
+                                    Total Hours: {memberTotalHours.toFixed(2)}
                                   </Typography>
                                 )}
-                                
+
                                 <Box sx={{ display: 'flex', gap: 2 }}>
-                                  <FormControl size="small" sx={{ minWidth: 120 }}>
-                                    <InputLabel>Status</InputLabel>
-                                    <Select
-                                      value={memberData.status}
-                                      label="Status"
-                                      onChange={(e) => updateMemberFormData(memberIndex, 'status', e.target.value)}
-                                    >
-                                      <MenuItem value="draft">Draft</MenuItem>
-                                      <MenuItem value="submitted">Submitted</MenuItem>
-                                      <MenuItem value="approved">Approved</MenuItem>
-                                      <MenuItem value="rejected">Rejected</MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                  
                                   <TextField
                                     fullWidth
-                                    label="Location"
+                                    label="Working Hours"
+                                    type="number"
                                     size="small"
-                                    value={memberData.location}
-                                    onChange={(e) => updateMemberFormData(memberIndex, 'location', e.target.value)}
+                                    inputProps={{ min: 0, step: 0.5 }}
+                                    value={memberData.working_hours}
+                                    onChange={(e) => updateMemberFormData(memberIndex, 'working_hours', parseFloat(e.target.value) || 0)}
+                                  />
+                                  <TextField
+                                    fullWidth
+                                    label="Traveling Hours"
+                                    type="number"
+                                    size="small"
+                                    inputProps={{ min: 0, step: 0.5 }}
+                                    value={memberData.traveling_hours}
+                                    onChange={(e) => updateMemberFormData(memberIndex, 'traveling_hours', parseFloat(e.target.value) || 0)}
+                                  />
+                                  <TextField
+                                    fullWidth
+                                    label="Standby Hours"
+                                    type="number"
+                                    size="small"
+                                    inputProps={{ min: 0, step: 0.5 }}
+                                    value={memberData.standby_hours}
+                                    onChange={(e) => updateMemberFormData(memberIndex, 'standby_hours', parseFloat(e.target.value) || 0)}
                                   />
                                 </Box>
                                 
                                 <TextField
                                   fullWidth
-                                  label="Work Description"
+                                  label="Notes"
                                   multiline
                                   rows={2}
                                   size="small"
@@ -685,25 +633,13 @@ export function TimesheetDetailModal({
                         <Typography variant="body1">{formatTime(timesheet.end_time)}</Typography>
                       </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 4 }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body2" color="text.secondary">Regular Hours</Typography>
-                        <Typography variant="body1">{timesheet.hours_regular.toFixed(2)}</Typography>
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body2" color="text.secondary">Overtime Hours</Typography>
-                        <Typography variant="body1">{timesheet.hours_overtime.toFixed(2)}</Typography>
-                      </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Total Hours</Typography>
+                      <Typography variant="body1">{timesheet.hours_regular.toFixed(2)}</Typography>
                     </Box>
-                    {(timesheet as any).location && (
-                      <Box>
-                        <Typography variant="body2" color="text.secondary">Location</Typography>
-                        <Typography variant="body1">{(timesheet as any).location}</Typography>
-                      </Box>
-                    )}
                     {timesheet.work_description && (
                       <Box>
-                        <Typography variant="body2" color="text.secondary">Work Description</Typography>
+                        <Typography variant="body2" color="text.secondary">Notes</Typography>
                         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
                           {timesheet.work_description}
                         </Typography>
