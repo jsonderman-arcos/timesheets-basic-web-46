@@ -37,7 +37,14 @@ interface Crew {
   company_id: string;
 }
 
+interface Company {
+  id: string;
+  name: string;
+}
+
 export function GpsTracking() {
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
   const [crews, setCrews] = useState<Crew[]>([]);
   const [selectedCrew, setSelectedCrew] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -46,8 +53,13 @@ export function GpsTracking() {
   const { toast } = useToast();
 
   useEffect(() => {
+    fetchCompanies();
     fetchCrews();
   }, []);
+
+  useEffect(() => {
+    fetchCrews();
+  }, [selectedCompany]);
 
   useEffect(() => {
     if (selectedCrew && selectedDate) {
@@ -55,17 +67,52 @@ export function GpsTracking() {
     }
   }, [selectedCrew, selectedDate]);
 
+  const fetchCompanies = async () => {
+    try {
+      console.log('Fetching companies for GPS...');
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name')
+        .eq('active', true)
+        .order('name');
+
+      console.log('Companies result:', { data, error, count: data?.length });
+      if (error) throw error;
+      setCompanies(data || []);
+    } catch (error: any) {
+      console.error('Error fetching companies:', error);
+      showErrorToast(
+        "Error loading companies",
+        error.message
+      );
+    }
+  };
+
   const fetchCrews = async () => {
     try {
       console.log('Fetching crews for GPS...');
-      const { data, error } = await supabase
+      let query = supabase
         .from('crews')
         .select('id, crew_name, company_id')
-        .order('crew_name');
+        .eq('active', true);
+
+      if (selectedCompany) {
+        query = query.eq('company_id', selectedCompany);
+      }
+
+      const { data, error } = await query.order('crew_name');
 
       console.log('Crews result:', { data, error, count: data?.length });
       if (error) throw error;
       setCrews(data || []);
+      
+      // Reset crew selection if the current selection is not in the new list
+      if (selectedCrew && data) {
+        const crewExists = data.some(crew => crew.id === selectedCrew);
+        if (!crewExists) {
+          setSelectedCrew('');
+        }
+      }
     } catch (error: any) {
       console.error('Error fetching crews:', error);
       showErrorToast(
@@ -143,10 +190,43 @@ export function GpsTracking() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Crew and Date Selectors */}
-            <div className="flex gap-4 items-end">
+            {/* Company, Crew and Date Selectors */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              {/* Company Selector */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Select Company</label>
+                <FormControl size="small" className="w-full">
+                  <InputLabel id="company-label">Company</InputLabel>
+                  <Select
+                    labelId="company-label"
+                    id="company-select"
+                    value={selectedCompany}
+                    label="Company"
+                    onChange={(e) => {
+                      setSelectedCompany(e.target.value as string);
+                      setSelectedCrew(''); // Reset crew selection when company changes
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 1400,
+                          backgroundColor: 'white'
+                        }
+                      }
+                    }}
+                  >
+                    <MenuItem value="">All Companies</MenuItem>
+                    {companies.map((company) => (
+                      <MenuItem key={company.id} value={company.id}>
+                        {company.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+
               {/* Crew Selector */}
-              <div className="flex-1">
+              <div>
                 <label className="block text-sm font-medium mb-2">Select Crew</label>
                 <FormControl size="small" className="w-full">
                   <InputLabel id="crew-label">Crew</InputLabel>
@@ -156,6 +236,14 @@ export function GpsTracking() {
                     value={selectedCrew}
                     label="Crew"
                     onChange={(e) => setSelectedCrew(e.target.value as string)}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 1400,
+                          backgroundColor: 'white'
+                        }
+                      }
+                    }}
                   >
                     {crews.map((crew) => (
                       <MenuItem key={crew.id} value={crew.id}>
@@ -167,7 +255,7 @@ export function GpsTracking() {
               </div>
 
               {/* Date Selector */}
-              <div className="flex-1">
+              <div>
                 <label className="block text-sm font-medium mb-2">Select Date</label>
                 <div className="flex items-center gap-2">
                   <Button variant="outlined" size="small" onClick={goToPreviousDay} className="px-3">
@@ -180,7 +268,7 @@ export function GpsTracking() {
                     value={format(selectedDate, 'yyyy-MM-dd')}
                     onChange={(e) => setSelectedDate(new Date(e.target.value))}
                     InputLabelProps={{ shrink: true }}
-                    className="min-w-[200px]"
+                    className="min-w-[150px]"
                   />
 
                   <Button variant="outlined" size="small" onClick={goToNextDay} className="px-3">
