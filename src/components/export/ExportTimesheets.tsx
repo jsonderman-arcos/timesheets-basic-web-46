@@ -138,21 +138,21 @@ export function ExportTimesheets() {
           />
         </div>
 
-        <FormControl size="small" className="w-full md:w-1/2">
-          <InputLabel id="export-type-label">Export Format</InputLabel>
-          <Select
-            labelId="export-type-label"
-            id="export-type"
-            value={exportType}
-            label="Export Format"
-            onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
-          >
-            <MenuItem value="csv">CSV Format</MenuItem>
-            <MenuItem value="excel" disabled>Excel Format (Coming Soon)</MenuItem>
-          </Select>
-        </FormControl>
-
-        <div className="flex items-center gap-4">
+        <div className="flex items-end gap-4">
+          <FormControl size="small" className="flex-1">
+            <InputLabel id="export-type-label">Export Format</InputLabel>
+            <Select
+              labelId="export-type-label"
+              id="export-type"
+              value={exportType}
+              label="Export Format"
+              onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
+            >
+              <MenuItem value="csv">CSV Format</MenuItem>
+              <MenuItem value="excel" disabled>Excel Format (Coming Soon)</MenuItem>
+            </Select>
+          </FormControl>
+          
           <Button
             onClick={exportTimesheets}
             disabled={loading || exportType === 'excel'}
