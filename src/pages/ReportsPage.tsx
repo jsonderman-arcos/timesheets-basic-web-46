@@ -216,7 +216,7 @@ export default function ReportsPage() {
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
           <div className="flex gap-4 bg-white">
-            <div className="space-y-2">
+            <div className="space-y-2 bg-white">
               <Label htmlFor="start-date">Start Date</Label>
               <Input
                 id="start-date"
@@ -225,7 +225,7 @@ export default function ReportsPage() {
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 bg-white">
               <Label htmlFor="end-date">End Date</Label>
               <Input
                 id="end-date"
