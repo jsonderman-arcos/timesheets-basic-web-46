@@ -89,10 +89,15 @@ export function TimesheetDetailModal({
   return (
     <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md" fullWidth>
       <DialogTitle>
-        <Box className="flex items-center gap-2">
-          <PersonIcon fontSize="small" />
+        <Box className="flex items-center justify-between">
+          <Box className="flex items-center gap-2">
+            <PersonIcon fontSize="small" />
+            <Typography component="span" variant="h6" fontWeight={600}>
+              {crew.crew_name}
+            </Typography>
+          </Box>
           <Typography component="span" variant="h6" fontWeight={600}>
-            {crew.crew_name} – {formatDate(modalDate)}
+            {formatDate(modalDate)}
           </Typography>
         </Box>
       </DialogTitle>
