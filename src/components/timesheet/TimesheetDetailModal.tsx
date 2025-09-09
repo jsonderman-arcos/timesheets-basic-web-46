@@ -226,6 +226,9 @@ export function TimesheetDetailModal({
           hours_regular: totalHours,
           hours_overtime: 0,
           work_description: formData.work_description,
+          working_hours: formData.working_hours,
+          traveling_hours: formData.traveling_hours,
+          standby_hours: formData.standby_hours,
         };
 
         if (timesheet) {
@@ -315,6 +318,9 @@ export function TimesheetDetailModal({
             hours_regular: totalHours,
             hours_overtime: 0,
             work_description: memberData.work_description,
+            working_hours: memberData.working_hours,
+            traveling_hours: memberData.traveling_hours,
+            standby_hours: memberData.standby_hours,
           };
         });
 

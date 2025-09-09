@@ -298,12 +298,15 @@ export type Database = {
           id: string
           location: string | null
           member_id: string | null
+          standby_hours: number | null
           start_time: string
           status: string
           submitted_at: string | null
           submitted_by: string | null
+          traveling_hours: number | null
           work_description: string | null
           work_package_id: string | null
+          working_hours: number | null
         }
         Insert: {
           comments?: string | null
@@ -317,12 +320,15 @@ export type Database = {
           id?: string
           location?: string | null
           member_id?: string | null
+          standby_hours?: number | null
           start_time: string
           status?: string
           submitted_at?: string | null
           submitted_by?: string | null
+          traveling_hours?: number | null
           work_description?: string | null
           work_package_id?: string | null
+          working_hours?: number | null
         }
         Update: {
           comments?: string | null
@@ -336,12 +342,15 @@ export type Database = {
           id?: string
           location?: string | null
           member_id?: string | null
+          standby_hours?: number | null
           start_time?: string
           status?: string
           submitted_at?: string | null
           submitted_by?: string | null
+          traveling_hours?: number | null
           work_description?: string | null
           work_package_id?: string | null
+          working_hours?: number | null
         }
         Relationships: [
           {

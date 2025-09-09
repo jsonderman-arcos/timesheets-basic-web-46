@@ -28,6 +28,9 @@ interface DailyReport {
   date: string;
   timesheetId: string;
   hours: number;
+  workingHours: number;
+  travelingHours: number;
+  standbyHours: number;
   workDescription: string;
   status: string;
 }
@@ -132,6 +135,9 @@ export default function ReportsPage() {
           date,
           hours_regular,
           hours_overtime,
+          working_hours,
+          traveling_hours,
+          standby_hours,
           work_description,
           status
         `)
@@ -147,6 +153,9 @@ export default function ReportsPage() {
         date: entry.date,
         timesheetId: entry.id,
         hours: Number(entry.hours_regular || 0) + Number(entry.hours_overtime || 0),
+        workingHours: Number(entry.working_hours || 0),
+        travelingHours: Number(entry.traveling_hours || 0),
+        standbyHours: Number(entry.standby_hours || 0),
         workDescription: entry.work_description || 'No description',
         status: entry.status
       }));
@@ -281,7 +290,10 @@ export default function ReportsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
-                  <TableHead>Hours</TableHead>
+                  <TableHead>Total Hours</TableHead>
+                  <TableHead>Working</TableHead>
+                  <TableHead>Traveling</TableHead>
+                  <TableHead>Standby</TableHead>
                   <TableHead>Work Description</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -289,13 +301,16 @@ export default function ReportsPage() {
               <TableBody>
                 {isLoadingDaily ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                    <TableCell colSpan={7} className="text-center">Loading...</TableCell>
                   </TableRow>
                 ) : (
                   dailyReports?.map((report) => (
                     <TableRow key={report.timesheetId}>
                       <TableCell>{format(new Date(report.date), 'MMM dd, yyyy')}</TableCell>
                       <TableCell>{report.hours.toFixed(1)} hrs</TableCell>
+                      <TableCell>{report.workingHours.toFixed(1)} hrs</TableCell>
+                      <TableCell>{report.travelingHours.toFixed(1)} hrs</TableCell>
+                      <TableCell>{report.standbyHours.toFixed(1)} hrs</TableCell>
                       <TableCell className="max-w-xs truncate">{report.workDescription}</TableCell>
                       <TableCell>
                         <Badge variant={report.status === 'approved' ? 'default' : 'secondary'}>

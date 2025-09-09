@@ -35,6 +35,9 @@ interface DashboardStats {
   totalCrews: number;
   submittedToday: number;
   pendingExceptions: number;
+  workingHours: number;
+  travelingHours: number;
+  standbyHours: number;
 }
 
 interface HoursByDay {
@@ -44,6 +47,12 @@ interface HoursByDay {
 
 interface HoursByUtility {
   utility: string;
+  hours: number;
+  color: string;
+}
+
+interface HoursByType {
+  type: string;
   hours: number;
   color: string;
 }
@@ -58,9 +67,13 @@ export function Dashboard() {
     totalCrews: 0,
     submittedToday: 0,
     pendingExceptions: 0,
+    workingHours: 0,
+    travelingHours: 0,
+    standbyHours: 0,
   });
   const [hoursByDay, setHoursByDay] = useState<HoursByDay[]>([]);
   const [hoursByUtility, setHoursByUtility] = useState<HoursByUtility[]>([]);
+  const [hoursByType, setHoursByType] = useState<HoursByType[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -90,7 +103,7 @@ export function Dashboard() {
       // Total hours this week
       const { data: weeklyEntries } = await supabase
         .from('time_entries')
-        .select('hours_regular, hours_overtime')
+        .select('hours_regular, hours_overtime, working_hours, traveling_hours, standby_hours')
         .gte('date', lastWeekDate);
 
       // Pending exceptions
@@ -104,11 +117,29 @@ export function Dashboard() {
         0
       );
 
+      const workingHours = (weeklyEntries || []).reduce(
+        (sum, t) => sum + (t.working_hours || 0),
+        0
+      );
+
+      const travelingHours = (weeklyEntries || []).reduce(
+        (sum, t) => sum + (t.traveling_hours || 0),
+        0
+      );
+
+      const standbyHours = (weeklyEntries || []).reduce(
+        (sum, t) => sum + (t.standby_hours || 0),
+        0
+      );
+
       setStats({
         totalHours,
         totalCrews: crewsData?.length || 0,
         submittedToday: todayEntries?.length || 0,
         pendingExceptions: exceptions?.length || 0,
+        workingHours,
+        travelingHours,
+        standbyHours,
       });
 
       // Hours by day of week
@@ -155,6 +186,27 @@ export function Dashboard() {
       }));
 
       setHoursByUtility(utilityData);
+
+      // Hours by work type (Working, Traveling, Standby)
+      const typeData: HoursByType[] = [
+        {
+          type: 'Working',
+          hours: workingHours,
+          color: '#16a34a', // green
+        },
+        {
+          type: 'Traveling', 
+          hours: travelingHours,
+          color: '#dc2626', // red
+        },
+        {
+          type: 'Standby',
+          hours: standbyHours,
+          color: '#ca8a04', // amber
+        },
+      ].filter(item => item.hours > 0); // Only show types with hours > 0
+
+      setHoursByType(typeData);
     } catch (error: any) {
       toast({
         title: 'Error loading dashboard',
@@ -260,7 +312,7 @@ export function Dashboard() {
 
       {/* Charts */}
       <Grid container spacing={3} sx={{ mt: 0 }}>
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
             <CardHeader title={<Typography variant="h6">Hours by Day of Week</Typography>} />
             <Divider />
@@ -280,7 +332,7 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
@@ -300,6 +352,35 @@ export function Dashboard() {
                       style={{ cursor: 'pointer' }}
                     >
                       {hoursByUtility.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={hoursByType}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="hours"
+                    >
+                      {hoursByType.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
