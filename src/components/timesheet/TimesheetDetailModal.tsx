@@ -98,23 +98,6 @@ export function TimesheetDetailModal({
       </DialogTitle>
       <DialogContent dividers>
         <div className="space-y-6">
-          {/* Crew Information */}
-          <Card variant="outlined">
-            <CardHeader
-              title={<Typography variant="subtitle1">Crew Information</Typography>}
-            />
-            <CardContent>
-              <div className="flex justify-between py-1">
-                <Typography variant="body2" fontWeight={600}>Crew Name:</Typography>
-                <Typography variant="body2">{crew.crew_name}</Typography>
-              </div>
-              <Divider className="my-2" />
-              <div className="flex justify-between py-1">
-                <Typography variant="body2" fontWeight={600}>Company ID:</Typography>
-                <Typography variant="body2">{crew.company_id}</Typography>
-              </div>
-            </CardContent>
-          </Card>
 
           {timesheet ? (
             <>
