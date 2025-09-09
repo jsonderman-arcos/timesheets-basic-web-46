@@ -117,7 +117,7 @@ export function ExportTimesheets() {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+        <div className="space-y-4">
           <TextField
             id="start-date"
             label="Start Date"
@@ -128,41 +128,42 @@ export function ExportTimesheets() {
             size="small"
             className="w-64"
           />
-          <TextField
-            id="end-date"
-            label="End Date"
-            type="date"
-            value={dateRange.end}
-            onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-            InputLabelProps={{ shrink: true }}
-            size="small"
-            className="w-64"
-          />
-        </div>
-
-        <div className="flex items-end gap-4">
-          <FormControl size="small" className="w-64">
-            <InputLabel id="export-type-label">Export Format</InputLabel>
-            <Select
-              labelId="export-type-label"
-              id="export-type"
-              value={exportType}
-              label="Export Format"
-              onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
-            >
-              <MenuItem value="csv">CSV Format</MenuItem>
-              <MenuItem value="excel" disabled>Excel Format (Coming Soon)</MenuItem>
-            </Select>
-          </FormControl>
           
-          <Button
-            onClick={exportTimesheets}
-            disabled={loading || exportType === 'excel'}
-            variant="contained"
-            startIcon={loading ? <CircularProgress size={16} /> : <DownloadIcon />}
-          >
-            {loading ? 'Exporting…' : 'Export Timesheets'}
-          </Button>
+          <div className="flex items-end gap-4">
+            <TextField
+              id="end-date"
+              label="End Date"
+              type="date"
+              value={dateRange.end}
+              onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              className="w-64"
+            />
+            
+            <FormControl size="small" className="w-64">
+              <InputLabel id="export-type-label">Export Format</InputLabel>
+              <Select
+                labelId="export-type-label"
+                id="export-type"
+                value={exportType}
+                label="Export Format"
+                onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
+              >
+                <MenuItem value="csv">CSV Format</MenuItem>
+                <MenuItem value="excel" disabled>Excel Format (Coming Soon)</MenuItem>
+              </Select>
+            </FormControl>
+            
+            <Button
+              onClick={exportTimesheets}
+              disabled={loading || exportType === 'excel'}
+              variant="contained"
+              startIcon={loading ? <CircularProgress size={16} /> : <DownloadIcon />}
+            >
+              {loading ? 'Exporting…' : 'Export Timesheets'}
+            </Button>
+          </div>
         </div>
 
         {exportType === 'excel' && (
