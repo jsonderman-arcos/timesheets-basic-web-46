@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -24,21 +24,62 @@ export function ExportTimesheets() {
     start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     end: new Date().toISOString().split('T')[0]
   });
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
+  const [selectedCrew, setSelectedCrew] = useState<string>('');
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [crews, setCrews] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      const { data } = await supabase
+        .from('companies')
+        .select('id, name')
+        .eq('active', true);
+      setCompanies(data || []);
+    };
+    fetchCompanies();
+  }, []);
+
+  useEffect(() => {
+    const fetchCrews = async () => {
+      let query = supabase
+        .from('crews')
+        .select('id, crew_name, company_id')
+        .eq('active', true);
+      
+      if (selectedCompany) {
+        query = query.eq('company_id', selectedCompany);
+      }
+      
+      const { data } = await query;
+      setCrews(data || []);
+    };
+    fetchCrews();
+  }, [selectedCompany]);
 
   const exportTimesheets = async () => {
     setLoading(true);
     try {
-      const { data: timesheets, error } = await supabase
+      let query = supabase
         .from('time_entries')
         .select(`
           *,
-          crews!inner (crew_name, companies!inner(name))
+          crews!inner (crew_name, company_id, companies!inner(name))
         `)
         .gte('date', dateRange.start)
-        .lte('date', dateRange.end)
-        .order('date', { ascending: false });
+        .lte('date', dateRange.end);
+
+      if (selectedCompany) {
+        query = query.eq('crews.company_id', selectedCompany);
+      }
+      
+      if (selectedCrew) {
+        query = query.eq('crew_id', selectedCrew);
+      }
+
+      const { data: timesheets, error } = await query.order('date', { ascending: false });
 
       if (error) throw error;
 
@@ -139,6 +180,45 @@ export function ExportTimesheets() {
               size="small"
               className="w-64"
             />
+          </div>
+
+          <div className="flex items-end gap-4">
+            <FormControl size="small" className="w-64">
+              <InputLabel id="company-label">Filter by Company</InputLabel>
+              <Select
+                labelId="company-label"
+                value={selectedCompany}
+                label="Filter by Company"
+                onChange={(e) => {
+                  setSelectedCompany(e.target.value);
+                  setSelectedCrew(''); // Reset crew selection when company changes
+                }}
+              >
+                <MenuItem value="">All Companies</MenuItem>
+                {companies.map((company) => (
+                  <MenuItem key={company.id} value={company.id}>
+                    {company.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl size="small" className="w-64">
+              <InputLabel id="crew-label">Filter by Crew</InputLabel>
+              <Select
+                labelId="crew-label"
+                value={selectedCrew}
+                label="Filter by Crew"
+                onChange={(e) => setSelectedCrew(e.target.value)}
+              >
+                <MenuItem value="">All Crews</MenuItem>
+                {crews.map((crew) => (
+                  <MenuItem key={crew.id} value={crew.id}>
+                    {crew.crew_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
           
           <div className="flex items-end gap-4">
