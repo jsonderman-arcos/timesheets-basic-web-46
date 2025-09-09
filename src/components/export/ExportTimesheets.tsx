@@ -164,7 +164,7 @@ export function ExportTimesheets() {
           
           <div className="text-sm text-muted-foreground flex items-center gap-1">
             <CalendarMonthIcon fontSize="small" />
-            {dateRange.start} to {dateRange.end}
+            {dateRange.start} {dateRange.end}
           </div>
         </div>
 
