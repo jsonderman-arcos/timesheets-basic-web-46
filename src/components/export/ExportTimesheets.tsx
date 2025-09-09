@@ -55,9 +55,17 @@ export function ExportTimesheets() {
       
       const { data } = await query;
       setCrews(data || []);
+      
+      // Reset crew selection if the current selection is not in the new list
+      if (selectedCrew && data) {
+        const crewExists = data.some(crew => crew.id === selectedCrew);
+        if (!crewExists) {
+          setSelectedCrew('');
+        }
+      }
     };
     fetchCrews();
-  }, [selectedCompany]);
+  }, [selectedCompany, selectedCrew]);
 
   const exportTimesheets = async () => {
     setLoading(true);
