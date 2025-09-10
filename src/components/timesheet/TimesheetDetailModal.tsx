@@ -31,7 +31,6 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CloseIcon from '@mui/icons-material/Close';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import IconButton from '@mui/material/IconButton';
@@ -510,14 +509,6 @@ export function TimesheetDetailModal({
               title="Next Day"
             >
               <ChevronRightIcon />
-            </IconButton>
-            
-            <IconButton
-              onClick={() => onOpenChange(false)}
-              size="small"
-              sx={{ ml: 1 }}
-            >
-              <CloseIcon />
             </IconButton>
           </Box>
         </Box>
