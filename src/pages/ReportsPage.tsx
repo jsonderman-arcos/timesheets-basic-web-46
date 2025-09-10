@@ -266,10 +266,10 @@ export default function ReportsPage() {
             <Table className="bg-white">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Teams</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead className="font-bold">Company</TableHead>
+                  <TableHead className="font-bold">Total Hours</TableHead>
+                  <TableHead className="font-bold">Teams</TableHead>
+                  <TableHead className="font-bold">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -303,10 +303,10 @@ export default function ReportsPage() {
             <Table className="bg-white">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Team Name</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Timesheets</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead className="font-bold">Team Name</TableHead>
+                  <TableHead className="font-bold">Total Hours</TableHead>
+                  <TableHead className="font-bold">Timesheets</TableHead>
+                  <TableHead className="font-bold">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -340,19 +340,18 @@ export default function ReportsPage() {
             <Table className="bg-white">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Working</TableHead>
-                  <TableHead>Traveling</TableHead>
-                  <TableHead>Standby</TableHead>
-                  <TableHead>Work Description</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="font-bold">Date</TableHead>
+                  <TableHead className="font-bold">Total Hours</TableHead>
+                  <TableHead className="font-bold">Working</TableHead>
+                  <TableHead className="font-bold">Traveling</TableHead>
+                  <TableHead className="font-bold">Standby</TableHead>
+                  <TableHead className="font-bold">Work Description</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoadingDaily ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                    <TableCell colSpan={6} className="text-center">Loading...</TableCell>
                   </TableRow>
                 ) : (
                   dailyReports?.map((report) => (
@@ -363,11 +362,6 @@ export default function ReportsPage() {
                       <TableCell>{report.travelingHours.toFixed(1)} hrs</TableCell>
                       <TableCell>{report.standbyHours.toFixed(1)} hrs</TableCell>
                       <TableCell className="max-w-xs truncate">{report.workDescription}</TableCell>
-                      <TableCell>
-                        <Badge variant={report.status === 'approved' ? 'default' : 'secondary'}>
-                          {report.status}
-                        </Badge>
-                      </TableCell>
                     </TableRow>
                   ))
                 )}
