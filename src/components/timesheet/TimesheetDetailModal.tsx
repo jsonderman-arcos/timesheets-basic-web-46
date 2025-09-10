@@ -29,10 +29,16 @@ import GroupIcon from '@mui/icons-material/Group';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import IconButton from '@mui/material/IconButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format, addDays, subDays } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface Crew {
   id: string;
@@ -81,6 +87,7 @@ interface TimesheetDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: () => void;
+  onDateChange: (date: string) => void;
 }
 
 export function TimesheetDetailModal({
@@ -90,6 +97,7 @@ export function TimesheetDetailModal({
   open,
   onOpenChange,
   onUpdate,
+  onDateChange,
 }: TimesheetDetailModalProps) {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -169,6 +177,24 @@ export function TimesheetDetailModal({
     }
     setIsEditing(false);
   }, [timesheet, open]);
+
+  const handlePreviousDay = () => {
+    const currentDate = new Date(selectedDate);
+    const previousDay = subDays(currentDate, 1);
+    onDateChange(format(previousDay, 'yyyy-MM-dd'));
+  };
+
+  const handleNextDay = () => {
+    const currentDate = new Date(selectedDate);
+    const nextDay = addDays(currentDate, 1);
+    onDateChange(format(nextDay, 'yyyy-MM-dd'));
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      onDateChange(format(date, 'yyyy-MM-dd'));
+    }
+  };
 
   if (!crew) return null;
 
@@ -383,9 +409,47 @@ export function TimesheetDetailModal({
             </Box>
           </Box>
           <Box className="flex items-center gap-2">
-            <Typography component="span" variant="h6" fontWeight={600}>
-              {formatDate(modalDate)}
-            </Typography>
+            <IconButton
+              onClick={handlePreviousDay}
+              size="small"
+              title="Previous Day"
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outlined"
+                  className={cn(
+                    "min-w-[180px] justify-center text-center font-medium",
+                    "hover:bg-gray-50"
+                  )}
+                  size="small"
+                >
+                  <CalendarMonthIcon fontSize="small" sx={{ mr: 1 }} />
+                  {format(new Date(modalDate), 'MMM d, yyyy')}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="center">
+                <Calendar
+                  mode="single"
+                  selected={new Date(modalDate)}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+            
+            <IconButton
+              onClick={handleNextDay}
+              size="small"
+              title="Next Day"
+            >
+              <ChevronRightIcon />
+            </IconButton>
+            
             <IconButton
               onClick={() => onOpenChange(false)}
               size="small"

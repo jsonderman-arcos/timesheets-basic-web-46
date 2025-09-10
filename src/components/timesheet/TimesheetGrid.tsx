@@ -461,6 +461,12 @@ export function TimesheetGrid() {
           setSelectedDate('');
         }}
         onUpdate={refreshData}
+        onDateChange={(newDate) => {
+          setSelectedDate(newDate);
+          // Find timesheet for the new date
+          const newTimesheet = selectedCrew ? timesheets[selectedCrew.id]?.[newDate] || null : null;
+          setSelectedTimesheet(newTimesheet);
+        }}
       />
     </>
   );
