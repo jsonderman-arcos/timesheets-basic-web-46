@@ -196,6 +196,10 @@ export function MapView({ gpsPoints }: MapViewProps) {
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
 
+      console.log('Total GPS points received:', gpsPoints.length);
+      console.log('Sorted GPS points:', sortedPoints.length);
+      console.log('GPS points data:', sortedPoints.map((p, i) => `${i+1}: ${p.timestamp}`));
+
       // Add GPS points as markers
       sortedPoints.forEach((point, index) => {
         if (!map.current) return;
