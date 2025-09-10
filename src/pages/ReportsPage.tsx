@@ -262,7 +262,7 @@ export default function ReportsPage() {
       <Card>
         <CardHeader className="bg-white">
           {drillDown.level === 'company' && (
-            <div className="flex items-center justify-between border-b pb-2 bg-white">
+            <div className="grid grid-cols-4 gap-4 border-b pb-2 bg-white text-center">
               <span className="font-medium">Company</span>
               <span className="font-medium">Total Hours</span>
               <span className="font-medium">Teams</span>
@@ -270,7 +270,7 @@ export default function ReportsPage() {
             </div>
           )}
           {drillDown.level === 'team' && (
-            <div className="flex items-center justify-between border-b pb-2 bg-white">
+            <div className="grid grid-cols-4 gap-4 border-b pb-2 bg-white text-center">
               <span className="font-medium">Team Name</span>
               <span className="font-medium">Total Hours</span>
               <span className="font-medium">Timesheets</span>
@@ -278,14 +278,13 @@ export default function ReportsPage() {
             </div>
           )}
           {drillDown.level === 'daily' && (
-            <div className="grid grid-cols-7 gap-4 border-b pb-2 bg-white">
+            <div className="grid grid-cols-6 gap-4 border-b pb-2 bg-white text-center">
               <span className="font-medium">Date</span>
               <span className="font-medium">Total Hours</span>
               <span className="font-medium">Working</span>
               <span className="font-medium">Traveling</span>
               <span className="font-medium">Standby</span>
               <span className="font-medium">Work Description</span>
-              <span className="font-medium">Status</span>
             </div>
           )}
         </CardHeader>
@@ -297,23 +296,23 @@ export default function ReportsPage() {
                   <TableRow>
                     <TableCell colSpan={4} className="text-center">Loading...</TableCell>
                   </TableRow>
-                ) : (
-                  companyReports?.map((report) => (
-                    <TableRow key={report.utility}>
-                      <TableCell className="font-medium">{report.utility}</TableCell>
-                      <TableCell>{report.totalHours.toFixed(1)} hrs</TableCell>
-                      <TableCell>{report.crewCount} teams</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCompanyDrillDown(report.utility)}
-                        >
-                          View Teams <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                 ) : (
+                   companyReports?.map((report) => (
+                     <TableRow key={report.utility}>
+                       <TableCell className="font-medium text-center">{report.utility}</TableCell>
+                       <TableCell className="text-center">{report.totalHours.toFixed(1)} hrs</TableCell>
+                       <TableCell className="text-center">{report.crewCount} teams</TableCell>
+                       <TableCell className="text-center">
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => handleCompanyDrillDown(report.utility)}
+                         >
+                           View Teams <ChevronRight className="w-4 h-4 ml-1" />
+                         </Button>
+                       </TableCell>
+                     </TableRow>
+                   ))
                 )}
               </TableBody>
             </Table>
@@ -326,23 +325,23 @@ export default function ReportsPage() {
                   <TableRow>
                     <TableCell colSpan={4} className="text-center">Loading...</TableCell>
                   </TableRow>
-                ) : (
-                  teamReports?.map((report) => (
-                    <TableRow key={report.crewId}>
-                      <TableCell className="font-medium">{report.crewName}</TableCell>
-                      <TableCell>{report.totalHours.toFixed(1)} hrs</TableCell>
-                      <TableCell>{report.timesheetCount} submissions</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleTeamDrillDown(report.crewId, report.crewName)}
-                        >
-                          View Daily <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                 ) : (
+                   teamReports?.map((report) => (
+                     <TableRow key={report.crewId}>
+                       <TableCell className="font-medium text-center">{report.crewName}</TableCell>
+                       <TableCell className="text-center">{report.totalHours.toFixed(1)} hrs</TableCell>
+                       <TableCell className="text-center">{report.timesheetCount} submissions</TableCell>
+                       <TableCell className="text-center">
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => handleTeamDrillDown(report.crewId, report.crewName)}
+                         >
+                           View Daily <ChevronRight className="w-4 h-4 ml-1" />
+                         </Button>
+                       </TableCell>
+                     </TableRow>
+                   ))
                 )}
               </TableBody>
             </Table>
@@ -352,25 +351,20 @@ export default function ReportsPage() {
             <Table className="bg-white">
               <TableBody>
                 {isLoadingDaily ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center">Loading...</TableCell>
-                  </TableRow>
-                ) : (
-                  dailyReports?.map((report) => (
-                    <TableRow key={report.timesheetId}>
-                      <TableCell>{format(new Date(report.date), 'MMM dd, yyyy')}</TableCell>
-                      <TableCell>{report.hours.toFixed(1)} hrs</TableCell>
-                      <TableCell>{report.workingHours.toFixed(1)} hrs</TableCell>
-                      <TableCell>{report.travelingHours.toFixed(1)} hrs</TableCell>
-                      <TableCell>{report.standbyHours.toFixed(1)} hrs</TableCell>
-                      <TableCell className="max-w-xs truncate">{report.workDescription}</TableCell>
-                      <TableCell>
-                        <Badge variant={report.status === 'approved' ? 'default' : 'secondary'}>
-                          {report.status}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                   <TableRow>
+                     <TableCell colSpan={6} className="text-center">Loading...</TableCell>
+                   </TableRow>
+                 ) : (
+                   dailyReports?.map((report) => (
+                     <TableRow key={report.timesheetId}>
+                       <TableCell className="text-center">{format(new Date(report.date), 'MMM dd, yyyy')}</TableCell>
+                       <TableCell className="text-center">{report.hours.toFixed(1)} hrs</TableCell>
+                       <TableCell className="text-center">{report.workingHours.toFixed(1)} hrs</TableCell>
+                       <TableCell className="text-center">{report.travelingHours.toFixed(1)} hrs</TableCell>
+                       <TableCell className="text-center">{report.standbyHours.toFixed(1)} hrs</TableCell>
+                       <TableCell className="text-center max-w-xs truncate">{report.workDescription}</TableCell>
+                     </TableRow>
+                   ))
                 )}
               </TableBody>
             </Table>
