@@ -21,6 +21,8 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
@@ -255,7 +257,17 @@ export function ExceptionManagement() {
       </Card>
 
       <Dialog open={!!selectedException} onClose={() => setSelectedException(null)}>
-        <DialogTitle>Exception Details</DialogTitle>
+        <DialogTitle>
+          <div className="flex items-center justify-between">
+            Exception Details
+            <IconButton 
+              onClick={() => setSelectedException(null)}
+              size="small"
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </div>
+        </DialogTitle>
         <DialogContent className="max-w-2xl">
           {selectedException && (
             <div className="space-y-6 py-2">
