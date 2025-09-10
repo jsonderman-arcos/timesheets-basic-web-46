@@ -181,24 +181,44 @@ export function TimesheetDetailModal({
     setIsEditing(false);
   }, [timesheet, open]);
 
-  const handlePreviousDay = () => {
+  const handlePreviousDay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     try {
-      const currentDate = new Date(selectedDate);
+      console.log('Previous day clicked. Current selectedDate:', selectedDate);
+      
+      // Parse the date string properly
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      const currentDate = new Date(year, month - 1, day); // month is 0-indexed
+      console.log('Parsed current date:', currentDate);
+      
       const previousDay = subDays(currentDate, 1);
+      console.log('Previous day calculated:', previousDay);
+      
       const newDateString = format(previousDay, 'yyyy-MM-dd');
-      console.log('Previous day:', selectedDate, '->', newDateString);
+      console.log('Previous day formatted:', newDateString);
+      
       onDateChange(newDateString);
     } catch (error) {
       console.error('Error in handlePreviousDay:', error);
     }
   };
 
-  const handleNextDay = () => {
+  const handleNextDay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     try {
-      const currentDate = new Date(selectedDate);
+      console.log('Next day clicked. Current selectedDate:', selectedDate);
+      
+      // Parse the date string properly
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      const currentDate = new Date(year, month - 1, day); // month is 0-indexed
+      console.log('Parsed current date:', currentDate);
+      
       const nextDay = addDays(currentDate, 1);
+      console.log('Next day calculated:', nextDay);
+      
       const newDateString = format(nextDay, 'yyyy-MM-dd');
-      console.log('Next day:', selectedDate, '->', newDateString);
+      console.log('Next day formatted:', newDateString);
+      
       onDateChange(newDateString);
     } catch (error) {
       console.error('Error in handleNextDay:', error);
@@ -440,7 +460,7 @@ export function TimesheetDetailModal({
           </Box>
           <Box className="flex items-center gap-2">
             <IconButton
-              onClick={handlePreviousDay}
+              onClick={(e) => handlePreviousDay(e)}
               size="small"
               title="Previous Day"
             >
@@ -485,7 +505,7 @@ export function TimesheetDetailModal({
             </Menu>
             
             <IconButton
-              onClick={handleNextDay}
+              onClick={(e) => handleNextDay(e)}
               size="small"
               title="Next Day"
             >
