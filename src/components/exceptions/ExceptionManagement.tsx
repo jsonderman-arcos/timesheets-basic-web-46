@@ -91,7 +91,7 @@ export function ExceptionManagement() {
     }
   };
 
-  const updateExceptionStatus = async (exceptionId: string, status: 'approved' | 'denied') => {
+  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined') => {
     try {
       const { error } = await supabase
         .from('exceptions')
@@ -111,9 +111,10 @@ export function ExceptionManagement() {
         )
       );
 
+      const statusText = status === 'accepted' ? 'approved' : 'declined';
       showSuccessToast(
         "Exception updated",
-        `Exception has been ${status}.`
+        `Exception has been ${statusText}.`
       );
 
       setSelectedException(null);
@@ -307,10 +308,10 @@ export function ExceptionManagement() {
                 <p>{formatDate(selectedException.created_at)}</p>
               </div>
 
-              {selectedException.status === 'pending' && (
+              {(selectedException.status === 'submitted' || selectedException.status === 'under_review') && (
                 <div className="flex gap-3 pt-4">
                   <Button
-                    onClick={() => updateExceptionStatus(selectedException.id, 'approved')}
+                    onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
                     color="success"
                     variant="contained"
                     startIcon={<CheckCircleIcon fontSize="small" />}
@@ -318,12 +319,12 @@ export function ExceptionManagement() {
                     Approve
                   </Button>
                   <Button
-                    onClick={() => updateExceptionStatus(selectedException.id, 'denied')}
+                    onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
                     color="error"
                     variant="contained"
                     startIcon={<CancelIcon fontSize="small" />}
                   >
-                    Deny
+                    Decline
                   </Button>
                 </div>
               )}
