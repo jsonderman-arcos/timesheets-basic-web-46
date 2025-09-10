@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, ChevronLeft, ChevronRight, FileBarChart } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, FileBarChart, Home } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 import { TextField } from '@mui/material';
 import { supabase } from '@/integrations/supabase/client';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
@@ -179,10 +187,57 @@ export default function ReportsPage() {
     }
   };
 
-  const getBreadcrumb = () => {
-    if (drillDown.level === 'company') return 'Companies';
-    if (drillDown.level === 'team') return `${drillDown.company} > Teams`;
-    return `${drillDown.company} > ${drillDown.teamName} > Daily Reports`;
+  const renderBreadcrumb = () => {
+    return (
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/" className="flex items-center gap-1">
+              <Home className="h-4 w-4" />
+              Home
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          {drillDown.level === 'company' ? (
+            <BreadcrumbItem>
+              <BreadcrumbPage>Reports</BreadcrumbPage>
+            </BreadcrumbItem>
+          ) : (
+            <>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => setDrillDown({ level: 'company' })}
+                  className="cursor-pointer hover:text-foreground"
+                >
+                  Reports
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              {drillDown.level === 'team' ? (
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{drillDown.company}</BreadcrumbPage>
+                </BreadcrumbItem>
+              ) : (
+                <>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink 
+                      onClick={() => setDrillDown({ level: 'team', company: drillDown.company })}
+                      className="cursor-pointer hover:text-foreground"
+                    >
+                      {drillDown.company}
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{drillDown.teamName}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
+            </>
+          )}
+        </BreadcrumbList>
+      </Breadcrumb>
+    );
   };
 
   const getTotalHours = () => {
@@ -200,11 +255,27 @@ export default function ReportsPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileBarChart className="w-6 h-6" />
-          <h1 className="text-2xl font-bold">Reports</h1>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FileBarChart className="w-6 h-6" />
+            <h1 className="text-2xl font-bold">Reports</h1>
+          </div>
         </div>
+        
+        {renderBreadcrumb()}
+        
+        {drillDown.level !== 'company' && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleBack}
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </Button>
+        )}
       </div>
 
       <Card>
