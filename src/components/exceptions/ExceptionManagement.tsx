@@ -27,8 +27,21 @@ import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 interface Exception {
   id: string;
   description: string;
+  reason: string;
   status: string;
   created_at: string;
+  flagged_by: string;
+  time_entries?: {
+    date: string;
+    crews?: {
+      crew_name: string;
+      company_id: string;
+    };
+    crew_members?: {
+      name: string;
+      role: string;
+    };
+  };
 }
 
 export function ExceptionManagement() {
@@ -48,8 +61,21 @@ export function ExceptionManagement() {
         .select(`
           id,
           description,
+          reason,
           status,
-          created_at
+          created_at,
+          flagged_by,
+          time_entries:time_entry_id (
+            date,
+            crews:crew_id (
+              crew_name,
+              company_id
+            ),
+            crew_members:member_id (
+              name,
+              role
+            )
+          )
         `)
         .order('created_at', { ascending: false });
 
@@ -185,15 +211,28 @@ export function ExceptionManagement() {
                 <TableBody>
                   {exceptions.map((exception) => (
                     <TableRow key={exception.id} hover>
-                      <TableCell className="font-medium">General Exception</TableCell>
+                      <TableCell className="font-medium">Schedule Exception</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-semibold">N/A</div>
-                          <div className="text-sm text-muted-foreground">N/A</div>
+                          <div className="font-semibold">
+                            {exception.time_entries?.crews?.crew_name || 'Unknown Crew'}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {exception.time_entries?.date ? new Date(exception.time_entries.date).toLocaleDateString() : 'No date'}
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell>N/A</TableCell>
-                      <TableCell>N/A</TableCell>
+                      <TableCell>{exception.time_entries?.date ? new Date(exception.time_entries.date).toLocaleDateString() : 'N/A'}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-semibold">
+                            {exception.time_entries?.crew_members?.name || exception.flagged_by || 'Unknown'}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {exception.time_entries?.crew_members?.role || 'Supervisor'}
+                          </div>
+                        </div>
+                      </TableCell>
                       <TableCell>{getStatusChip(exception.status)}</TableCell>
                       <TableCell>{formatDate(exception.created_at)}</TableCell>
                       <TableCell>
@@ -223,7 +262,7 @@ export function ExceptionManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Exception Type</h4>
-                  <p>General Exception</p>
+                  <p>Schedule Exception</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Status</h4>
@@ -238,16 +277,35 @@ export function ExceptionManagement() {
                 </p>
               </div>
 
+              <div>
+                <h4 className="font-semibold mb-2">Reason</h4>
+                <p className="text-sm leading-relaxed bg-muted p-3 rounded-md">
+                  {selectedException.reason}
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Crew Information</h4>
-                  <p>N/A</p>
-                  <p className="text-sm text-muted-foreground">N/A</p>
+                  <p className="font-medium">{selectedException.time_entries?.crews?.crew_name || 'Unknown Crew'}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Work Date: {selectedException.time_entries?.date ? new Date(selectedException.time_entries.date).toLocaleDateString() : 'Unknown'}
+                  </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Date Created</h4>
-                  <p>{formatDate(selectedException.created_at)}</p>
+                  <h4 className="font-semibold mb-2">Submitted By</h4>
+                  <p className="font-medium">
+                    {selectedException.time_entries?.crew_members?.name || selectedException.flagged_by || 'Unknown'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedException.time_entries?.crew_members?.role || 'Supervisor'}
+                  </p>
                 </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Date Created</h4>
+                <p>{formatDate(selectedException.created_at)}</p>
               </div>
 
               {selectedException.status === 'pending' && (
