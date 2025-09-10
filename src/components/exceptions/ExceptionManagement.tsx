@@ -97,7 +97,7 @@ export function ExceptionManagement() {
         .from('exceptions')
         .update({ 
           status,
-          reviewed_at: new Date().toISOString()
+          resolved_at: new Date().toISOString()
         })
         .eq('id', exceptionId);
 
