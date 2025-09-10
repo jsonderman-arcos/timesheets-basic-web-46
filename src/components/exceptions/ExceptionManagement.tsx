@@ -320,24 +320,26 @@ export function ExceptionManagement() {
                 <p>{formatDate(selectedException.created_at)}</p>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
-                  color="success"
-                  variant="contained"
-                  startIcon={<CheckCircleIcon fontSize="small" />}
-                >
-                  Approve
-                </Button>
-                <Button
-                  onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
-                  color="error"
-                  variant="contained"
-                  startIcon={<CancelIcon fontSize="small" />}
-                >
-                  Decline
-                </Button>
-              </div>
+              {(selectedException.status === 'submitted' || selectedException.status === 'under_review') && (
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
+                    color="success"
+                    variant="contained"
+                    startIcon={<CheckCircleIcon fontSize="small" />}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
+                    color="error"
+                    variant="contained"
+                    startIcon={<CancelIcon fontSize="small" />}
+                  >
+                    Decline
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
