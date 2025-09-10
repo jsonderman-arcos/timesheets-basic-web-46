@@ -242,7 +242,7 @@ export function ExceptionManagement() {
                           onClick={() => setSelectedException(exception)}
                           startIcon={<VisibilityIcon fontSize="small" />}
                         >
-                          View
+                          Review
                         </Button>
                       </TableCell>
                     </TableRow>
