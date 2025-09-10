@@ -196,22 +196,19 @@ export function ExceptionManagement() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Crew</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Submitted By</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Created</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
+                <Table>
+                 <TableHead>
+                   <TableRow>
+                     <TableCell>Crew</TableCell>
+                     <TableCell>Submitted By</TableCell>
+                     <TableCell>Status</TableCell>
+                     <TableCell>Created</TableCell>
+                     <TableCell>Actions</TableCell>
+                   </TableRow>
+                 </TableHead>
                 <TableBody>
                   {exceptions.map((exception) => (
                     <TableRow key={exception.id} hover>
-                      <TableCell className="font-medium">Schedule Exception</TableCell>
                       <TableCell>
                         <div>
                           <div className="font-semibold">
@@ -222,7 +219,6 @@ export function ExceptionManagement() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{exception.time_entries?.date ? new Date(exception.time_entries.date).toLocaleDateString() : 'N/A'}</TableCell>
                       <TableCell>
                         <div>
                           <div className="font-semibold">
