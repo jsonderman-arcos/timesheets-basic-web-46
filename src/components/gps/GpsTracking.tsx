@@ -127,26 +127,45 @@ export function GpsTracking() {
     try {
       console.log('Fetching GPS data for crew:', selectedCrew, 'date:', selectedDate.toISOString().split('T')[0]);
       
-      // First, get the time entry for this crew and date
-      const { data: timeEntryData, error: timeEntryError } = await supabase
+      // Fetch time entries for this crew and date with GPS locations
+      const { data: timeEntries, error } = await supabase
         .from('time_entries')
-        .select('id')
+        .select('id, gps_locations, created_at')
         .eq('crew_id', selectedCrew)
-        .eq('date', selectedDate.toISOString().split('T')[0])
-        .maybeSingle();
+        .eq('date', selectedDate.toISOString().split('T')[0]);
 
-      if (timeEntryError) throw timeEntryError;
+      if (error) throw error;
 
-      if (!timeEntryData) {
-        console.log('No time entry found for this crew and date');
+      if (!timeEntries || timeEntries.length === 0) {
+        console.log('No time entries found for this crew and date');
         setGpsPoints([]);
         return;
       }
 
-      // For now, we'll simulate GPS data since gps_tracking table doesn't exist
-      // In a real implementation, you would fetch from the actual GPS tracking table
-      console.log('No GPS tracking data available - would need GPS tracking table');
-      setGpsPoints([]);
+      // Extract GPS points from time entries
+      const allGpsPoints: GpsPoint[] = [];
+      
+      timeEntries.forEach((entry, entryIndex) => {
+        if (entry.gps_locations && Array.isArray(entry.gps_locations)) {
+          entry.gps_locations.forEach((location: any, locationIndex: number) => {
+            if (location.latitude && location.longitude) {
+              allGpsPoints.push({
+                id: `${entry.id}-${locationIndex}`,
+                latitude: parseFloat(location.latitude),
+                longitude: parseFloat(location.longitude),
+                timestamp: location.timestamp || new Date(entry.created_at || new Date()).toISOString(),
+                accuracy: location.accuracy || 5
+              });
+            }
+          });
+        }
+      });
+
+      // Sort GPS points by timestamp
+      allGpsPoints.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      
+      console.log(`Found ${allGpsPoints.length} GPS points for crew and date`);
+      setGpsPoints(allGpsPoints);
     } catch (error: any) {
       console.error('Error fetching GPS data:', error);
       showErrorToast(
