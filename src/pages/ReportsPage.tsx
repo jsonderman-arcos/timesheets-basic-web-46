@@ -191,13 +191,6 @@ export default function ReportsPage() {
     return (
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/" className="flex items-center gap-1">
-              <Home className="h-4 w-4" />
-              Home
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
           {drillDown.level === 'company' ? (
             <BreadcrumbItem>
               <BreadcrumbPage>Reports</BreadcrumbPage>
@@ -265,22 +258,9 @@ export default function ReportsPage() {
         
         {renderBreadcrumb()}
         
-        {drillDown.level !== 'company' && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleBack}
-            className="flex items-center gap-2"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </Button>
-        )}
       </div>
 
       <Card>
-        <CardHeader>
-        </CardHeader>
         <CardContent className="space-y-4 bg-white">
           {drillDown.level === 'company' && (
             <Table className="bg-white">
