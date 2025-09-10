@@ -12,9 +12,13 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Reverse geocode request received')
     const { longitude, latitude } = await req.json()
     
+    console.log(`Reverse geocoding coordinates: ${latitude}, ${longitude}`)
+    
     if (!longitude || !latitude) {
+      console.error('Missing coordinates')
       return new Response(
         JSON.stringify({ error: 'Longitude and latitude are required' }),
         { 
@@ -27,6 +31,7 @@ serve(async (req) => {
     const token = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
     
     if (!token) {
+      console.error('Mapbox token not configured')
       return new Response(
         JSON.stringify({ error: 'Mapbox token not configured' }),
         { 
@@ -36,17 +41,25 @@ serve(async (req) => {
       )
     }
 
+    console.log('Making request to Mapbox API')
+    
     // Call Mapbox Geocoding API for reverse geocoding
-    const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${token}&types=address`
-    )
+    const mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${token}&types=address`
+    const response = await fetch(mapboxUrl)
+
+    console.log(`Mapbox response status: ${response.status}`)
 
     if (!response.ok) {
-      throw new Error('Failed to fetch address from Mapbox')
+      const errorText = await response.text()
+      console.error('Mapbox API error:', errorText)
+      throw new Error(`Mapbox API returned ${response.status}: ${errorText}`)
     }
 
     const data = await response.json()
+    console.log('Mapbox response data:', JSON.stringify(data, null, 2))
+    
     const address = data.features?.[0]?.place_name || 'Address not found'
+    console.log('Resolved address:', address)
 
     return new Response(
       JSON.stringify({ address }),
@@ -55,6 +68,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error('Error in reverse-geocode function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
