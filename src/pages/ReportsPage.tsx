@@ -262,7 +262,7 @@ export default function ReportsPage() {
       <Card>
         <CardHeader>
           {drillDown.level === 'company' && (
-            <div className="flex items-center justify-between border-b pb-2">
+            <div className="flex items-center justify-between border-b pb-2 bg-white">
               <span className="font-medium">Company</span>
               <span className="font-medium">Total Hours</span>
               <span className="font-medium">Teams</span>
@@ -270,7 +270,7 @@ export default function ReportsPage() {
             </div>
           )}
           {drillDown.level === 'team' && (
-            <div className="flex items-center justify-between border-b pb-2">
+            <div className="flex items-center justify-between border-b pb-2 bg-white">
               <span className="font-medium">Team Name</span>
               <span className="font-medium">Total Hours</span>
               <span className="font-medium">Timesheets</span>
@@ -278,7 +278,7 @@ export default function ReportsPage() {
             </div>
           )}
           {drillDown.level === 'daily' && (
-            <div className="grid grid-cols-7 gap-4 border-b pb-2">
+            <div className="grid grid-cols-7 gap-4 border-b pb-2 bg-white">
               <span className="font-medium">Date</span>
               <span className="font-medium">Total Hours</span>
               <span className="font-medium">Working</span>
