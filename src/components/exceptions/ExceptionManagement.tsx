@@ -127,6 +127,7 @@ export function ExceptionManagement() {
 
   const getStatusChip = (status: string) => {
     switch (status) {
+      case 'submitted':
       case 'pending':
         return (
           <Chip
@@ -136,6 +137,7 @@ export function ExceptionManagement() {
             size="small"
           />
         );
+      case 'accepted':
       case 'approved':
         return (
           <Chip
@@ -145,10 +147,11 @@ export function ExceptionManagement() {
             size="small"
           />
         );
+      case 'declined':
       case 'denied':
         return (
           <Chip
-            label="Denied"
+            label="Declined"
             variant="outlined"
             className="bg-error/10 text-error border-error"
             size="small"
