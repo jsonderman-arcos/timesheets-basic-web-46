@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, ChevronLeft, ChevronRight, FileBarChart, Home } from 'lucide-react';
+import { Calendar, ChevronRight, FileBarChart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -191,13 +191,6 @@ export default function ReportsPage() {
     return (
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/" className="flex items-center gap-1">
-              <Home className="h-4 w-4" />
-              Home
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
           {drillDown.level === 'company' ? (
             <BreadcrumbItem>
               <BreadcrumbPage>Reports</BreadcrumbPage>
@@ -264,34 +257,41 @@ export default function ReportsPage() {
         </div>
         
         {renderBreadcrumb()}
-        
-        {drillDown.level !== 'company' && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleBack}
-            className="flex items-center gap-2"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </Button>
-        )}
       </div>
 
       <Card>
         <CardHeader>
+          {drillDown.level === 'company' && (
+            <div className="flex items-center justify-between border-b pb-2">
+              <span className="font-medium">Company</span>
+              <span className="font-medium">Total Hours</span>
+              <span className="font-medium">Teams</span>
+              <span className="font-medium">Action</span>
+            </div>
+          )}
+          {drillDown.level === 'team' && (
+            <div className="flex items-center justify-between border-b pb-2">
+              <span className="font-medium">Team Name</span>
+              <span className="font-medium">Total Hours</span>
+              <span className="font-medium">Timesheets</span>
+              <span className="font-medium">Action</span>
+            </div>
+          )}
+          {drillDown.level === 'daily' && (
+            <div className="grid grid-cols-7 gap-4 border-b pb-2">
+              <span className="font-medium">Date</span>
+              <span className="font-medium">Total Hours</span>
+              <span className="font-medium">Working</span>
+              <span className="font-medium">Traveling</span>
+              <span className="font-medium">Standby</span>
+              <span className="font-medium">Work Description</span>
+              <span className="font-medium">Status</span>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-4 bg-white">
           {drillDown.level === 'company' && (
             <Table className="bg-white">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Teams</TableHead>
-                  <TableHead>Action</TableHead>
-                </TableRow>
-              </TableHeader>
               <TableBody>
                 {isLoadingCompanies ? (
                   <TableRow>
@@ -321,14 +321,6 @@ export default function ReportsPage() {
 
           {drillDown.level === 'team' && (
             <Table className="bg-white">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Team Name</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Timesheets</TableHead>
-                  <TableHead>Action</TableHead>
-                </TableRow>
-              </TableHeader>
               <TableBody>
                 {isLoadingTeams ? (
                   <TableRow>
@@ -358,17 +350,6 @@ export default function ReportsPage() {
 
           {drillDown.level === 'daily' && (
             <Table className="bg-white">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Total Hours</TableHead>
-                  <TableHead>Working</TableHead>
-                  <TableHead>Traveling</TableHead>
-                  <TableHead>Standby</TableHead>
-                  <TableHead>Work Description</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
               <TableBody>
                 {isLoadingDaily ? (
                   <TableRow>
