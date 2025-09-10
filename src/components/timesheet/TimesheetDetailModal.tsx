@@ -28,6 +28,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
@@ -384,6 +386,13 @@ export function TimesheetDetailModal({
             <Typography component="span" variant="h6" fontWeight={600}>
               {formatDate(modalDate)}
             </Typography>
+            <IconButton
+              onClick={() => onOpenChange(false)}
+              size="small"
+              sx={{ ml: 1 }}
+            >
+              <CloseIcon />
+            </IconButton>
           </Box>
         </Box>
       </DialogTitle>
@@ -661,25 +670,34 @@ export function TimesheetDetailModal({
         </div>
       </DialogContent>
       
-      {isEditing && (
-        <DialogActions>
+      <DialogActions>
+        {isEditing ? (
+          <>
+            <Button 
+              onClick={handleCancel} 
+              startIcon={<CancelIcon />}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              variant="contained" 
+              startIcon={<SaveIcon />}
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : timesheet ? 'Update' : 'Create'}
+            </Button>
+          </>
+        ) : (
           <Button 
-            onClick={handleCancel} 
-            startIcon={<CancelIcon />}
-            disabled={loading}
+            onClick={() => onOpenChange(false)}
+            variant="outlined"
           >
-            Cancel
+            Close
           </Button>
-          <Button 
-            onClick={handleSave} 
-            variant="contained" 
-            startIcon={<SaveIcon />}
-            disabled={loading}
-          >
-            {loading ? 'Saving...' : timesheet ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      )}
+        )}
+      </DialogActions>
     </Dialog>
   );
 }
