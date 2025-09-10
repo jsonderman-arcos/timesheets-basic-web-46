@@ -147,11 +147,9 @@ export function GpsTracking() {
       
       timeEntries.forEach((entry, entryIndex) => {
         const gpsLocations = entry.gps_locations as any[];
-        console.log(`Processing entry ${entryIndex + 1}:`, entry.id, 'GPS locations count:', gpsLocations?.length || 0);
         
         if (gpsLocations && Array.isArray(gpsLocations)) {
           gpsLocations.forEach((location: any, locationIndex: number) => {
-            console.log(`  Location ${locationIndex + 1}:`, location);
             if (location.latitude && location.longitude) {
               allGpsPoints.push({
                 id: `${entry.id}-${locationIndex}`,
@@ -168,8 +166,7 @@ export function GpsTracking() {
       // Sort GPS points by timestamp
       allGpsPoints.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       
-      console.log(`Total GPS points found: ${allGpsPoints.length}`);
-      console.log('GPS points:', allGpsPoints.map((p, i) => `${i+1}: ${new Date(p.timestamp).toLocaleTimeString()}`));
+      console.log(`Found ${allGpsPoints.length} GPS points for crew and date`);
       setGpsPoints(allGpsPoints);
     } catch (error: any) {
       console.error('Error fetching GPS data:', error);
