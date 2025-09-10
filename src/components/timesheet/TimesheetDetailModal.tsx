@@ -18,6 +18,9 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
+  Menu,
+  MenuItem,
+  Paper,
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PersonIcon from '@mui/icons-material/Person';
@@ -36,7 +39,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format, addDays, subDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -104,6 +106,7 @@ export function TimesheetDetailModal({
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState<'crew' | 'individual'>('crew');
   const [crewMembers, setCrewMembers] = useState<CrewMember[]>([]);
+  const [calendarAnchor, setCalendarAnchor] = useState<null | HTMLElement>(null);
   
   const modalDate = selectedDate;
   
@@ -179,21 +182,48 @@ export function TimesheetDetailModal({
   }, [timesheet, open]);
 
   const handlePreviousDay = () => {
-    const currentDate = new Date(selectedDate);
-    const previousDay = subDays(currentDate, 1);
-    onDateChange(format(previousDay, 'yyyy-MM-dd'));
+    try {
+      const currentDate = new Date(selectedDate);
+      const previousDay = subDays(currentDate, 1);
+      const newDateString = format(previousDay, 'yyyy-MM-dd');
+      console.log('Previous day:', selectedDate, '->', newDateString);
+      onDateChange(newDateString);
+    } catch (error) {
+      console.error('Error in handlePreviousDay:', error);
+    }
   };
 
   const handleNextDay = () => {
-    const currentDate = new Date(selectedDate);
-    const nextDay = addDays(currentDate, 1);
-    onDateChange(format(nextDay, 'yyyy-MM-dd'));
+    try {
+      const currentDate = new Date(selectedDate);
+      const nextDay = addDays(currentDate, 1);
+      const newDateString = format(nextDay, 'yyyy-MM-dd');
+      console.log('Next day:', selectedDate, '->', newDateString);
+      onDateChange(newDateString);
+    } catch (error) {
+      console.error('Error in handleNextDay:', error);
+    }
   };
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
-      onDateChange(format(date, 'yyyy-MM-dd'));
+      try {
+        const newDateString = format(date, 'yyyy-MM-dd');
+        console.log('Date selected:', newDateString);
+        onDateChange(newDateString);
+        setCalendarAnchor(null);
+      } catch (error) {
+        console.error('Error in handleDateSelect:', error);
+      }
     }
+  };
+
+  const handleCalendarOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setCalendarAnchor(event.currentTarget);
+  };
+
+  const handleCalendarClose = () => {
+    setCalendarAnchor(null);
   };
 
   if (!crew) return null;
@@ -417,21 +447,33 @@ export function TimesheetDetailModal({
               <ChevronLeftIcon />
             </IconButton>
             
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outlined"
-                  className={cn(
-                    "min-w-[180px] justify-center text-center font-medium",
-                    "hover:bg-gray-50"
-                  )}
-                  size="small"
-                >
-                  <CalendarMonthIcon fontSize="small" sx={{ mr: 1 }} />
-                  {format(new Date(modalDate), 'MMM d, yyyy')}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="center">
+            <Button
+              variant="outlined"
+              onClick={handleCalendarOpen}
+              sx={{
+                minWidth: '180px',
+                justifyContent: 'center',
+                textAlign: 'center',
+                fontWeight: 'medium',
+                '&:hover': {
+                  backgroundColor: 'rgba(0,0,0,0.04)'
+                }
+              }}
+              size="small"
+            >
+              <CalendarMonthIcon fontSize="small" sx={{ mr: 1 }} />
+              {format(new Date(modalDate), 'MMM d, yyyy')}
+            </Button>
+            
+            <Menu
+              anchorEl={calendarAnchor}
+              open={Boolean(calendarAnchor)}
+              onClose={handleCalendarClose}
+              PaperProps={{
+                sx: { mt: 1 }
+              }}
+            >
+              <Paper sx={{ p: 0 }}>
                 <Calendar
                   mode="single"
                   selected={new Date(modalDate)}
@@ -439,8 +481,8 @@ export function TimesheetDetailModal({
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
-              </PopoverContent>
-            </Popover>
+              </Paper>
+            </Menu>
             
             <IconButton
               onClick={handleNextDay}
