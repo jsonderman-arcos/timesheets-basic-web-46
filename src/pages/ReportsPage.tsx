@@ -260,7 +260,7 @@ export default function ReportsPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="bg-white">
           {drillDown.level === 'company' && (
             <div className="flex items-center justify-between border-b pb-2 bg-white">
               <span className="font-medium">Company</span>
