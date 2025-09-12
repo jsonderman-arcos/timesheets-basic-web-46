@@ -255,7 +255,7 @@ export function ExportTimesheets() {
               variant="contained"
               startIcon={loading ? <CircularProgress size={16} /> : <DownloadIcon />}
             >
-              {loading ? 'Exporting…' : 'Export Timesheets'}
+              {loading ? 'Exporting…' : 'Export timesheets'}
             </Button>
           </div>
         </div>
