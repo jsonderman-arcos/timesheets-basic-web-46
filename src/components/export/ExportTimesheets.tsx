@@ -244,8 +244,8 @@ export function ExportTimesheets() {
                 label="Export Format"
                 onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
               >
-                <MenuItem value="csv">CSV Format</MenuItem>
-                <MenuItem value="excel" disabled>Excel Format (Coming Soon)</MenuItem>
+                <MenuItem value="csv">Csv format</MenuItem>
+                <MenuItem value="excel" disabled>Excel format (Coming soon)</MenuItem>
               </Select>
             </FormControl>
             
