@@ -38,15 +38,10 @@ const StyledDrawer = styled(Drawer, {
   '& .MuiDrawer-paper': {
     width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
     boxSizing: 'border-box',
-    backgroundColor: 'var(--theme-component-navigation-topbar-background-fill)',
-    color: 'var(--theme-component-navigation-topbar-text-fill-default)',
-    '& .MuiListItemIcon-root': {
-      color: 'var(--theme-component-navigation-topbar-text-fill)',
-    },
-    '& .MuiTypography-root': {
-      color: 'var(--theme-component-navigation-topbar-text-fill)',
-    },
-    borderRight: '1px solid var(--sidebar-border)',
+    backgroundColor: 'var(--theme-base-background-paper-elevation-2)',
+    color: 'var(--theme-base-text-primary)',
+    borderRight: `var(--theme-base-border-size-default)px solid var(--theme-base-divider-default)`,
+    fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -58,14 +53,17 @@ const StyledListItemButton = styled(ListItemButton, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<{ active?: boolean }>(({ theme, active }) => ({
   minHeight: 48,
-  borderRadius: '6px',
-  margin: '2px 8px',
-  color: 'var(--theme-base-primary-contrast-text)',
-  backgroundColor: active ? 'var( --core-lighthouse-colors-reds-punchy-red-darkly-500-alpha-50)' : 'transparent',
-  fontWeight: active ? 600 : 400,
+  borderRadius: 'var(--core-radii-border-radius)px',
+  margin: 'var(--core-spacing-spacing-3xs)px var(--core-spacing-spacing-2xs)px',
+  color: 'var(--theme-base-text-primary)',
+  backgroundColor: active ? 'var(--theme-base-primary-states-selected)' : 'transparent',
+  fontWeight: active ? 'var(--core-lighthouse-typography-font-weight-semibold)' : 'var(--core-lighthouse-typography-font-weight-regular)',
+  fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
+  transition: `background-color var(--core-animation-duration-fast) var(--core-animation-easing-standard),
+               color var(--core-animation-duration-fast) var(--core-animation-easing-standard)`,
   '&:hover': {
-    backgroundColor: active ? 'hsl(var(--sidebar-accent))' : 'hsl(var(--sidebar-accent))',
-    color: 'var(--theme-component-navigation-topbar-text-fill)',
+    backgroundColor: active ? 'var(--theme-base-primary-states-hover)' : 'var(--theme-base-surface-light-hover)',
+    color: 'var(--theme-base-text-primary)',
   },
 }));
 
@@ -179,9 +177,9 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
         <IconButton 
           onClick={onToggleCollapse}
           sx={{ 
-            color: '(var(--theme-navigation-topbar-text-fill-default))',
+            color: 'var(--theme-base-text-primary)',
             '&:hover': {
-              backgroundColor: 'hsl(var(--sidebar-accent))',
+              backgroundColor: 'var(--theme-base-surface-light-hover)',
             }
           }}
         >
@@ -206,7 +204,9 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
                 <ListItemIcon
                   sx={{
                     minWidth: collapsed ? 'auto' : 40,
-                    color: hasPendingExceptions ? 'hsl(var(--warning))' : 'var(--theme-component-navigation-topbar-text-fill)',
+                    color: hasPendingExceptions 
+                      ? 'var(--theme-base-feedback-warning-main)' 
+                      : 'var(--theme-base-text-primary)',
                     mr: collapsed ? 0 : 1,
                   }}
                 >
@@ -224,10 +224,11 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
                             badgeContent={pendingExceptionsCount > 99 ? '99+' : pendingExceptionsCount}
                             sx={{
                               '& .MuiBadge-badge': {
-                                backgroundColor: 'hsl(var(--error))',
-                                color: 'hsl(var(--error-foreground))',
+                                backgroundColor: 'var(--theme-base-feedback-error-main)',
+                                color: 'var(--theme-base-feedback-error-contrast-text)',
                                 fontSize: '0.75rem',
-                                fontWeight: 700,
+                                fontWeight: 'var(--core-lighthouse-typography-font-weight-bold)',
+                                fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
                                 minWidth: '22px',
                                 height: '22px',
                               }

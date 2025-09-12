@@ -58,7 +58,13 @@ interface HoursByType {
   color: string;
 }
 
-const UTILITY_COLORS = ['#2563eb', '#dc2626', '#16a34a', '#ca8a04', '#9333ea'];
+  const UTILITY_COLORS = [
+    'var(--theme-base-primary-main)', 
+    'var(--theme-base-secondary-main)', 
+    'var(--theme-base-feedback-success-main)', 
+    'var(--theme-base-feedback-warning-main)', 
+    'var(--theme-base-feedback-error-main)'
+  ];
 
 export function Dashboard() {
   const theme = useTheme();
@@ -193,17 +199,17 @@ export function Dashboard() {
         {
           type: 'Working',
           hours: workingHours,
-          color: '#16a34a', // green
+          color: 'var(--theme-base-feedback-success-main)', // ARCOS success color
         },
         {
           type: 'Traveling', 
           hours: travelingHours,
-          color: '#dc2626', // red
+          color: 'var(--theme-base-feedback-error-main)', // ARCOS error color
         },
         {
           type: 'Standby',
           hours: standbyHours,
-          color: '#ca8a04', // amber
+          color: 'var(--theme-base-feedback-warning-main)', // ARCOS warning color
         },
       ].filter(item => item.hours > 0); // Only show types with hours > 0
 
