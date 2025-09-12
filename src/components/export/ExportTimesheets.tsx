@@ -254,6 +254,7 @@ export function ExportTimesheets() {
               disabled={loading || exportType === 'excel'}
               variant="contained"
               startIcon={loading ? <CircularProgress size={16} /> : <DownloadIcon />}
+              sx={{ textTransform: 'none' }}
             >
               {loading ? 'Exporting…' : 'Export timesheets'}
             </Button>
