@@ -397,69 +397,6 @@ export function Dashboard() {
 
       {/* Charts */}
       <Grid container spacing={3} sx={{ mt: 0 }}>
-        <Grid size={{ xs: 12, lg: 8 }}>
-          <Card>
-            <CardHeader title={<Typography variant="h6">Daily Cost History (Running Total)</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={dailyCostData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis 
-                      tickFormatter={(value: any) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <RechartsTooltip 
-                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Running Total Cost']}
-                      labelFormatter={(label: any) => `Date: ${label}`}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="cost" 
-                      stroke={theme.palette.success.main} 
-                      fill={theme.palette.success.main}
-                      fillOpacity={0.3}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
-            <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByType}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      dataKey="hours"
-                    >
-                      {hoursByType.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Additional Charts Row */}
-      <Grid container spacing={3} sx={{ mt: 3 }}>
         <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
             <CardHeader title={<Typography variant="h6">Hours by Day of Week</Typography>} />
@@ -480,7 +417,7 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 8 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
@@ -522,6 +459,69 @@ export function Dashboard() {
                       ]} 
                     />
                   </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={hoursByType}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="hours"
+                    >
+                      {hoursByType.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Daily Cost History Chart */}
+      <Grid container spacing={3} sx={{ mt: 3 }}>
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Daily Cost History (Running Total)</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dailyCostData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis 
+                      tickFormatter={(value: any) => `$${(value / 1000).toFixed(0)}k`}
+                    />
+                    <RechartsTooltip 
+                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Running Total Cost']}
+                      labelFormatter={(label: any) => `Date: ${label}`}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="cost" 
+                      stroke={theme.palette.success.main} 
+                      fill={theme.palette.success.main}
+                      fillOpacity={0.3}
+                    />
+                  </AreaChart>
                 </ResponsiveContainer>
               </Box>
             </CardContent>
