@@ -1,16 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-  Box,
-  Skeleton,
-  Divider,
-} from '@mui/material';
-import Grid from '@mui/material/Grid';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   BarChart,
   Bar,
@@ -23,11 +15,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import GroupIcon from '@mui/icons-material/Group';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { useTheme } from '@mui/material/styles';
+import { Clock, Users, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { showErrorToast } from '@/lib/toast-utils';
 
@@ -58,16 +46,15 @@ interface HoursByType {
   color: string;
 }
 
-  const UTILITY_COLORS = [
-    'var(--theme-base-primary-main)', 
-    'var(--theme-base-secondary-main)', 
-    'var(--theme-base-feedback-success-main)', 
-    'var(--theme-base-feedback-warning-main)', 
-    'var(--theme-base-feedback-error-main)'
-  ];
+const UTILITY_COLORS = [
+  'hsl(var(--primary))', 
+  'hsl(var(--secondary))', 
+  'hsl(var(--accent))', 
+  'hsl(var(--muted))', 
+  'hsl(var(--destructive))'
+];
 
 export function Dashboard() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalHours: 0,
@@ -199,17 +186,17 @@ export function Dashboard() {
         {
           type: 'Working',
           hours: workingHours,
-          color: 'var(--theme-base-feedback-success-main)', // ARCOS success color
+          color: 'hsl(var(--primary))',
         },
         {
           type: 'Traveling', 
           hours: travelingHours,
-          color: 'var(--theme-base-feedback-error-main)', // ARCOS error color
+          color: 'hsl(var(--destructive))',
         },
         {
           type: 'Standby',
           hours: standbyHours,
-          color: 'var(--theme-base-feedback-warning-main)', // ARCOS warning color
+          color: 'hsl(var(--secondary))',
         },
       ].filter(item => item.hours > 0); // Only show types with hours > 0
 
@@ -238,166 +225,153 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <Box>
-        <Grid container spacing={3}>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Grid size={{ xs: 12, md: 6, lg: 3 }} key={i}>
-              <Card>
-                <CardContent sx={{ p: 3 }}>
-                  <Skeleton variant="text" width="75%" sx={{ mb: 1 }} />
-                  <Skeleton variant="rounded" width="50%" height={32} />
-                </CardContent>
-              </Card>
-            </Grid>
+            <Card key={i}>
+              <CardContent className="p-6">
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-8 w-1/2" />
+              </CardContent>
+            </Card>
           ))}
-        </Grid>
-      </Box>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box>
+    <div className="space-y-6">
       {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Total Hours (Week)</Typography>
-                  <Typography variant="h4" fontWeight={700}>{stats.totalHours.toFixed(1)}</Typography>
-                </Box>
-                <AccessTimeIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Hours (Week)</p>
+                <h3 className="text-2xl font-bold">{stats.totalHours.toFixed(1)}</h3>
+              </div>
+              <Clock className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Active Crews</Typography>
-                  <Typography variant="h4" fontWeight={700}>{stats.totalCrews}</Typography>
-                </Box>
-                <GroupIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Active Crews</p>
+                <h3 className="text-2xl font-bold">{stats.totalCrews}</h3>
+              </div>
+              <Users className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Submitted Today</Typography>
-                  <Typography variant="h4" fontWeight={700}>{stats.submittedToday}</Typography>
-                </Box>
-                <TrendingUpIcon sx={{ fontSize: 32, color: 'success.main' }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Submitted Today</p>
+                <h3 className="text-2xl font-bold">{stats.submittedToday}</h3>
+              </div>
+              <TrendingUp className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">Pending Exceptions</Typography>
-                  <Typography variant="h4" fontWeight={700}>{stats.pendingExceptions}</Typography>
-                </Box>
-                <WarningAmberIcon sx={{ fontSize: 32, color: 'warning.main' }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Pending Exceptions</p>
+                <h3 className="text-2xl font-bold">{stats.pendingExceptions}</h3>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-destructive" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Charts */}
-      <Grid container spacing={3} sx={{ mt: 0 }}>
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
-            <CardHeader title={<Typography variant="h6">Hours by Day of Week</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hoursByDay} onClick={handleBarClick}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                    <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Hours by Day of Week</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={hoursByDay} onClick={handleBarClick}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                  <Bar dataKey="hours" fill="hsl(var(--primary))" style={{ cursor: 'pointer' }} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
-            <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByUtility}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => `${d.utility} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      dataKey="hours"
-                      onClick={handlePieClick}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {hoursByUtility.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Card>
+          <CardHeader>
+            <CardTitle>Hours by Utility</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={hoursByUtility}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={(d: any) => `${d.utility} ${(d.percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    dataKey="hours"
+                    onClick={handlePieClick}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {hoursByUtility.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
-            <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByType}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      dataKey="hours"
-                    >
-                      {hoursByType.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+        <Card>
+          <CardHeader>
+            <CardTitle>Hours by Work Type</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={hoursByType}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    dataKey="hours"
+                  >
+                    {hoursByType.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
