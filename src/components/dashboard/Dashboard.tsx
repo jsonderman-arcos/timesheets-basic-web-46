@@ -337,22 +337,22 @@ export function Dashboard() {
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
             <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
+              <Box sx={{ width: '100%', height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={hoursByUtility}
                       cx="50%"
-                      cy="50%"
+                      cy="45%"
                       labelLine={false}
                       label={(d: any) => {
-                        const name = d.utility.length > 12 ? `${d.utility.substring(0, 12)}...` : d.utility;
-                        return `${name} ${(d.percent * 100).toFixed(0)}%`;
+                        const name = d.utility.length > 18 ? `${d.utility.substring(0, 18)}...` : d.utility;
+                        return `${name}\n${(d.percent * 100).toFixed(0)}%`;
                       }}
-                      outerRadius={90}
+                      outerRadius={75}
                       dataKey="hours"
                       onClick={handlePieClick}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', fontSize: '12px' }}
                     >
                       {hoursByUtility.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
