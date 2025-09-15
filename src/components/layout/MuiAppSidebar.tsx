@@ -38,19 +38,19 @@ const StyledDrawer = styled(Drawer, {
   '& .MuiDrawer-paper': {
     width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
     boxSizing: 'border-box',
-    backgroundColor: 'var(--theme-component-navigation-topbar-background-fill)',
-    color: 'var(--theme-component-navigation-topbar-text-fill-default)',
+    backgroundColor: '#F3F4F6', // Light gray background
+    color: '#374151', // Dark gray text
     position: 'fixed',
     top: '64px', // Position under header
     height: 'calc(100vh - 64px)',
     left: 0,
     '& .MuiListItemIcon-root': {
-      color: 'var(--theme-component-navigation-topbar-text-fill)',
+      color: '#6B7280', // Dark gray icons
     },
     '& .MuiTypography-root': {
-      color: 'var(--theme-component-navigation-topbar-text-fill)',
+      color: '#374151', // Dark gray text
     },
-    borderRight: '1px solid var(--sidebar-border)',
+    borderRight: '1px solid #E5E7EB',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -64,14 +64,14 @@ const StyledListItemButton = styled(ListItemButton, {
   minHeight: 48,
   borderRadius: '6px',
   margin: '2px 8px',
-  color: 'var(--theme-base-primary-contrast-text)',
-  backgroundColor: active ? 'var( --core-lighthouse-colors-reds-punchy-red-darkly-500-alpha-50)' : 'transparent',
+  color: '#374151', // Dark gray text
+  backgroundColor: active ? '#E5E7EB' : 'transparent', // Light gray for active
   fontWeight: active ? 600 : 400,
   '&:hover': {
-    backgroundColor: active ? 'hsl(var(--sidebar-accent))' : 'hsl(var(--sidebar-accent))',
-    color: 'var(--theme-component-navigation-topbar-text-fill)',
+    backgroundColor: '#FFFFFF', // White background on hover
+    color: '#374151', // Keep dark gray text
     '& .MuiListItemIcon-root': {
-      color: 'var(--theme-component-navigation-topbar-background-fill)',
+      color: '#6B7280', // Dark gray icons on hover
     },
   },
 }));
@@ -197,7 +197,7 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
                 <ListItemIcon
                   sx={{
                     minWidth: collapsed ? 'auto' : 40,
-                    color: hasPendingExceptions ? 'hsl(var(--warning))' : 'var(--theme-component-navigation-topbar-text-fill)',
+                    color: hasPendingExceptions ? 'hsl(var(--warning))' : '#6B7280', // Dark gray icons
                     mr: collapsed ? 0 : 1,
                   }}
                 >
@@ -236,13 +236,13 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
       </List>
 
       {/* Toggle button at bottom */}
-      <Box sx={{ p: 1, borderTop: '1px solid var(--sidebar-border)' }}>
+      <Box sx={{ p: 1, borderTop: '1px solid #E5E7EB' }}>
         <IconButton 
           onClick={onToggleCollapse}
           sx={{ 
             width: '100%',
             justifyContent: collapsed ? 'center' : 'flex-end',
-            color: 'var(--theme-component-navigation-topbar-text-fill-default)',
+            color: '#6B7280', // Dark gray icon
             '&:hover': {
               backgroundColor: 'transparent',
             }
