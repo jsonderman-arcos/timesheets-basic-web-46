@@ -22,11 +22,16 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
 } from 'recharts';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import GroupIcon from '@mui/icons-material/Group';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { useTheme } from '@mui/material/styles';
 import { useToast } from '@/hooks/use-toast';
 import { showErrorToast } from '@/lib/toast-utils';
@@ -39,6 +44,7 @@ interface DashboardStats {
   workingHours: number;
   travelingHours: number;
   standbyHours: number;
+  totalCost: number;
 }
 
 interface HoursByDay {
@@ -59,6 +65,14 @@ interface HoursByType {
   color: string;
 }
 
+interface DailyCostData {
+  date: string;
+  cost: number;
+  hours: number;
+}
+
+const COST_PER_HOUR = 150;
+
 const UTILITY_COLORS = ['#2563eb', '#dc2626', '#16a34a', '#ca8a04', '#9333ea'];
 
 export function Dashboard() {
@@ -72,10 +86,12 @@ export function Dashboard() {
     workingHours: 0,
     travelingHours: 0,
     standbyHours: 0,
+    totalCost: 0,
   });
   const [hoursByDay, setHoursByDay] = useState<HoursByDay[]>([]);
   const [hoursByUtility, setHoursByUtility] = useState<HoursByUtility[]>([]);
   const [hoursByType, setHoursByType] = useState<HoursByType[]>([]);
+  const [dailyCostData, setDailyCostData] = useState<DailyCostData[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -134,6 +150,8 @@ export function Dashboard() {
         0
       );
 
+      const totalCost = totalHours * COST_PER_HOUR;
+
       setStats({
         totalHours,
         totalCrews: crewsData?.length || 0,
@@ -142,6 +160,7 @@ export function Dashboard() {
         workingHours,
         travelingHours,
         standbyHours,
+        totalCost,
       });
 
       // Hours by day of week
@@ -221,6 +240,45 @@ export function Dashboard() {
       ].filter(item => item.hours > 0); // Only show types with hours > 0
 
       setHoursByType(typeData);
+
+      // Daily cost data (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().split('T')[0];
+
+      const { data: dailyHoursData } = await supabase
+        .from('time_entries')
+        .select('date, hours_regular, hours_overtime')
+        .gte('date', thirtyDaysAgoDate)
+        .order('date');
+
+      // Group by date and calculate cumulative costs
+      const dailyCostMap: { [key: string]: number } = {};
+      (dailyHoursData || []).forEach(entry => {
+        const date = entry.date;
+        const dailyHours = (entry.hours_regular || 0) + (entry.hours_overtime || 0);
+        if (!dailyCostMap[date]) {
+          dailyCostMap[date] = 0;
+        }
+        dailyCostMap[date] += dailyHours;
+      });
+
+      // Convert to array and calculate running total
+      const sortedDates = Object.keys(dailyCostMap).sort();
+      let runningTotal = 0;
+      const costData: DailyCostData[] = sortedDates.map(date => {
+        const dailyHours = dailyCostMap[date];
+        const dailyCost = dailyHours * COST_PER_HOUR;
+        runningTotal += dailyCost;
+        
+        return {
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          cost: runningTotal,
+          hours: dailyHours,
+        };
+      });
+
+      setDailyCostData(costData);
     } catch (error: any) {
       showErrorToast(
         'Error loading dashboard',
@@ -266,7 +324,7 @@ export function Dashboard() {
     <Box>
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -280,7 +338,21 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
+          <Card>
+            <CardContent sx={{ p: 3 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">Total Cost (Week)</Typography>
+                  <Typography variant="h4" fontWeight={700}>${stats.totalCost.toLocaleString()}</Typography>
+                </Box>
+                <AttachMoneyIcon sx={{ fontSize: 32, color: 'success.main' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -294,7 +366,7 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -308,7 +380,7 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -325,6 +397,69 @@ export function Dashboard() {
 
       {/* Charts */}
       <Grid container spacing={3} sx={{ mt: 0 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Daily Cost History (Running Total)</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dailyCostData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis 
+                      tickFormatter={(value: any) => `$${(value / 1000).toFixed(0)}k`}
+                    />
+                    <RechartsTooltip 
+                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Running Total Cost']}
+                      labelFormatter={(label: any) => `Date: ${label}`}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="cost" 
+                      stroke={theme.palette.success.main} 
+                      fill={theme.palette.success.main}
+                      fillOpacity={0.3}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={hoursByType}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="hours"
+                    >
+                      {hoursByType.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Additional Charts Row */}
+      <Grid container spacing={3} sx={{ mt: 3 }}>
         <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
             <CardHeader title={<Typography variant="h6">Hours by Day of Week</Typography>} />
@@ -345,7 +480,7 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 4 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Card>
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
@@ -386,35 +521,6 @@ export function Dashboard() {
                         props.payload.fullName
                       ]} 
                     />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
-            <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByType}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      dataKey="hours"
-                    >
-                      {hoursByType.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
                   </PieChart>
                 </ResponsiveContainer>
               </Box>
