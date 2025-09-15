@@ -424,7 +424,7 @@ export function TimesheetGrid() {
                     {dates.map((date) => {
                       const hasTimesheet = !!timesheets[crew.id]?.[date];
                       const today = format(new Date(), 'yyyy-MM-dd');
-                      const isFutureDate = date > today;
+                      const isFutureDate = new Date(date + 'T00:00:00') > new Date(today + 'T00:00:00');
                       return (
                         <TableCell
                           key={date}
