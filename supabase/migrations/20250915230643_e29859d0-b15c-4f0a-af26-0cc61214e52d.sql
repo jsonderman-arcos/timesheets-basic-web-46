@@ -1,0 +1,23 @@
+-- Insert 20 more example pending exceptions using valid status values
+INSERT INTO exceptions (time_entry_id, flagged_by, reason, description, status) VALUES
+-- Get some random time entry IDs to use for these exceptions
+((SELECT id FROM time_entries LIMIT 1 OFFSET 10), 'Site Manager John Davis', 'Heavy machinery breakdown required 4 hours of repair time', 'Crew worked 4 additional hours due to equipment failure', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 11), 'Safety Coordinator Lisa Brown', 'Electrical hazard discovered, work stopped for 2 hours until utility company arrived', 'Team stopped work early due to safety concerns', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 12), 'Crew Supervisor Mike Chen', 'Team member injured finger, required medical attention and early departure', 'Worker left 3 hours early for medical treatment', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 13), 'Project Manager Sarah Wilson', 'Materials delivery delayed by 5 hours, crew had extended standby time', 'Crew worked extended standby hours waiting for materials', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 14), 'Field Supervisor Tom Anderson', 'Road closure prevented access to work site until afternoon', 'Late start due to transportation issues', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 15), 'Operations Manager Jennifer Lee', 'Customer requested work stoppage due to family event on property', 'Work interrupted by customer request', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 16), 'Safety Officer Robert Kim', 'Severe thunderstorm warning forced crew evacuation for 3 hours', 'Weather-related work stoppage', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 17), 'Crew Lead David Parker', 'Permit expired during work, had to stop until renewal processed', 'Permit issues caused work delay', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 18), 'Site Foreman Amanda White', 'Underground cable strike required emergency utility response', 'Emergency situation extended work hours', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 19), 'Supervisor Carlos Rodriguez', 'Two crew members called in sick with food poisoning', 'Reduced crew size due to illness', 'submitted'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 20), 'Project Coordinator Rachel Green', 'Homeowner complaint required meeting with utility representative', 'Customer relations meeting extended work day', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 21), 'Field Manager Kevin Johnson', 'Vehicle accident on way to job site caused 2-hour delay', 'Transportation incident delayed start time', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 22), 'Safety Specialist Maria Martinez', 'Asbestos discovered in work area, required hazmat team response', 'Hazardous material discovery stopped work', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 23), 'Operations Supervisor Alex Thompson', 'Wrong materials delivered, crew waited 4 hours for correct supplies', 'Material delivery error caused delays', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 24), 'Crew Chief Christopher Davis', 'Fiber optic cable damage required specialized repair crew', 'Specialized repair extended work hours', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 25), 'Site Manager Patricia Brown', 'Police investigation of nearby incident blocked work area access', 'Law enforcement activity prevented work', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 26), 'Field Supervisor Daniel Wilson', 'Equipment theft overnight required police report and replacement procurement', 'Theft incident delayed work start', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 27), 'Project Manager Jessica Lee', 'Unexpected underground utilities required hand digging instead of machine work', 'Utility conflicts slowed work progress', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 28), 'Safety Coordinator Mark Chen', 'Crane inspection failed, required replacement equipment delivery', 'Equipment inspection failure caused delays', 'under_review'),
+((SELECT id FROM time_entries LIMIT 1 OFFSET 29), 'Operations Manager Lisa Parker', 'Emergency city water main break required crew to assist with traffic control', 'Emergency response duties extended work day', 'under_review');
