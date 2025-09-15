@@ -61,6 +61,7 @@ interface Timesheet {
   hours_regular: number;
   hours_overtime: number;
   work_description: string;
+  status: string;
 }
 
 interface TimesheetGridData {
@@ -424,7 +425,8 @@ export function TimesheetGrid() {
                       </div>
                     </TableCell>
                     {dates.map((date) => {
-                      const hasTimesheet = !!timesheets[crew.id]?.[date];
+                      const timesheet = timesheets[crew.id]?.[date];
+                      const hasSubmittedTimesheet = timesheet && timesheet.status === 'submitted';
                       const today = format(new Date(), 'yyyy-MM-dd');
                       const isFutureDate = date > today;
                       return (
@@ -447,7 +449,7 @@ export function TimesheetGrid() {
                                 strokeWidth: 2
                               }} 
                             />
-                          ) : hasTimesheet ? (
+                          ) : hasSubmittedTimesheet ? (
                             <CheckCircleIcon color="success" fontSize="small" />
                           ) : (
                             <CancelIcon color="error" fontSize="small" />
