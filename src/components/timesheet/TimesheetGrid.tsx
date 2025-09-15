@@ -429,6 +429,12 @@ export function TimesheetGrid() {
                       const hasSubmittedTimesheet = timesheet && timesheet.status === 'submitted';
                       const today = format(new Date(), 'yyyy-MM-dd');
                       const isFutureDate = date > today;
+                      
+                      // Debug logging
+                      if (crew.id === Object.keys(timesheets)[0]) { // Only log for first crew to avoid spam
+                        console.log(`Date: ${date}, Today: ${today}, isFutureDate: ${isFutureDate}, hasTimesheet: ${!!timesheet}, status: ${timesheet?.status}, hasSubmittedTimesheet: ${hasSubmittedTimesheet}`);
+                      }
+                      
                       return (
                         <TableCell
                           key={date}
