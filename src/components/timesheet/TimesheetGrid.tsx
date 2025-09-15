@@ -209,7 +209,15 @@ export function TimesheetGrid() {
       const organized: TimesheetGridData = {};
       (timesheetData || []).forEach((t) => {
         if (!organized[t.crew_id]) organized[t.crew_id] = {};
-        organized[t.crew_id][t.date] = t;
+        
+        // If there's already an entry for this date, only replace it if the new one is submitted
+        // or if the existing one is not submitted
+        const existingEntry = organized[t.crew_id][t.date];
+        if (!existingEntry || 
+            (t.status === 'submitted' && existingEntry.status !== 'submitted') ||
+            (t.status === 'submitted' && existingEntry.status === 'submitted')) {
+          organized[t.crew_id][t.date] = t;
+        }
       });
 
       console.log('Timesheets fetched and organized:', organized);
