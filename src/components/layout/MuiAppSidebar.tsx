@@ -70,6 +70,9 @@ const StyledListItemButton = styled(ListItemButton, {
   '&:hover': {
     backgroundColor: active ? 'hsl(var(--sidebar-accent))' : 'hsl(var(--sidebar-accent))',
     color: 'var(--theme-component-navigation-topbar-text-fill)',
+    '& .MuiListItemIcon-root': {
+      color: 'var(--theme-component-navigation-topbar-background-fill)',
+    },
   },
 }));
 
