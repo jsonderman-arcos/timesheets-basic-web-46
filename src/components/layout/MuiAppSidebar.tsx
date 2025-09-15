@@ -23,7 +23,8 @@ import {
   GpsFixed as GpsFixedIcon,
   Assessment as AssessmentIcon,
   Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon
 } from '@mui/icons-material';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -172,23 +173,23 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
       variant="permanent"
       collapsed={collapsed}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', p: 1 }}>
- 
-        <IconButton 
-          onClick={onToggleCollapse}
-          sx={{ 
-            color: 'var(--theme-base-text-primary)',
-            '&:hover': {
-              backgroundColor: 'var(--theme-base-surface-light-hover)',
-            }
-          }}
-        >
-          {collapsed ? <MenuIcon /> : <ChevronLeftIcon />}
-        </IconButton>
-      </Box>
-    
+      {!collapsed && (
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', p: 1 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: 'var(--theme-base-text-primary)',
+              fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
+              fontWeight: 'var(--core-lighthouse-typography-font-weight-semibold)',
+              ml: 1
+            }}
+          >
+            Navigation
+          </Typography>
+        </Box>
+      )}
       
-      <List sx={{ pt: 1 }}>
+      <List sx={{ pt: 1, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const isExceptions = item.url === '/exceptions';
           const hasPendingExceptions = isExceptions && pendingExceptionsCount > 0;
@@ -244,6 +245,21 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
           );
         })}
       </List>
+
+      {/* Expand/Collapse Button at Bottom */}
+      <Box sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
+        <IconButton 
+          onClick={onToggleCollapse}
+          sx={{ 
+            color: 'var(--theme-base-text-primary)',
+            '&:hover': {
+              backgroundColor: 'var(--theme-base-surface-light-hover)',
+            }
+          }}
+        >
+          {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </IconButton>
+      </Box>
     </StyledDrawer>
   );
 }
