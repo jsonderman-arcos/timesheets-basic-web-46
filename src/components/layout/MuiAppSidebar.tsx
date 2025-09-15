@@ -238,19 +238,14 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
           onClick={onToggleCollapse}
           sx={{ 
             width: '100%',
-            justifyContent: collapsed ? 'center' : 'flex-start',
+            justifyContent: collapsed ? 'center' : 'flex-end',
             color: 'var(--theme-component-navigation-topbar-text-fill-default)',
             '&:hover': {
-              backgroundColor: 'hsl(var(--sidebar-accent))',
+              backgroundColor: 'transparent',
             }
           }}
         >
           {collapsed ? <ArrowRightIcon /> : <ArrowLeftIcon />}
-          {!collapsed && (
-            <Typography variant="body2" sx={{ ml: 1 }}>
-              Collapse
-            </Typography>
-          )}
         </IconButton>
       </Box>
     </StyledDrawer>
