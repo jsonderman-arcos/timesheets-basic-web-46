@@ -76,14 +76,10 @@ function NavigationLayoutContent({
         <Box 
           component="main" 
           sx={{ 
-            flexGrow: 1, 
+            flex: 1, 
             backgroundColor: theme.palette.background.paper,
             minHeight: 'calc(100vh - 64px)',
-            ml: collapsed ? '64px' : '256px',
-            transition: theme.transitions.create('margin', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
+            width: 0, // Forces flex item to shrink properly
           }}
           className="p-3 md:p-6"
         >
