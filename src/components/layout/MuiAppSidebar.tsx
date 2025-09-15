@@ -22,8 +22,8 @@ import {
   Warning as WarningIcon,
   GpsFixed as GpsFixedIcon,
   Assessment as AssessmentIcon,
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon
+  ArrowRight as ArrowRightIcon,
+  ArrowLeft as ArrowLeftIcon
 } from '@mui/icons-material';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -40,6 +40,10 @@ const StyledDrawer = styled(Drawer, {
     boxSizing: 'border-box',
     backgroundColor: 'var(--theme-component-navigation-topbar-background-fill)',
     color: 'var(--theme-component-navigation-topbar-text-fill-default)',
+    position: 'fixed',
+    top: '64px', // Position under header
+    height: 'calc(100vh - 64px)',
+    left: 0,
     '& .MuiListItemIcon-root': {
       color: 'var(--theme-component-navigation-topbar-text-fill)',
     },
@@ -174,23 +178,7 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
       variant="permanent"
       collapsed={collapsed}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', p: 1 }}>
- 
-        <IconButton 
-          onClick={onToggleCollapse}
-          sx={{ 
-            color: '(var(--theme-navigation-topbar-text-fill-default))',
-            '&:hover': {
-              backgroundColor: 'hsl(var(--sidebar-accent))',
-            }
-          }}
-        >
-          {collapsed ? <MenuIcon /> : <ChevronLeftIcon />}
-        </IconButton>
-      </Box>
-    
-      
-      <List sx={{ pt: 1 }}>
+      <List sx={{ pt: 1, flex: 1 }}>
         {menuItems.map((item) => {
           const isExceptions = item.url === '/exceptions';
           const hasPendingExceptions = isExceptions && pendingExceptionsCount > 0;
@@ -243,6 +231,28 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
           );
         })}
       </List>
+
+      {/* Toggle button at bottom */}
+      <Box sx={{ p: 1, borderTop: '1px solid var(--sidebar-border)' }}>
+        <IconButton 
+          onClick={onToggleCollapse}
+          sx={{ 
+            width: '100%',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            color: 'var(--theme-component-navigation-topbar-text-fill-default)',
+            '&:hover': {
+              backgroundColor: 'hsl(var(--sidebar-accent))',
+            }
+          }}
+        >
+          {collapsed ? <ArrowRightIcon /> : <ArrowLeftIcon />}
+          {!collapsed && (
+            <Typography variant="body2" sx={{ ml: 1 }}>
+              Collapse
+            </Typography>
+          )}
+        </IconButton>
+      </Box>
     </StyledDrawer>
   );
 }
