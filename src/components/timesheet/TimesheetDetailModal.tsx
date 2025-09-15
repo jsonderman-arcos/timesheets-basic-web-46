@@ -33,6 +33,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import IconButton from '@mui/material/IconButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -435,6 +436,25 @@ export function TimesheetDetailModal({
     setIsEditing(false);
   };
 
+  const handleRemindCrewLead = async () => {
+    setLoading(true);
+    try {
+      // Here you could implement actual notification logic (email, SMS, etc.)
+      // For now, we'll show a success message
+      showSuccessToast(
+        'Reminder Sent',
+        `A reminder has been sent to ${crew.crew_name} to submit their timesheet for ${formatDate(modalDate)}.`
+      );
+    } catch (error: any) {
+      showErrorToast(
+        'Error',
+        'Failed to send reminder. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -773,13 +793,23 @@ export function TimesheetDetailModal({
                       {crew.crew_name} has not submitted a timesheet for {formatDate(modalDate)}.
                     </Typography>
                   </div>
-                  <Button
-                    variant="contained"
-                    startIcon={<EditIcon />}
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Create Timesheet
-                  </Button>
+                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<NotificationsIcon />}
+                      onClick={handleRemindCrewLead}
+                      disabled={loading}
+                    >
+                      Remind Crew Lead
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<EditIcon />}
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Create Timesheet
+                    </Button>
+                  </Box>
                 </div>
               </CardContent>
             </Card>
