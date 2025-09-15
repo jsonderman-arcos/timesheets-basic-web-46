@@ -345,8 +345,11 @@ export function Dashboard() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={(d: any) => `${d.utility} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
+                      label={(d: any) => {
+                        const name = d.utility.length > 12 ? `${d.utility.substring(0, 12)}...` : d.utility;
+                        return `${name} ${(d.percent * 100).toFixed(0)}%`;
+                      }}
+                      outerRadius={90}
                       dataKey="hours"
                       onClick={handlePieClick}
                       style={{ cursor: 'pointer' }}
@@ -355,7 +358,12 @@ export function Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                    <RechartsTooltip 
+                      formatter={(value: any, name: any, props: any) => [
+                        `${value} hours`, 
+                        props.payload.utility
+                      ]} 
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </Box>
