@@ -336,8 +336,10 @@ export function TimesheetDetailModal({
           );
         }
         
+        console.log('Timesheet saved successfully, calling onUpdate');
         setIsEditing(false);
         onUpdate();
+        console.log('onUpdate called, closing modal');
         onOpenChange(false); // Close the modal
       } catch (error: any) {
         showErrorToast(
@@ -400,8 +402,10 @@ export function TimesheetDetailModal({
           'Member timesheets saved successfully.'
         );
         
+        console.log('Member timesheets saved successfully, calling onUpdate');
         setIsEditing(false);
         onUpdate();
+        console.log('onUpdate called, closing modal');
         onOpenChange(false); // Close the modal
       } catch (error: any) {
         showErrorToast(

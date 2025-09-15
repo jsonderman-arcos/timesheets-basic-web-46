@@ -211,6 +211,7 @@ export function TimesheetGrid() {
         organized[t.crew_id][t.date] = t;
       });
 
+      console.log('Timesheets fetched and organized:', organized);
       setTimesheets(organized);
     } catch (error: any) {
       showErrorToast(
@@ -227,6 +228,7 @@ export function TimesheetGrid() {
   };
 
   const refreshData = () => {
+    console.log('refreshData called, about to fetchTimesheets');
     fetchTimesheets();
   };
 
