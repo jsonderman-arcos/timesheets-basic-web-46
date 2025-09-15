@@ -337,7 +337,7 @@ export function Dashboard() {
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
             <CardContent>
-              <Box sx={{ width: '100%', height: 320 }}>
+              <Box sx={{ width: '100%', height: 340 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -346,13 +346,29 @@ export function Dashboard() {
                       cy="45%"
                       labelLine={false}
                       label={(d: any) => {
-                        const name = d.utility.length > 18 ? `${d.utility.substring(0, 18)}...` : d.utility;
-                        return `${name}\n${(d.percent * 100).toFixed(0)}%`;
+                        const name = d.utility;
+                        const maxLineLength = 12;
+                        const words = name.split(' ');
+                        const lines = [];
+                        let currentLine = '';
+                        
+                        for (const word of words) {
+                          if ((currentLine + word).length <= maxLineLength) {
+                            currentLine += (currentLine ? ' ' : '') + word;
+                          } else {
+                            if (currentLine) lines.push(currentLine);
+                            currentLine = word;
+                          }
+                        }
+                        if (currentLine) lines.push(currentLine);
+                        
+                        const wrappedName = lines.join('\n');
+                        return `${wrappedName}\n${(d.percent * 100).toFixed(0)}%`;
                       }}
-                      outerRadius={75}
+                      outerRadius={70}
                       dataKey="hours"
                       onClick={handlePieClick}
-                      style={{ cursor: 'pointer', fontSize: '12px' }}
+                      style={{ cursor: 'pointer', fontSize: '11px' }}
                     >
                       {hoursByUtility.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
