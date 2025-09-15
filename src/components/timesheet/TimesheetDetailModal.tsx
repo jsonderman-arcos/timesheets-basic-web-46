@@ -307,6 +307,8 @@ export function TimesheetDetailModal({
           working_hours: formData.working_hours,
           traveling_hours: formData.traveling_hours,
           standby_hours: formData.standby_hours,
+          status: 'submitted',
+          submitted_at: new Date().toISOString(),
         };
 
         if (timesheet) {
@@ -379,6 +381,8 @@ export function TimesheetDetailModal({
             working_hours: memberData.working_hours,
             traveling_hours: memberData.traveling_hours,
             standby_hours: memberData.standby_hours,
+            status: 'submitted',
+            submitted_at: new Date().toISOString(),
           };
         });
 
