@@ -71,7 +71,7 @@ function NavigationLayoutContent({
       </AppBar>
 
       {/* Layout Container */}
-      <Box sx={{ display: 'flex', minHeight: '100vh', pt: '64px' }} className="min-h-screen">
+      <Box sx={{ display: 'flex', minHeight: '100vh', pt: '64px', width: '100vw' }} className="min-h-screen">
         <MuiAppSidebar 
           collapsed={collapsed}
           onToggleCollapse={toggleCollapsed}
@@ -80,14 +80,10 @@ function NavigationLayoutContent({
         <Box 
           component="main" 
           sx={{ 
-            width: '100%',
+            flex: 1,
             backgroundColor: theme.palette.background.paper,
             minHeight: 'calc(100vh - 64px)',
-            ml: collapsed ? `${COLLAPSED_WIDTH/8}rem` : `${DRAWER_WIDTH/8}rem`,
-            transition: theme.transitions.create('margin', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            })
+            overflow: 'hidden'
           }}
           className="p-3 md:p-6"
         >

@@ -34,21 +34,20 @@ const COLLAPSED_WIDTH = 64;
 const StyledDrawer = styled(Drawer, {
   shouldForwardProp: (prop) => prop !== 'collapsed',
 })<{ collapsed?: boolean }>(({ theme, collapsed }) => ({
-  width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
+  width: 'auto',
   flexShrink: 0,
   '& .MuiDrawer-paper': {
-    width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
+    width: 'auto',
+    minWidth: collapsed ? COLLAPSED_WIDTH : 'auto',
     boxSizing: 'border-box',
     backgroundColor: 'var(--theme-base-background-paper-elevation-2)',
     color: 'var(--theme-base-text-primary)',
     borderRight: `var(--theme-base-border-size-default)px solid var(--theme-base-divider-default)`,
     fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
-    position: 'fixed',
-    top: '64px',
-    left: 0,
+    position: 'relative',
     height: 'calc(100vh - 64px)',
     overflowY: 'hidden',
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create(['width', 'min-width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
