@@ -337,38 +337,31 @@ export function Dashboard() {
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
             <CardContent>
-              <Box sx={{ width: '100%', height: 340 }}>
+              <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={hoursByUtility}
                       cx="50%"
-                      cy="45%"
+                      cy="50%"
                       labelLine={false}
                       label={(d: any) => {
                         const name = d.utility;
-                        const maxLineLength = 12;
-                        const words = name.split(' ');
-                        const lines = [];
-                        let currentLine = '';
+                        const maxChars = 20;
+                        let wrappedName = name;
                         
-                        for (const word of words) {
-                          if ((currentLine + word).length <= maxLineLength) {
-                            currentLine += (currentLine ? ' ' : '') + word;
-                          } else {
-                            if (currentLine) lines.push(currentLine);
-                            currentLine = word;
-                          }
+                        if (name.length > maxChars) {
+                          const firstLine = name.substring(0, maxChars);
+                          const secondLine = name.substring(maxChars);
+                          wrappedName = `${firstLine}\n${secondLine}`;
                         }
-                        if (currentLine) lines.push(currentLine);
                         
-                        const wrappedName = lines.join('\n');
                         return `${wrappedName}\n${(d.percent * 100).toFixed(0)}%`;
                       }}
-                      outerRadius={70}
+                      outerRadius={80}
                       dataKey="hours"
                       onClick={handlePieClick}
-                      style={{ cursor: 'pointer', fontSize: '11px' }}
+                      style={{ cursor: 'pointer' }}
                     >
                       {hoursByUtility.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
