@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { NavigationLayout } from "@/components/navigation/NavigationLayout";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import TimesheetPage from "./pages/TimesheetPage";
 import ExportPage from "./pages/ExportPage";
@@ -13,8 +12,6 @@ import GpsPage from "./pages/GpsPage";
 import ReportsPage from "./pages/ReportsPage";
 import NotFound from "./pages/NotFound";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
-import { AuthProvider } from "@/hooks/useAuth";
-import Auth from "./pages/Auth";
 // Strip unknown props injected by tooling from provider boundaries
 function SafeStyledEngineProvider({ children }: { children: React.ReactNode }) {
   return <StyledEngineProvider injectFirst>{children}</StyledEngineProvider>;
@@ -30,53 +27,26 @@ const theme = createMuiThemeFromTokens();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <SafeStyledEngineProvider>
-          <SafeThemeProvider theme={theme}>
-            {/* Keep Tailwind Preflight; omit CssBaseline */}
-            <BrowserRouter>
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/" element={
-                  <ProtectedRoute>
-                    <NavigationLayout><DashboardPage /></NavigationLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/timesheets" element={
-                  <ProtectedRoute>
-                    <NavigationLayout><TimesheetPage /></NavigationLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/export" element={
-                  <ProtectedRoute>
-                    <NavigationLayout><ExportPage /></NavigationLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/exceptions" element={
-                  <ProtectedRoute>
-                    <NavigationLayout><ExceptionsPage /></NavigationLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/gps" element={
-                  <ProtectedRoute>
-                    <NavigationLayout><GpsPage /></NavigationLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/reports" element={
-                  <ProtectedRoute>
-                    <NavigationLayout><ReportsPage /></NavigationLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </SafeThemeProvider>
-        </SafeStyledEngineProvider>
-      </TooltipProvider>
-    </AuthProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <SafeStyledEngineProvider>
+        <SafeThemeProvider theme={theme}>
+          {/* Keep Tailwind Preflight; omit CssBaseline */}
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<NavigationLayout><DashboardPage /></NavigationLayout>} />
+              <Route path="/timesheets" element={<NavigationLayout><TimesheetPage /></NavigationLayout>} />
+              <Route path="/export" element={<NavigationLayout><ExportPage /></NavigationLayout>} />
+              <Route path="/exceptions" element={<NavigationLayout><ExceptionsPage /></NavigationLayout>} />
+              <Route path="/gps" element={<NavigationLayout><GpsPage /></NavigationLayout>} />
+              <Route path="/reports" element={<NavigationLayout><ReportsPage /></NavigationLayout>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </SafeThemeProvider>
+      </SafeStyledEngineProvider>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
