@@ -61,7 +61,6 @@ interface Timesheet {
   hours_regular: number;
   hours_overtime: number;
   work_description: string;
-  status: string;
 }
 
 interface TimesheetGridData {
@@ -209,15 +208,7 @@ export function TimesheetGrid() {
       const organized: TimesheetGridData = {};
       (timesheetData || []).forEach((t) => {
         if (!organized[t.crew_id]) organized[t.crew_id] = {};
-        
-        // If there's already an entry for this date, only replace it if the new one is submitted
-        // or if the existing one is not submitted
-        const existingEntry = organized[t.crew_id][t.date];
-        if (!existingEntry || 
-            (t.status === 'submitted' && existingEntry.status !== 'submitted') ||
-            (t.status === 'submitted' && existingEntry.status === 'submitted')) {
-          organized[t.crew_id][t.date] = t;
-        }
+        organized[t.crew_id][t.date] = t;
       });
 
       console.log('Timesheets fetched and organized:', organized);
@@ -434,14 +425,9 @@ export function TimesheetGrid() {
                     </TableCell>
                     {dates.map((date) => {
                       const timesheet = timesheets[crew.id]?.[date];
-                      const hasSubmittedTimesheet = timesheet && timesheet.status === 'submitted';
+                      const hasTimesheet = !!timesheet;
                       const today = format(new Date(), 'yyyy-MM-dd');
                       const isFutureDate = date > today;
-                      
-                      // Debug logging
-                      if (crew.id === Object.keys(timesheets)[0]) { // Only log for first crew to avoid spam
-                        console.log(`Date: ${date}, Today: ${today}, isFutureDate: ${isFutureDate}, hasTimesheet: ${!!timesheet}, status: ${timesheet?.status}, hasSubmittedTimesheet: ${hasSubmittedTimesheet}`);
-                      }
                       
                       return (
                         <TableCell
@@ -463,7 +449,7 @@ export function TimesheetGrid() {
                                 strokeWidth: 2
                               }} 
                             />
-                          ) : hasSubmittedTimesheet ? (
+                          ) : hasTimesheet ? (
                             <CheckCircleIcon color="success" fontSize="small" />
                           ) : (
                             <CancelIcon color="error" fontSize="small" />
