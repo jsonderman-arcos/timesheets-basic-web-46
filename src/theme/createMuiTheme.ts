@@ -1,4 +1,4 @@
-// src/theme/createMuiTheme.ts - Simplified ARCOS Harmony integration
+// ARCOS Harmony themed MUI configuration - updated
 import { extendTheme } from "@mui/material/styles";
 
 export function createMuiThemeFromTokens() {
