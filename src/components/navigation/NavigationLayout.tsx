@@ -11,6 +11,9 @@ import { MuiAppSidebar } from '@/components/layout/MuiAppSidebar';
 import { NavigationProvider, useNavigation } from './NavigationProvider';
 import { useTheme } from '@mui/material/styles';
 
+const DRAWER_WIDTH = 256;
+const COLLAPSED_WIDTH = 64;
+
 interface NavigationLayoutContentProps {
   children: ReactNode;
   title?: string;
@@ -27,61 +30,68 @@ function NavigationLayoutContent({
 
   return (
     <>
-      <Box sx={{ display: 'flex', minHeight: '100vh' }} className="min-h-screen">
+      {/* Fixed Header */}
+      <AppBar 
+        position="fixed"
+        elevation={0}
+        sx={{ 
+          backgroundColor: theme.palette.background.default,
+          borderBottom: `1px solid ${theme.palette.divider}` as const,
+          color: theme.palette.text.primary,
+          zIndex: theme.zIndex.drawer + 1,
+          width: '100%'
+        }}
+      >
+        <Toolbar sx={{ minHeight: '64px !important' }} className="min-h-16">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {showMobileToggle && (
+              <IconButton
+                edge="start"
+                onClick={toggleCollapsed}
+                sx={{ 
+                  display: { sm: 'none' },
+                  color: theme.palette.text.primary
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
+            <Typography 
+              variant="h6" 
+              component="h1"
+              sx={{ 
+                fontWeight: 600,
+                color: theme.palette.text.primary
+              }}
+            >
+              {title}
+            </Typography>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Layout Container */}
+      <Box sx={{ display: 'flex', minHeight: '100vh', pt: '64px' }} className="min-h-screen">
         <MuiAppSidebar 
           collapsed={collapsed}
           onToggleCollapse={toggleCollapsed}
         />
         
-        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <AppBar 
-            position="sticky"
-            elevation={0}
-            sx={{ 
-              backgroundColor: theme.palette.background.default,
-              borderBottom: `1px solid ${theme.palette.divider}` as const,
-              color: theme.palette.text.primary,
-            }}
-          >
-            <Toolbar sx={{ minHeight: '64px !important' }} className="min-h-16">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                {showMobileToggle && (
-                  <IconButton
-                    edge="start"
-                    onClick={toggleCollapsed}
-                    sx={{ 
-                      display: { sm: 'none' },
-                      color: theme.palette.text.primary
-                    }}
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                )}
-                <Typography 
-                  variant="h6" 
-                  component="h1"
-                  sx={{ 
-                    fontWeight: 600,
-                    color: theme.palette.text.primary
-                  }}
-                >
-                  {title}
-                </Typography>
-              </Box>
-            </Toolbar>
-          </AppBar>
-          
-          <Box 
-            component="main" 
-            sx={{ 
-              flexGrow: 1, 
-              backgroundColor: theme.palette.background.paper,
-              minHeight: 'calc(100vh - 64px)'
-            }}
-            className="p-3 md:p-6"
-          >
-            {children}
-          </Box>
+        <Box 
+          component="main" 
+          sx={{ 
+            flexGrow: 1, 
+            backgroundColor: theme.palette.background.paper,
+            minHeight: 'calc(100vh - 64px)',
+            ml: collapsed ? `${COLLAPSED_WIDTH/8}rem` : `${DRAWER_WIDTH/8}rem`,
+            transition: theme.transitions.create('margin', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            })
+          }}
+          className="p-3 md:p-6"
+        >
+          {children}
         </Box>
       </Box>
     </>

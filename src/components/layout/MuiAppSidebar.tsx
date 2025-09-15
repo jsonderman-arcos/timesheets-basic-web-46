@@ -43,6 +43,11 @@ const StyledDrawer = styled(Drawer, {
     color: 'var(--theme-base-text-primary)',
     borderRight: `var(--theme-base-border-size-default)px solid var(--theme-base-divider-default)`,
     fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
+    position: 'fixed',
+    top: '64px',
+    left: 0,
+    height: 'calc(100vh - 64px)',
+    overflowY: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -189,7 +194,7 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
         </Box>
       )}
       
-      <List sx={{ pt: collapsed ? 8 : 1, flexGrow: 1 }}>
+      <List sx={{ pt: 1, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const isExceptions = item.url === '/exceptions';
           const hasPendingExceptions = isExceptions && pendingExceptionsCount > 0;
