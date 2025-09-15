@@ -189,7 +189,7 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
         </Box>
       )}
       
-      <List sx={{ pt: 1, flexGrow: 1 }}>
+      <List sx={{ pt: collapsed ? 8 : 1, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const isExceptions = item.url === '/exceptions';
           const hasPendingExceptions = isExceptions && pendingExceptionsCount > 0;
