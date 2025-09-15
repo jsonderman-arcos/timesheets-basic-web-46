@@ -445,6 +445,7 @@ export function TimesheetDetailModal({
         'Reminder Sent',
         `A reminder has been sent to ${crew.crew_name} to submit their timesheet for ${formatDate(modalDate)}.`
       );
+      onOpenChange(false); // Close the modal
     } catch (error: any) {
       showErrorToast(
         'Error',
