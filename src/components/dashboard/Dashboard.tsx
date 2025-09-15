@@ -108,11 +108,11 @@ export function Dashboard() {
         .select('hours_regular, hours_overtime, working_hours, traveling_hours, standby_hours')
         .gte('date', lastWeekDate);
 
-      // Pending exceptions
+      // Pending exceptions (including submitted status as pending)
       const { data: exceptions } = await supabase
         .from('exceptions')
         .select('id')
-        .eq('status', 'pending');
+        .in('status', ['pending', 'submitted']);
 
       const totalHours = (weeklyEntries || []).reduce(
         (sum, t) => sum + (t.hours_regular || 0) + (t.hours_overtime || 0),
