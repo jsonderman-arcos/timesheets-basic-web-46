@@ -360,7 +360,6 @@ export function Dashboard() {
                   <Typography variant="body2" color="text.secondary">Active Crews</Typography>
                   <Typography variant="h4" fontWeight={700}>{stats.totalCrews}</Typography>
                 </Box>
-                <GroupIcon sx={{ fontSize: 32, color: 'primary.main' }} />
               </Box>
             </CardContent>
           </Card>
