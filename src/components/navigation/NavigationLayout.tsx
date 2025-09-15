@@ -32,9 +32,9 @@ function NavigationLayoutContent({
         position="fixed"
         elevation={0}
         sx={{ 
-          backgroundColor: theme.palette.background.default,
+          backgroundColor: 'var(--theme-component-navigation-topbar-background-fill)',
           borderBottom: `1px solid ${theme.palette.divider}` as const,
-          color: theme.palette.text.primary,
+          color: 'white',
           zIndex: theme.zIndex.drawer + 1,
         }}
       >
@@ -46,7 +46,7 @@ function NavigationLayoutContent({
                 onClick={toggleCollapsed}
                 sx={{ 
                   display: { sm: 'none' },
-                  color: theme.palette.text.primary
+                  color: 'white'
                 }}
               >
                 <MenuIcon />
@@ -57,7 +57,7 @@ function NavigationLayoutContent({
               component="h1"
               sx={{ 
                 fontWeight: 600,
-                color: theme.palette.text.primary
+                color: 'white'
               }}
             >
               {title}
