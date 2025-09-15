@@ -26,6 +26,7 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TodayIcon from '@mui/icons-material/Today';
@@ -422,6 +423,7 @@ export function TimesheetGrid() {
                     </TableCell>
                     {dates.map((date) => {
                       const hasTimesheet = !!timesheets[crew.id]?.[date];
+                      const isFutureDate = new Date(date) > new Date();
                       return (
                         <TableCell
                           key={date}
@@ -434,7 +436,15 @@ export function TimesheetGrid() {
                           }}
                           onClick={() => handleCellClick(crew, date)}
                         >
-                          {hasTimesheet ? (
+                          {isFutureDate ? (
+                            <RadioButtonUncheckedIcon 
+                              sx={{ 
+                                color: '#D1D5DB', 
+                                fontSize: 'small',
+                                strokeWidth: 2
+                              }} 
+                            />
+                          ) : hasTimesheet ? (
                             <CheckCircleIcon color="success" fontSize="small" />
                           ) : (
                             <CancelIcon color="error" fontSize="small" />
