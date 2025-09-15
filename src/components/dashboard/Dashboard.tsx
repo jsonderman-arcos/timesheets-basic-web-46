@@ -48,6 +48,7 @@ interface HoursByDay {
 
 interface HoursByUtility {
   utility: string;
+  fullName: string;
   hours: number;
   color: string;
 }
@@ -173,16 +174,28 @@ export function Dashboard() {
         .select('hours_regular, hours_overtime, crews!inner(crew_name, companies!inner(name))')
         .gte('date', lastWeekDate);
 
-      const utilityMap: { [key: string]: number } = {};
+      const utilityMap: { [key: string]: { hours: number; fullName: string } } = {};
       (companyHours || []).forEach(entry => {
         const company = (entry as any).crews?.companies?.name || 'Unknown';
-        utilityMap[company] =
-          (utilityMap[company] || 0) + (entry.hours_regular || 0) + (entry.hours_overtime || 0);
+        if (!utilityMap[company]) {
+          utilityMap[company] = { hours: 0, fullName: company };
+        }
+        utilityMap[company].hours += (entry.hours_regular || 0) + (entry.hours_overtime || 0);
       });
 
-      const utilityData = Object.entries(utilityMap).map(([utility, hours], index) => ({
-        utility,
-        hours,
+      // Helper function to create acronyms from company names
+      const createAcronym = (name: string): string => {
+        return name
+          .split(' ')
+          .filter(word => word.length > 0)
+          .map(word => word.charAt(0).toUpperCase())
+          .join('');
+      };
+
+      const utilityData = Object.entries(utilityMap).map(([company, data], index) => ({
+        utility: createAcronym(company),
+        fullName: data.fullName,
+        hours: data.hours,
         color: UTILITY_COLORS[index % UTILITY_COLORS.length],
       }));
 
@@ -225,8 +238,8 @@ export function Dashboard() {
   };
 
   const handlePieClick = (data: any) => {
-    if (data && data.utility) {
-      navigate(`/timesheets?company=${encodeURIComponent(data.utility)}`);
+    if (data && data.fullName) {
+      navigate(`/timesheets?company=${encodeURIComponent(data.fullName)}`);
     }
   };
 
@@ -370,7 +383,7 @@ export function Dashboard() {
                     <RechartsTooltip 
                       formatter={(value: any, name: any, props: any) => [
                         `${value} hours`, 
-                        props.payload.utility
+                        props.payload.fullName
                       ]} 
                     />
                   </PieChart>
