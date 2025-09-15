@@ -373,7 +373,6 @@ export function Dashboard() {
                   <Typography variant="body2" color="text.secondary">Submitted Today</Typography>
                   <Typography variant="h4" fontWeight={700}>{stats.submittedToday}</Typography>
                 </Box>
-                <TrendingUpIcon sx={{ fontSize: 32, color: 'success.main' }} />
               </Box>
             </CardContent>
           </Card>
