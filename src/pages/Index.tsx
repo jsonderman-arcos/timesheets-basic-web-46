@@ -84,20 +84,20 @@ const Index = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh', 
-      backgroundColor: 'var(--theme-base-background-default)', 
-      py: 'var(--core-spacing-spacing-lg)' 
+      backgroundColor: 'background.default', 
+      py: 4
     }}>
       <Container maxWidth="lg">
         {/* Hero Section */}
-        <Box sx={{ textAlign: 'center', mb: 'var(--core-spacing-spacing-2xl)' }}>
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Typography 
             variant="h2" 
             component="h1" 
             gutterBottom 
             sx={{ 
-              fontWeight: 'var(--core-lighthouse-typography-font-weight-bold)', 
-              color: 'var(--theme-base-primary-main)',
-              fontFamily: 'var(--core-lighthouse-typography-font-family-base)'
+              fontWeight: 'bold', 
+              color: 'primary.main',
+              fontFamily: 'Arial, sans-serif'
             }}
           >
             Timesheet Management System
@@ -105,38 +105,32 @@ const Index = () => {
           <Typography 
             variant="h5" 
             sx={{ 
-              color: 'var(--theme-base-text-secondary)', 
+              color: 'text.secondary', 
               maxWidth: 600, 
               mx: 'auto',
-              mb: 'var(--core-spacing-spacing-md)'
+              mb: 3
             }}
           >
             Streamline your workforce management with our comprehensive timesheet tracking and reporting platform powered by ARCOS Harmony
           </Typography>
-          <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" sx={{ mt: 'var(--core-spacing-spacing-sm)' }}>
+          <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" sx={{ mt: 2 }}>
             <Chip 
               icon={<CloudIcon />} 
               label="Cloud-Based" 
               sx={{ 
-                backgroundColor: 'var(--theme-base-primary-main)',
-                color: 'var(--theme-base-primary-contrast-text)'
+                backgroundColor: 'primary.main',
+                color: 'primary.contrastText'
               }}
             />
             <Chip 
               icon={<SecurityIcon />} 
               label="Secure" 
-              sx={{ 
-                backgroundColor: 'var(--theme-base-feedback-success-main)',
-                color: 'var(--theme-base-feedback-success-contrast-text)'
-              }}
+              color="success"
             />
             <Chip 
               icon={<SupportIcon />} 
               label="24/7 Support" 
-              sx={{ 
-                backgroundColor: 'var(--theme-base-secondary-main)',
-                color: 'var(--theme-base-secondary-contrast-text)'
-              }}
+              color="secondary"
             />
           </Stack>
         </Box>
@@ -145,34 +139,32 @@ const Index = () => {
         <Box sx={{ 
           display: 'grid', 
           gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
-          gap: 'var(--core-spacing-spacing-md)',
-          mb: 'var(--core-spacing-spacing-2xl)' 
+          gap: 3,
+          mb: 6
         }}>
           {stats.map((stat, index) => (
             <Paper
               key={index}
               elevation={2}
               sx={{
-                p: 'var(--core-spacing-spacing-md)',
+                p: 3,
                 textAlign: 'center',
-                backgroundColor: 'var(--theme-base-background-paper-elevation-1)',
-                border: `var(--theme-base-border-size-default)px solid var(--theme-base-divider-default)`,
-                borderRadius: 'var(--core-radii-border-radius)px',
-                transition: 'var(--core-animation-easing-standard) var(--core-animation-duration-slow)',
+                backgroundColor: 'background.paper',
+                borderRadius: 2,
+                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
                 '&:hover': {
                   transform: 'translateY(-4px)',
-                  boxShadow: 'var(--core-lighthouse-effects-shadow-level-3)',
-                  backgroundColor: 'var(--theme-base-surface-light-hover)'
+                  boxShadow: 6
                 }
               }}
             >
               <Avatar sx={{ 
-                bgcolor: 'var(--theme-base-primary-main)', 
+                bgcolor: 'primary.main', 
                 mx: 'auto', 
-                mb: 'var(--core-spacing-spacing-sm)', 
+                mb: 2, 
                 width: 56, 
                 height: 56,
-                color: 'var(--theme-base-primary-contrast-text)'
+                color: 'primary.contrastText'
               }}>
                 {stat.icon}
               </Avatar>
@@ -181,9 +173,9 @@ const Index = () => {
                 component="div" 
                 gutterBottom 
                 sx={{ 
-                  fontWeight: 'var(--core-lighthouse-typography-font-weight-bold)', 
-                  color: 'var(--theme-base-primary-main)',
-                  fontFamily: 'var(--core-lighthouse-typography-font-family-base)'
+                  fontWeight: 'bold', 
+                  color: 'primary.main',
+                  fontFamily: 'Arial, sans-serif'
                 }}
               >
                 {stat.value}
@@ -191,8 +183,8 @@ const Index = () => {
               <Typography 
                 variant="body2" 
                 sx={{ 
-                  color: 'var(--theme-base-text-secondary)',
-                  fontFamily: 'var(--core-lighthouse-typography-font-family-base)'
+                  color: 'text.secondary',
+                  fontFamily: 'Arial, sans-serif'
                 }}
               >
                 {stat.label}
@@ -207,10 +199,10 @@ const Index = () => {
           component="h2" 
           sx={{ 
             textAlign: 'center', 
-            mb: 'var(--core-spacing-spacing-lg)', 
-            fontWeight: 'var(--core-lighthouse-typography-font-weight-semibold)',
-            color: 'var(--theme-base-text-primary)',
-            fontFamily: 'var(--core-lighthouse-typography-font-family-base)'
+            mb: 4, 
+            fontWeight: 600,
+            color: 'text.primary',
+            fontFamily: 'Arial, sans-serif'
           }}
         >
           Platform Features
@@ -219,8 +211,8 @@ const Index = () => {
         <Box sx={{ 
           display: 'grid', 
           gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(3, 1fr)' },
-          gap: 'var(--core-spacing-spacing-lg)',
-          mb: 'var(--core-spacing-spacing-2xl)'
+          gap: 4,
+          mb: 6
         }}>
           {features.map((feature, index) => (
             <Card
@@ -229,23 +221,20 @@ const Index = () => {
               sx={{
                 height: '100%',
                 cursor: 'pointer',
-                backgroundColor: 'var(--theme-base-background-paper-elevation-1)',
-                border: `var(--theme-base-border-size-default)px solid var(--theme-base-divider-default)`,
-                borderRadius: 'var(--core-radii-border-radius)px',
-                transition: `transform var(--core-animation-duration-slow) var(--core-animation-easing-emphasized),
-                           box-shadow var(--core-animation-duration-slow) var(--core-animation-easing-emphasized)`,
+                backgroundColor: 'background.paper',
+                borderRadius: 2,
+                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
                 '&:hover': {
                   transform: 'translateY(-8px)',
-                  boxShadow: 'var(--core-lighthouse-effects-shadow-level-3)',
-                  backgroundColor: 'var(--theme-base-surface-light-hover)'
+                  boxShadow: 8
                 }
               }}
               onClick={() => navigate(feature.path)}
             >
-              <CardContent sx={{ p: 'var(--core-spacing-spacing-md)', textAlign: 'center' }}>
+              <CardContent sx={{ p: 3, textAlign: 'center' }}>
                 <Box
                   sx={{
-                    backgroundColor: 'var(--theme-base-primary-light)',
+                    backgroundColor: feature.color,
                     borderRadius: '50%',
                     width: 80,
                     height: 80,
@@ -253,8 +242,7 @@ const Index = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     mx: 'auto',
-                    mb: 'var(--core-spacing-spacing-sm)',
-                    color: 'var(--theme-base-primary-main)'
+                    mb: 2
                   }}
                 >
                   {feature.icon}
@@ -264,9 +252,9 @@ const Index = () => {
                   component="h3" 
                   gutterBottom 
                   sx={{ 
-                    fontWeight: 'var(--core-lighthouse-typography-font-weight-semibold)',
-                    color: 'var(--theme-base-text-primary)',
-                    fontFamily: 'var(--core-lighthouse-typography-font-family-base)'
+                    fontWeight: 600,
+                    color: 'text.primary',
+                    fontFamily: 'Arial, sans-serif'
                   }}
                 >
                   {feature.title}
@@ -275,9 +263,9 @@ const Index = () => {
                   variant="body2" 
                   paragraph
                   sx={{ 
-                    color: 'var(--theme-base-text-secondary)',
-                    fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
-                    mb: 'var(--core-spacing-spacing-sm)'
+                    color: 'text.secondary',
+                    fontFamily: 'Arial, sans-serif',
+                    mb: 2
                   }}
                 >
                   {feature.description}
@@ -285,14 +273,8 @@ const Index = () => {
                 <Button 
                   variant="outlined" 
                   sx={{ 
-                    mt: 'var(--core-spacing-spacing-sm)',
-                    borderColor: 'var(--theme-base-primary-main)',
-                    color: 'var(--theme-base-primary-main)',
-                    fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
-                    '&:hover': {
-                      backgroundColor: 'var(--theme-base-primary-states-hover)',
-                      borderColor: 'var(--theme-base-primary-main)'
-                    }
+                    mt: 2,
+                    fontFamily: 'Arial, sans-serif'
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -311,10 +293,10 @@ const Index = () => {
           <Paper 
             elevation={1} 
             sx={{ 
-              p: 'var(--core-spacing-spacing-xl)', 
-              backgroundColor: 'var(--theme-base-primary-main)', 
-              color: 'var(--theme-base-primary-contrast-text)',
-              borderRadius: 'var(--core-radii-border-radius)px'
+              p: 6, 
+              backgroundColor: 'primary.main', 
+              color: 'primary.contrastText',
+              borderRadius: 2
             }}
           >
             <Typography 
@@ -322,8 +304,8 @@ const Index = () => {
               component="h3" 
               gutterBottom 
               sx={{ 
-                fontWeight: 'var(--core-lighthouse-typography-font-weight-semibold)',
-                fontFamily: 'var(--core-lighthouse-typography-font-family-base)'
+                fontWeight: 600,
+                fontFamily: 'Arial, sans-serif'
               }}
             >
               Ready to Get Started with ARCOS Harmony?
@@ -332,8 +314,8 @@ const Index = () => {
               variant="body1" 
               paragraph
               sx={{ 
-                fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
-                mb: 'var(--core-spacing-spacing-md)'
+                fontFamily: 'Arial, sans-serif',
+                mb: 3
               }}
             >
               Begin managing your workforce more efficiently with our ARCOS-powered platform
@@ -342,14 +324,14 @@ const Index = () => {
               variant="contained" 
               size="large" 
               sx={{ 
-                backgroundColor: 'var(--theme-base-primary-contrast-text)', 
-                color: 'var(--theme-base-primary-main)',
-                fontFamily: 'var(--core-lighthouse-typography-font-family-base)',
-                fontWeight: 'var(--core-lighthouse-typography-font-weight-medium)',
+                backgroundColor: 'primary.contrastText', 
+                color: 'primary.main',
+                fontFamily: 'Arial, sans-serif',
+                fontWeight: 500,
                 '&:hover': { 
-                  backgroundColor: 'var(--theme-base-surface-light-hover)',
+                  backgroundColor: 'background.default',
                   transform: 'translateY(-2px)',
-                  transition: 'var(--core-animation-easing-emphasized) var(--core-animation-duration-fast)'
+                  transition: 'all 0.2s ease-in-out'
                 }
               }}
               onClick={() => navigate('/dashboard')}
