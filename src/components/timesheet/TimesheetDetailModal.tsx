@@ -800,7 +800,7 @@ export function TimesheetDetailModal({
                       onClick={handleRemindCrewLead}
                       disabled={loading}
                     >
-                      Remind Crew Lead
+                      Send Reminder
                     </Button>
                     <Button
                       variant="contained"
