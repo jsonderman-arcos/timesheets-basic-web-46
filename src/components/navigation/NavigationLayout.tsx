@@ -80,7 +80,7 @@ function NavigationLayoutContent({
         <Box 
           component="main" 
           sx={{ 
-            flexGrow: 1, 
+            width: '100%',
             backgroundColor: theme.palette.background.paper,
             minHeight: 'calc(100vh - 64px)',
             ml: collapsed ? `${COLLAPSED_WIDTH/8}rem` : `${DRAWER_WIDTH/8}rem`,
