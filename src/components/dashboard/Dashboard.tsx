@@ -198,11 +198,10 @@ export function Dashboard() {
 
       setHoursByDay(dayData);
 
-      // Hours by company (since we don't have utility in the current schema)
+      // Hours by company (all time - no date filter for cumulative data)
       const { data: companyHours } = await supabase
         .from('time_entries')
-        .select('hours_regular, hours_overtime, crews!inner(crew_name, companies!inner(name))')
-        .gte('date', lastWeekDate);
+        .select('hours_regular, hours_overtime, crews!inner(crew_name, companies!inner(name))');
 
       const utilityMap: { [key: string]: { hours: number; fullName: string } } = {};
       (companyHours || []).forEach(entry => {
