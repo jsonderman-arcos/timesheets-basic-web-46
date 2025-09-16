@@ -268,6 +268,8 @@ export default function ReportsPage() {
                 <TableRow>
                   <TableHead className="font-bold">Company</TableHead>
                   <TableHead className="font-bold">Total Hours</TableHead>
+                  <TableHead className="font-bold">Rate</TableHead>
+                  <TableHead className="font-bold">Total Cost</TableHead>
                   <TableHead className="font-bold">Teams</TableHead>
                   <TableHead className="font-bold">Action</TableHead>
                 </TableRow>
@@ -275,25 +277,31 @@ export default function ReportsPage() {
               <TableBody>
                 {isLoadingCompanies ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                    <TableCell colSpan={6} className="text-center">Loading...</TableCell>
                   </TableRow>
                 ) : (
-                  companyReports?.map((report) => (
-                    <TableRow key={report.utility}>
-                      <TableCell className="font-medium">{report.utility}</TableCell>
-                      <TableCell>{report.totalHours.toFixed(1)} hrs</TableCell>
-                      <TableCell>{report.crewCount} teams</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCompanyDrillDown(report.utility)}
-                        >
-                          View Teams <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  companyReports?.map((report) => {
+                    const rate = Math.floor(Math.random() * (165 - 140 + 1)) + 140;
+                    const totalCost = report.totalHours * rate;
+                    return (
+                      <TableRow key={report.utility}>
+                        <TableCell className="font-medium">{report.utility}</TableCell>
+                        <TableCell>{report.totalHours.toFixed(1)} hrs</TableCell>
+                        <TableCell>${rate}/hr</TableCell>
+                        <TableCell>${totalCost.toLocaleString('en-US', { maximumFractionDigits: 0 })}</TableCell>
+                        <TableCell>{report.crewCount} teams</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCompanyDrillDown(report.utility)}
+                          >
+                            View Teams <ChevronRight className="w-4 h-4 ml-1" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
