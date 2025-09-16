@@ -3,6 +3,8 @@ import { extendTheme } from "@mui/material/styles";
 import core from "@/styles/core.muiflat.json";
 import themeTokens from "@/styles/theme.muiflat.json";
 
+// Theme creation utility
+
 // Direct lookup into token map, with optional fallback
 const get = (k: string, fallback?: any) => (themeTokens as any)[k] ?? fallback;
 
