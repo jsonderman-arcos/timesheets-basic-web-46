@@ -112,11 +112,12 @@ export function Dashboard() {
         .from('crews')
         .select('id');
 
-      // Time entries submitted today
+      // Time entries submitted today (based on submitted_at timestamp)
       const { data: todayEntries } = await supabase
         .from('time_entries')
         .select('id')
-        .eq('date', today);
+        .gte('submitted_at', today)
+        .lt('submitted_at', `${today}T23:59:59.999Z`);
 
       // Total hours all time
       const { data: allEntries } = await supabase
