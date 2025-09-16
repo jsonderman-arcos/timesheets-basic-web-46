@@ -319,7 +319,7 @@ export default function ReportsPage() {
                       {companyReports.reduce((sum, report) => sum + report.totalHours, 0).toFixed(1)} hrs
                     </TableCell>
                     <TableCell className="font-bold">
-                      ${Math.round(Array.from(companyRates.values()).reduce((sum, rate) => sum + rate, 0) / companyRates.size)}/hr
+                      ${Math.round(Array.from(companyRates.values()).reduce((sum, rate) => sum + rate, 0) / companyRates.size)}/hr (avg)
                     </TableCell>
                     <TableCell className="font-bold">
                       ${companyReports.reduce((sum, report) => {
