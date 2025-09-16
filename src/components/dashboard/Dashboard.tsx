@@ -118,11 +118,10 @@ export function Dashboard() {
         .select('id')
         .eq('date', today);
 
-      // Total hours this week
-      const { data: weeklyEntries } = await supabase
+      // Total hours all time
+      const { data: allEntries } = await supabase
         .from('time_entries')
-        .select('hours_regular, hours_overtime, working_hours, traveling_hours, standby_hours')
-        .gte('date', lastWeekDate);
+        .select('hours_regular, hours_overtime, working_hours, traveling_hours, standby_hours');
 
       // Pending exceptions (including submitted status as pending)
       const { data: exceptions } = await supabase
@@ -130,22 +129,22 @@ export function Dashboard() {
         .select('id')
         .in('status', ['pending', 'submitted']);
 
-      const totalHours = (weeklyEntries || []).reduce(
+      const totalHours = (allEntries || []).reduce(
         (sum, t) => sum + (t.hours_regular || 0) + (t.hours_overtime || 0),
         0
       );
 
-      const workingHours = (weeklyEntries || []).reduce(
+      const workingHours = (allEntries || []).reduce(
         (sum, t) => sum + (t.working_hours || 0),
         0
       );
 
-      const travelingHours = (weeklyEntries || []).reduce(
+      const travelingHours = (allEntries || []).reduce(
         (sum, t) => sum + (t.traveling_hours || 0),
         0
       );
 
-      const standbyHours = (weeklyEntries || []).reduce(
+      const standbyHours = (allEntries || []).reduce(
         (sum, t) => sum + (t.standby_hours || 0),
         0
       );
@@ -340,7 +339,7 @@ export function Dashboard() {
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
-                  <Typography variant="body2" color="text.secondary">Total Hours (Week)</Typography>
+                  <Typography variant="body2" color="text.secondary">Total Hours</Typography>
                   <Typography variant="h4" fontWeight={700}>{stats.totalHours.toFixed(1)}</Typography>
                 </Box>
                 <AccessTimeIcon sx={{ fontSize: 32, color: 'primary.main' }} />
@@ -354,7 +353,7 @@ export function Dashboard() {
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
-                  <Typography variant="body2" color="text.secondary">Total Cost (Week)</Typography>
+                  <Typography variant="body2" color="text.secondary">Total Cost</Typography>
                   <Typography variant="h4" fontWeight={700}>${stats.totalCost.toLocaleString()}</Typography>
                 </Box>
               </Box>
