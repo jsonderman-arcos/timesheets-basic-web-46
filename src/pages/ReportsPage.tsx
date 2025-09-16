@@ -59,7 +59,7 @@ export default function ReportsPage() {
 
   // Company-level report
   const { data: companyReports, isLoading: isLoadingCompanies } = useQuery<CompanyReport[]>({
-    queryKey: ['company-reports', startDate, endDate],
+    queryKey: ['company-reports-cumulative'],
     queryFn: async (): Promise<CompanyReport[]> => {
       const { data, error } = await supabase
         .from('time_entries')
@@ -68,8 +68,7 @@ export default function ReportsPage() {
           hours_overtime,
           crews!inner(crew_name, companies!inner(name))
         `)
-        .gte('date', startDate)
-        .lte('date', endDate)
+        .lte('date', new Date().toISOString().split('T')[0])
         .not('hours_regular', 'is', null);
 
       if (error) throw error;
@@ -95,7 +94,7 @@ export default function ReportsPage() {
 
   // Team-level report
   const { data: teamReports, isLoading: isLoadingTeams } = useQuery<TeamReport[]>({
-    queryKey: ['team-reports', startDate, endDate, drillDown.company],
+    queryKey: ['team-reports-cumulative', drillDown.company],
     queryFn: async (): Promise<TeamReport[]> => {
       const { data, error } = await supabase
         .from('time_entries')
@@ -105,8 +104,7 @@ export default function ReportsPage() {
           crew_id,
           crews!inner(crew_name, companies!inner(name))
         `)
-        .gte('date', startDate)
-        .lte('date', endDate)
+        .lte('date', new Date().toISOString().split('T')[0])
         .eq('crews.companies.name', drillDown.company)
         .not('hours_regular', 'is', null);
 
@@ -134,7 +132,7 @@ export default function ReportsPage() {
 
   // Daily report
   const { data: dailyReports, isLoading: isLoadingDaily } = useQuery<DailyReport[]>({
-    queryKey: ['daily-reports', startDate, endDate, drillDown.teamId],
+    queryKey: ['daily-reports-cumulative', drillDown.teamId],
     queryFn: async (): Promise<DailyReport[]> => {
       const { data, error } = await supabase
         .from('time_entries')
@@ -149,8 +147,7 @@ export default function ReportsPage() {
           work_description,
           status
         `)
-        .gte('date', startDate)
-        .lte('date', endDate)
+        .lte('date', new Date().toISOString().split('T')[0])
         .eq('crew_id', drillDown.teamId)
         .not('hours_regular', 'is', null)
         .order('date', { ascending: false });
