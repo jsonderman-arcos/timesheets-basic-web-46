@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, ChevronLeft, ChevronRight, FileBarChart, Home } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { 
   Breadcrumb,
@@ -56,6 +56,12 @@ export default function ReportsPage() {
   const [startDate, setStartDate] = useState(() => format(startOfWeek(new Date()), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(() => format(endOfWeek(new Date()), 'yyyy-MM-dd'));
   const [drillDown, setDrillDown] = useState<DrillDownState>({ level: 'company' });
+
+  // Generate consistent rates for companies
+  const companyRates = useMemo(() => {
+    const rates = new Map<string, number>();
+    return rates;
+  }, []);
 
   // Company-level report
   const { data: companyReports, isLoading: isLoadingCompanies } = useQuery<CompanyReport[]>({
@@ -278,7 +284,11 @@ export default function ReportsPage() {
                   </TableRow>
                 ) : (
                   companyReports?.map((report) => {
-                    const rate = Math.floor(Math.random() * (165 - 140 + 1)) + 140;
+                    // Get or generate a consistent rate for this company
+                    if (!companyRates.has(report.utility)) {
+                      companyRates.set(report.utility, Math.floor(Math.random() * (165 - 140 + 1)) + 140);
+                    }
+                    const rate = companyRates.get(report.utility)!;
                     const totalCost = report.totalHours * rate;
                     return (
                       <TableRow key={report.utility}>
@@ -301,6 +311,28 @@ export default function ReportsPage() {
                   })
                 )}
               </TableBody>
+              <TableFooter>
+                {!isLoadingCompanies && companyReports && (
+                  <TableRow>
+                    <TableCell className="font-bold">Total</TableCell>
+                    <TableCell className="font-bold">
+                      {companyReports.reduce((sum, report) => sum + report.totalHours, 0).toFixed(1)} hrs
+                    </TableCell>
+                    <TableCell></TableCell>
+                    <TableCell className="font-bold">
+                      ${companyReports.reduce((sum, report) => {
+                        // Use the same consistent rate that was generated for each company
+                        const rate = companyRates.get(report.utility)!;
+                        return sum + (report.totalHours * rate);
+                      }, 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                    </TableCell>
+                    <TableCell className="font-bold">
+                      {companyReports.reduce((sum, report) => sum + report.crewCount, 0)} teams
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                )}
+              </TableFooter>
             </Table>
           )}
 
