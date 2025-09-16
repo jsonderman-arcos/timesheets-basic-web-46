@@ -11,22 +11,9 @@ import {
   Divider,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-} from 'recharts';
+import { PieChart } from '@mui/x-charts/PieChart';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { LineChart } from '@mui/x-charts/LineChart';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import GroupIcon from '@mui/icons-material/Group';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -410,43 +397,20 @@ export function Dashboard() {
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByUtility}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => {
-                        const name = d.utility;
-                        const maxChars = 20;
-                        let wrappedName = name;
-                        
-                        if (name.length > maxChars) {
-                          const firstLine = name.substring(0, maxChars);
-                          const secondLine = name.substring(maxChars);
-                          wrappedName = `${firstLine}\n${secondLine}`;
-                        }
-                        
-                        return `${wrappedName}\n${(d.percent * 100).toFixed(0)}%`;
-                      }}
-                      outerRadius={80}
-                      dataKey="hours"
-                      onClick={handlePieClick}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {hoursByUtility.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip 
-                      formatter={(value: any, name: any, props: any) => [
-                        `${value} hours`, 
-                        props.payload.fullName
-                      ]} 
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart
+                  series={[
+                    {
+                      data: hoursByUtility.map((item, index) => ({
+                        id: index,
+                        value: item.hours,
+                        label: item.utility,
+                        color: item.color,
+                      })),
+                    },
+                  ]}
+                  width={400}
+                  height={300}
+                />
               </Box>
             </CardContent>
           </Card>
@@ -458,24 +422,20 @@ export function Dashboard() {
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByType}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      dataKey="hours"
-                    >
-                      {hoursByType.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart
+                  series={[
+                    {
+                      data: hoursByType.map((item, index) => ({
+                        id: index,
+                        value: item.hours,
+                        label: item.type,
+                        color: item.color,
+                      })),
+                    },
+                  ]}
+                  width={400}
+                  height={300}
+                />
               </Box>
             </CardContent>
           </Card>
@@ -490,15 +450,24 @@ export function Dashboard() {
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hoursByDay} onClick={handleBarClick}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                    <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart
+                  dataset={hoursByDay as any}
+                  xAxis={[{ scaleType: 'band', dataKey: 'date' }]}
+                  series={[
+                    {
+                      dataKey: 'hours',
+                      label: 'Total Hours',
+                      color: theme.palette.primary.main,
+                    },
+                  ]}
+                  onAxisClick={(event, data) => {
+                    if (data) {
+                      handleBarClick({ activeLabel: data.axisValue });
+                    }
+                  }}
+                  width={800}
+                  height={400}
+                />
               </Box>
             </CardContent>
           </Card>
@@ -513,26 +482,23 @@ export function Dashboard() {
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={dailyCostData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis 
-                      tickFormatter={(value: any) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <RechartsTooltip 
-                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Running Total Cost']}
-                      labelFormatter={(label: any) => `Date: ${label}`}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="cost" 
-                      stroke={theme.palette.success.main} 
-                      fill={theme.palette.success.main}
-                      fillOpacity={0.3}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <LineChart
+                  dataset={dailyCostData as any}
+                  xAxis={[{ scaleType: 'point', dataKey: 'date' }]}
+                  yAxis={[{ 
+                    valueFormatter: (value: number) => `$${(value / 1000).toFixed(0)}k`
+                  }]}
+                  series={[
+                    {
+                      dataKey: 'cost',
+                      label: 'Running Total Cost',
+                      color: theme.palette.success.main,
+                      area: true,
+                    },
+                  ]}
+                  width={800}
+                  height={400}
+                />
               </Box>
             </CardContent>
           </Card>
