@@ -191,12 +191,7 @@ export function ExceptionManagement() {
   return (
     <>
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <WarningAmberIcon fontSize="small" />
-            <Typography variant="h6">Exception Management</Typography>
-          </div>
-        </CardHeader>
+  
         <CardContent>
           {exceptions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -205,8 +200,8 @@ export function ExceptionManagement() {
           ) : (
             <div className="overflow-x-auto">
                 <Table>
-                 <TableHead>
-                   <TableRow>
+                 <TableHead sx={{ backgroundColor: 'var(--theme-base-background-elevations-level-4)' }}>
+                  <TableRow>
                      <TableCell>Crew</TableCell>
                      <TableCell>Submitted By</TableCell>
                      <TableCell>Status</TableCell>
@@ -326,7 +321,13 @@ export function ExceptionManagement() {
                 <div className="flex gap-3 pt-4">
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
-                    color="primary"
+                    sx={{
+                      backgroundColor: 'var(--theme-base-feedback-success-main)',
+                      color: 'var(--theme-base-feedback-success-contrast-text)',
+                      '&:hover': {
+                        backgroundColor: 'var(--theme-base-feedback-success-dark)',
+                      },
+                    }}
                     variant="contained"
                     startIcon={<CheckCircleIcon fontSize="small" />}
                   >
@@ -334,7 +335,13 @@ export function ExceptionManagement() {
                   </Button>
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
-                    color="primary"
+                    sx={{
+                      backgroundColor: 'var(--theme-base-feedback-error-main)',
+                      color: 'var(--theme-base-feedback-error-contrast-text)',
+                      '&:hover': {
+                        backgroundColor: 'var(--theme-base-feedback-error-dark)',
+                      },
+                    }}
                     variant="contained"
                     startIcon={<CancelIcon fontSize="small" />}
                   >

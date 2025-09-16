@@ -137,6 +137,13 @@ export function createMuiThemeFromTokens() {
           },
         },
       },
+      MuiDialogTitle: {
+        styleOverrides: {
+          root: {
+            backgroundColor: 'var(--theme-base-background-elevations-level-3)',
+          },
+        },
+      },
     },
   });
 }
