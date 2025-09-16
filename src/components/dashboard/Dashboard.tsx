@@ -48,7 +48,7 @@ interface DashboardStats {
 }
 
 interface HoursByDay {
-  day: string;
+  date: string;
   hours: number;
 }
 
@@ -163,27 +163,31 @@ export function Dashboard() {
         totalCost,
       });
 
-      // Hours by day of week
+      // Hours by actual date (last 7 days)
       const { data: dailyHours } = await supabase
         .from('time_entries')
         .select('date, hours_regular, hours_overtime')
-        .gte('date', lastWeekDate);
+        .gte('date', lastWeekDate)
+        .order('date');
 
-      const dayMap: { [key: string]: number } = {};
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-      days.forEach(day => (dayMap[day] = 0));
+      const dateMap: { [key: string]: number } = {};
 
       (dailyHours || []).forEach(entry => {
-        const date = new Date(entry.date);
-        const dayName = days[date.getDay()];
-        dayMap[dayName] += (entry.hours_regular || 0) + (entry.hours_overtime || 0);
+        const date = entry.date;
+        if (!dateMap[date]) {
+          dateMap[date] = 0;
+        }
+        dateMap[date] += (entry.hours_regular || 0) + (entry.hours_overtime || 0);
       });
 
-      const dayData = days.map(day => ({
-        day,
-        hours: dayMap[day],
-      }));
+      // Convert to array and format dates for display
+      const dayData = Object.entries(dateMap)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .slice(-7) // Show last 7 days with data
+        .map(([date, hours]) => ({
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          hours,
+        }));
 
       setHoursByDay(dayData);
 
@@ -396,14 +400,14 @@ export function Dashboard() {
       <Grid container spacing={3} sx={{ mt: 0 }}>
         <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
-            <CardHeader title={<Typography variant="h6">Hours by Day of Week</Typography>} />
+            <CardHeader title={<Typography variant="h6">Daily Hours</Typography>} />
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={hoursByDay} onClick={handleBarClick}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
+                    <XAxis dataKey="date" />
                     <YAxis />
                     <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
                     <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
