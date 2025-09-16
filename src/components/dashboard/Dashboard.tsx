@@ -346,7 +346,6 @@ export function Dashboard() {
                   <Typography variant="body2" color="text.secondary">Total Cost (Week)</Typography>
                   <Typography variant="h4" fontWeight={700}>${stats.totalCost.toLocaleString()}</Typography>
                 </Box>
-                <AttachMoneyIcon sx={{ fontSize: 32, color: 'success.main' }} />
               </Box>
             </CardContent>
           </Card>
