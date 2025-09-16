@@ -15,28 +15,28 @@ import { MuiAppSidebar } from './MuiAppSidebar';
 const theme = createTheme({
   palette: {
     background: {
-      default: 'hsl(var(--background))',
-      paper: 'hsl(var(--card))',
+      default: 'var(--background)',
+      paper: 'var(--card)',
     },
     text: {
-      primary: 'hsl(var(--foreground))',
-      secondary: 'hsl(var(--muted-foreground))',
+      primary: 'var(--foreground)',
+      secondary: 'var(--muted-foreground)',
     },
     primary: {
-      main: 'hsl(var(--primary))',
-      contrastText: 'hsl(var(--primary-foreground))',
+      main: 'var(--primary)',
+      contrastText: 'var(--primary-foreground)',
     },
     secondary: {
-      main: 'hsl(var(--secondary))',
-      contrastText: 'hsl(var(--secondary-foreground))',
+      main: 'var(--secondary)',
+      contrastText: 'var(--secondary-foreground)',
     },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: 'hsl(var(--background))',
-          color: 'hsl(var(--foreground))',
+          backgroundColor: 'var(--background)',
+          color: 'var(--foreground)',
         },
       },
     },
@@ -78,9 +78,9 @@ export function MuiAppLayout({ children, ...props }: MuiAppLayoutProps) {
             position="sticky"
             elevation={0}
             sx={{ 
-              backgroundColor: 'hsl(var(--background))',
-              borderBottom: '1px solid hsl(var(--border))',
-              color: 'hsl(var(--foreground))',
+              backgroundColor: 'var(--theme-component-navigation-topbar-text-fill-default)',
+              borderBottom: '1px solid var(--border)',
+              color: 'var(--foreground)',
             }}
           >
             <Toolbar sx={{ minHeight: '64px !important' }}>
@@ -90,7 +90,7 @@ export function MuiAppLayout({ children, ...props }: MuiAppLayoutProps) {
                   onClick={handleToggleSidebar}
                   sx={{ 
                     display: { sm: 'none' },
-                    color: 'hsl(var(--foreground))'
+                    color: 'var(--foreground)'
                   }}
                 >
                   <MenuIcon />
@@ -100,7 +100,7 @@ export function MuiAppLayout({ children, ...props }: MuiAppLayoutProps) {
                   component="h1"
                   sx={{ 
                     fontWeight: 600,
-                    color: 'hsl(var(--foreground))'
+                    color: 'var(--foreground)'
                   }}
                 >
                   Timesheet Management System
@@ -114,7 +114,7 @@ export function MuiAppLayout({ children, ...props }: MuiAppLayoutProps) {
             sx={{ 
               flexGrow: 1, 
               p: 3,
-              backgroundColor: 'hsl(var(--muted) / 0.1)',
+              backgroundColor: 'var(--theme-base-background-elevations-level-4)',
               minHeight: 'calc(100vh - 64px)'
             }}
           >

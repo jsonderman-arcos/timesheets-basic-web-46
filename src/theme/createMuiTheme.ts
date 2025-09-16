@@ -98,6 +98,46 @@ export function createMuiThemeFromTokens() {
       fontFamily,
       fontSize: fontSizeRoot,
     },
+    components: {
+      MuiButton: {
+        defaultProps: {
+          variant: 'contained',
+          color: 'primary',
+        },
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+          },
+          contained: {
+            backgroundColor: 'var(--theme-component-button-primary-background-default)',
+            color: 'var(--theme-component-button-primary-text-default)',
+            '&:hover': {
+              backgroundColor: 'var(--theme-component-button-primary-background-hover)',
+            },
+            '&:active': {
+              backgroundColor: 'var(--theme-component-button-primary-background-hover)',
+            },
+            '&.Mui-disabled': {
+              backgroundColor: 'var(--theme-component-button-primary-background-disabled)',
+              color: 'var(--theme-component-button-primary-text-disabled)',
+            },
+          },
+          outlined: {
+            color: 'var(--theme-component-button-primary-background-default)',
+            borderColor: 'var(--theme-component-button-primary-background-default)',
+            '&:hover': {
+              borderColor: 'var(--theme-component-button-primary-background-hover)',
+              backgroundColor: 'var(--theme-component-button-primary-background-hover)',
+              color: 'var(--theme-component-button-primary-background-default)',
+            },
+            '&.Mui-disabled': {
+              borderColor: 'var(--theme-component-button-primary-background-disabled)',
+              color: 'var(--theme-component-button-primary-background-disabled)',
+            },
+          },
+        },
+      },
+    },
   });
 }
 

@@ -12,18 +12,19 @@ import {
   IconButton,
   Badge,
   Divider,
-  useTheme,
   styled
 } from '@mui/material';
 import {
   BarChart as BarChartIcon,
   GridView as GridViewIcon,
+  AccessTime as AccessTimeIcon,
   Download as DownloadIcon,
   Warning as WarningIcon,
   GpsFixed as GpsFixedIcon,
   Assessment as AssessmentIcon,
   ArrowRight as ArrowRightIcon,
-  ArrowLeft as ArrowLeftIcon
+  ArrowLeft as ArrowLeftIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -38,19 +39,19 @@ const StyledDrawer = styled(Drawer, {
   '& .MuiDrawer-paper': {
     width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
     boxSizing: 'border-box',
-    backgroundColor: '#F3F4F6', // Light gray background
-    color: '#374151', // Dark gray text
+    backgroundColor: 'var(--theme-component-navigation-sidebar-background-fill)',
+    color: 'var(--theme-component-navigation-sidebar-label-fill-default)',
     position: 'fixed',
     top: '64px', // Position under header
     height: 'calc(100vh - 64px)',
     left: 0,
     '& .MuiListItemIcon-root': {
-      color: '#6B7280', // Dark gray icons
+      color: 'var(--theme-component-navigation-sidebar-icon-fill-default)',
     },
     '& .MuiTypography-root': {
-      color: '#374151', // Dark gray text
+      color: 'var(--theme-component-navigation-sidebar-label-fill-default)',
     },
-    borderRight: '1px solid #E5E7EB',
+    borderRight: '1px solid var(--theme-component-navigation-sidebar-bar-border-stroke)',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -64,15 +65,32 @@ const StyledListItemButton = styled(ListItemButton, {
   minHeight: 48,
   borderRadius: '6px',
   margin: '2px 8px',
-  color: '#374151', // Dark gray text
-  backgroundColor: active ? '#E5E7EB' : 'transparent', // Light gray for active
+  color: active
+    ? 'var(--theme-component-navigation-sidebar-label-fill-selected)'
+    : 'var(--theme-component-navigation-sidebar-label-fill-default)',
+  backgroundColor: active
+    ? 'var(--theme-component-navigation-sidebar-background-fill-selected)'
+    : 'transparent',
   fontWeight: active ? 600 : 400,
   '&:hover': {
-    backgroundColor: '#FFFFFF', // White background on hover
-    color: '#374151', // Keep dark gray text
+    backgroundColor: 'var(--theme-component-navigation-sidebar-background-fill-selected)',
+    color: 'var(--theme-component-navigation-sidebar-label-fill-selected)',
     '& .MuiListItemIcon-root': {
-      color: '#6B7280', // Dark gray icons on hover
+      color: 'var(--theme-component-navigation-sidebar-icon-fill-selected)',
     },
+    '& .MuiTypography-root': {
+      color: 'var(--theme-component-navigation-sidebar-label-fill-selected)',
+    },
+  },
+  '& .MuiListItemIcon-root': {
+    color: active
+      ? 'var(--theme-component-navigation-sidebar-icon-fill-selected)'
+      : 'var(--theme-component-navigation-sidebar-icon-fill-default)',
+  },
+  '& .MuiTypography-root': {
+    color: active
+      ? 'var(--theme-component-navigation-sidebar-label-fill-selected)'
+      : 'var(--theme-component-navigation-sidebar-label-fill-default)',
   },
 }));
 
@@ -85,7 +103,7 @@ const menuItems = [
   {
     title: 'Timesheet Grid',
     url: '/timesheets',
-    icon: GridViewIcon,
+    icon: AccessTimeIcon,
   },
   {
     title: 'Export Data',
@@ -105,7 +123,7 @@ const menuItems = [
   {
     title: 'Reports',
     url: '/reports',
-    icon: AssessmentIcon,
+    icon: AssignmentIcon,
   },
 ];
 
@@ -119,7 +137,6 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
   
   const location = useLocation();
   const navigate = useNavigate();
-  const theme = useTheme();
   const [pendingExceptionsCount, setPendingExceptionsCount] = useState(0);
 
   useEffect(() => {
@@ -186,7 +203,16 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
           const isExceptions = item.url === '/exceptions';
           const hasPendingExceptions = isExceptions && pendingExceptionsCount > 0;
           const active = isActive(item.url);
-          
+          const IconComponent = item.icon;
+          const iconColor = hasPendingExceptions
+            ? 'var(--theme-base-feedback-warning-main)'
+            : active
+              ? 'var(--theme-component-navigation-sidebar-icon-fill-selected)'
+              : 'var(--theme-component-navigation-sidebar-icon-fill-default)';
+          const labelColor = active
+            ? 'var(--theme-component-navigation-sidebar-label-fill-selected)'
+            : 'var(--theme-component-navigation-sidebar-label-fill-default)';
+
           return (
             <ListItem key={item.title} disablePadding>
               <StyledListItemButton
@@ -197,17 +223,17 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
                 <ListItemIcon
                   sx={{
                     minWidth: collapsed ? 'auto' : 40,
-                    color: hasPendingExceptions ? 'hsl(var(--warning))' : '#6B7280', // Dark gray icons
+                    color: iconColor,
                     mr: collapsed ? 0 : 1,
                   }}
                 >
-                  <item.icon />
+                  <IconComponent sx={{ color: 'inherit' }} />
                 </ListItemIcon>
                 {!collapsed && (
                   <ListItemText 
                     primary={
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                        <Typography variant="body2" component="span">
+                        <Typography variant="body2" component="span" sx={{ color: labelColor }}>
                           {item.title}
                         </Typography>
                         {hasPendingExceptions && (
@@ -215,8 +241,8 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
                             badgeContent={pendingExceptionsCount > 99 ? '99+' : pendingExceptionsCount}
                             sx={{
                               '& .MuiBadge-badge': {
-                                backgroundColor: 'hsl(var(--error))',
-                                color: 'hsl(var(--error-foreground))',
+                                backgroundColor: 'var(--theme-base-feedback-error-main)',
+                                color: 'var(--theme-base-feedback-error-contrast-text)',
                                 fontSize: '0.75rem',
                                 fontWeight: 700,
                                 minWidth: '22px',
@@ -236,16 +262,22 @@ export function MuiAppSidebar({ collapsed, onToggleCollapse }: MuiAppSidebarProp
       </List>
 
       {/* Toggle button at bottom */}
-      <Box sx={{ p: 1, borderTop: '1px solid #E5E7EB' }}>
+      <Box sx={{ p: 1, borderTop: '1px solid var(--theme-component-navigation-sidebar-bar-border-stroke)' }}>
         <IconButton 
           onClick={onToggleCollapse}
           sx={{ 
             width: '100%',
             justifyContent: collapsed ? 'center' : 'flex-end',
-            color: '#6B7280', // Dark gray icon
+            color: 'var(--theme-component-navigation-sidebar-icon-fill-default)',
+            backgroundColor: 'transparent',
             '&:hover': {
               backgroundColor: 'transparent',
-            }
+              color: 'var(--theme-component-navigation-sidebar-icon-fill-default)',
+            },
+            '&:focus-visible': {
+              outline: '2px solid var(--theme-component-navigation-sidebar-stroke-selected)',
+              outlineOffset: 2,
+            },
           }}
         >
           {collapsed ? <ArrowRightIcon /> : <ArrowLeftIcon />}

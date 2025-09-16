@@ -171,7 +171,9 @@ export function ExceptionManagement() {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: false,
+      hourCycle: 'h23',
     });
   };
 
@@ -324,7 +326,7 @@ export function ExceptionManagement() {
                 <div className="flex gap-3 pt-4">
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
-                    color="success"
+                    color="primary"
                     variant="contained"
                     startIcon={<CheckCircleIcon fontSize="small" />}
                   >
@@ -332,7 +334,7 @@ export function ExceptionManagement() {
                   </Button>
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
-                    color="error"
+                    color="primary"
                     variant="contained"
                     startIcon={<CancelIcon fontSize="small" />}
                   >

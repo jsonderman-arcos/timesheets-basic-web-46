@@ -244,7 +244,7 @@ export function ExportTimesheets() {
                 label="Export Format"
                 onChange={(e) => setExportType(e.target.value as 'csv' | 'excel')}
               >
-                <MenuItem value="csv">Csv format</MenuItem>
+                <MenuItem value="csv">CSV format</MenuItem>
                 <MenuItem value="excel" disabled>Excel format (Coming soon)</MenuItem>
               </Select>
             </FormControl>
@@ -253,6 +253,7 @@ export function ExportTimesheets() {
               onClick={exportTimesheets}
               disabled={loading || exportType === 'excel'}
               variant="contained"
+              color="primary"
               startIcon={loading ? <CircularProgress size={16} /> : <DownloadIcon />}
               sx={{ textTransform: 'none' }}
             >

@@ -75,14 +75,14 @@ module.exports = {
         },
         // Sidebar colors
         sidebar: {
-          DEFAULT: "rgba(var(--sidebar-background))",
-          foreground: "rgba(var(--sidebar-foreground))",
-          primary: "rgba(var(--sidebar-primary))",
-          "primary-foreground": "rgba(var(--sidebar-primary-foreground))",
-          accent: "rgba(var(--sidebar-accent))",
-          "accent-foreground": "rgba(var(--sidebar-accent-foreground))",
-          border: "rgba(var(--sidebar-border))",
-          ring: "rgba(var(--sidebar-ring))",
+          DEFAULT: "var(--theme-component-navigation-sidebar-background-fill)",
+          foreground: "var(--theme-component-navigation-sidebar-label-fill-default)",
+          primary: "var(--theme-component-navigation-sidebar-background-fill-selected)",
+          "primary-foreground": "var(--theme-component-navigation-sidebar-label-fill-selected)",
+          accent: "var(--theme-component-navigation-sidebar-background-fill-selected)",
+          "accent-foreground": "var(--theme-component-navigation-sidebar-label-fill-selected)",
+          border: "var(--theme-component-navigation-sidebar-bar-border-stroke)",
+          ring: "var(--theme-component-navigation-sidebar-stroke-selected)",
         },
         overlay: {
           6: "var(--core-lighthouse-colors-reds-punchy-red-500-alpha-06)",

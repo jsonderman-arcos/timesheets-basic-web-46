@@ -268,7 +268,7 @@ export function MapView({ gpsPoints }: MapViewProps) {
               size="small"
               className="flex-1"
             />
-            <Button variant="contained" onClick={handleSetToken}>Set Token</Button>
+            <Button variant="contained" color="primary" onClick={handleSetToken}>Set Token</Button>
           </div>
         </div>
       </div>

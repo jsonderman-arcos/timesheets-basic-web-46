@@ -1,6 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, ChevronLeft, ChevronRight, FileBarChart, Home } from 'lucide-react';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +59,9 @@ export default function ReportsPage() {
   const [startDate, setStartDate] = useState(() => format(startOfWeek(new Date()), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(() => format(endOfWeek(new Date()), 'yyyy-MM-dd'));
   const [drillDown, setDrillDown] = useState<DrillDownState>({ level: 'company' });
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Generate consistent rates for companies
   const companyRates = useMemo(() => {
@@ -190,13 +196,34 @@ export default function ReportsPage() {
     }
   };
 
+  // Sorting helpers
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortData = <T,>(data: T[], getValue: (item: T) => any): T[] => {
+    if (!sortColumn) return data;
+    return [...data].sort((a, b) => {
+      const aValue = getValue(a);
+      const bValue = getValue(b);
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
   const renderBreadcrumb = () => {
     return (
-      <Breadcrumb>
+      <Breadcrumb className="mb-4" style={{ marginBottom: '16px' }}>
         <BreadcrumbList>
           {drillDown.level === 'company' ? (
             <BreadcrumbItem>
-              <BreadcrumbPage>Reports</BreadcrumbPage>
+              <BreadcrumbPage className="font-bold">Report Overview</BreadcrumbPage>
             </BreadcrumbItem>
           ) : (
             <>
@@ -205,13 +232,13 @@ export default function ReportsPage() {
                   onClick={() => setDrillDown({ level: 'company' })}
                   className="cursor-pointer hover:text-foreground"
                 >
-                  Reports
+                  Report Overview
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               {drillDown.level === 'team' ? (
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{drillDown.company}</BreadcrumbPage>
+                  <BreadcrumbPage className="font-bold">{drillDown.company}</BreadcrumbPage>
                 </BreadcrumbItem>
               ) : (
                 <>
@@ -225,7 +252,7 @@ export default function ReportsPage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>{drillDown.teamName}</BreadcrumbPage>
+                    <BreadcrumbPage className="font-bold">{drillDown.teamName}</BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
               )}
@@ -254,7 +281,7 @@ export default function ReportsPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileBarChart className="w-6 h-6" />
+            <AssessmentIcon className="w-6 h-6" fontSize="inherit" />
             <h1 className="text-2xl font-bold">Reports</h1>
           </div>
         </div>
@@ -263,17 +290,47 @@ export default function ReportsPage() {
         
       </div>
 
-      <Card>
-        <CardContent className="space-y-4 bg-white">
+      <Card className="rounded-md" style={{ backgroundColor: 'var(--theme-base-background-elevations-level-5)', borderRadius: '8px', overflow: 'hidden' }}>
+        <CardContent className="p-0" style={{ backgroundColor: 'var(--theme-base-background-elevations-level-5)' }}>
           {drillDown.level === 'company' && (
-            <Table className="bg-white">
+            <Table className="w-full" style={{ width: '100%' }}>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="font-bold">Company</TableHead>
-                  <TableHead className="font-bold">Total Hours</TableHead>
+                <TableRow style={{ backgroundColor: 'var(--theme-base-background-elevations-level-4)' }}>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Company')}
+                  >
+                    Company
+                    {sortColumn === 'Company' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Total Hours')}
+                  >
+                    Total Hours
+                    {sortColumn === 'Total Hours' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
                   <TableHead className="font-bold">Rate</TableHead>
                   <TableHead className="font-bold">Total Cost</TableHead>
-                  <TableHead className="font-bold">Teams</TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Teams')}
+                  >
+                    Teams
+                    {sortColumn === 'Teams' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
                   <TableHead className="font-bold">Action</TableHead>
                 </TableRow>
               </TableHeader>
@@ -283,7 +340,17 @@ export default function ReportsPage() {
                     <TableCell colSpan={6} className="text-center">Loading...</TableCell>
                   </TableRow>
                 ) : (
-                  companyReports?.map((report) => {
+                  sortData(
+                    companyReports ?? [],
+                    (r) => {
+                      switch (sortColumn) {
+                        case 'Company': return r.utility;
+                        case 'Total Hours': return r.totalHours;
+                        case 'Teams': return r.crewCount;
+                        default: return r.utility;
+                      }
+                    }
+                  ).map((report) => {
                     // Get or generate a consistent rate for this company
                     if (!companyRates.has(report.utility)) {
                       companyRates.set(report.utility, Math.floor(Math.random() * (165 - 140 + 1)) + 140);
@@ -303,7 +370,7 @@ export default function ReportsPage() {
                             size="sm"
                             onClick={() => handleCompanyDrillDown(report.utility)}
                           >
-                            View Teams <ChevronRight className="w-4 h-4 ml-1" />
+                          View Teams <ChevronRightIcon className="w-4 h-4 ml-1" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -339,12 +406,42 @@ export default function ReportsPage() {
           )}
 
           {drillDown.level === 'team' && (
-            <Table className="bg-white">
+            <Table className="w-full rounded-none" style={{ backgroundColor: 'var(--theme-base-background-elevations-level-5)', width: '100%' }}>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="font-bold">Team Name</TableHead>
-                  <TableHead className="font-bold">Total Hours</TableHead>
-                  <TableHead className="font-bold">Timesheets</TableHead>
+                <TableRow style={{ backgroundColor: 'var(--theme-base-background-elevations-level-4)' }}>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Team Name')}
+                  >
+                    Team Name
+                    {sortColumn === 'Team Name' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Total Hours')}
+                  >
+                    Total Hours
+                    {sortColumn === 'Total Hours' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Timesheets')}
+                  >
+                    Timesheets
+                    {sortColumn === 'Timesheets' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
                   <TableHead className="font-bold">Action</TableHead>
                 </TableRow>
               </TableHeader>
@@ -354,7 +451,17 @@ export default function ReportsPage() {
                     <TableCell colSpan={4} className="text-center">Loading...</TableCell>
                   </TableRow>
                 ) : (
-                  teamReports?.map((report) => (
+                  sortData(
+                    teamReports ?? [],
+                    (r) => {
+                      switch (sortColumn) {
+                        case 'Team Name': return r.crewName;
+                        case 'Total Hours': return r.totalHours;
+                        case 'Timesheets': return r.timesheetCount;
+                        default: return r.crewName;
+                      }
+                    }
+                  ).map((report) => (
                     <TableRow key={report.crewId}>
                       <TableCell className="font-medium">{report.crewName}</TableCell>
                       <TableCell>{report.totalHours.toFixed(1)} hrs</TableCell>
@@ -365,7 +472,7 @@ export default function ReportsPage() {
                           size="sm"
                           onClick={() => handleTeamDrillDown(report.crewId, report.crewName)}
                         >
-                          View Daily <ChevronRight className="w-4 h-4 ml-1" />
+                          View Daily <ChevronRightIcon className="w-4 h-4 ml-1" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -376,15 +483,75 @@ export default function ReportsPage() {
           )}
 
           {drillDown.level === 'daily' && (
-            <Table className="bg-white">
+            <Table className="w-full rounded-none" style={{ backgroundColor: 'var(--theme-base-background-elevations-level-5)', width: '100%' }}>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="font-bold">Date</TableHead>
-                  <TableHead className="font-bold">Total Hours</TableHead>
-                  <TableHead className="font-bold">Working</TableHead>
-                  <TableHead className="font-bold">Traveling</TableHead>
-                  <TableHead className="font-bold">Standby</TableHead>
-                  <TableHead className="font-bold">Work Description</TableHead>
+                <TableRow style={{ backgroundColor: 'var(--theme-base-background-elevations-level-4)' }}>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Date')}
+                  >
+                    Date
+                    {sortColumn === 'Date' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Total Hours')}
+                  >
+                    Total Hours
+                    {sortColumn === 'Total Hours' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Working')}
+                  >
+                    Working
+                    {sortColumn === 'Working' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Traveling')}
+                  >
+                    Traveling
+                    {sortColumn === 'Traveling' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Standby')}
+                  >
+                    Standby
+                    {sortColumn === 'Standby' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
+                  <TableHead
+                    className="font-bold cursor-pointer"
+                    onClick={() => handleSort('Work Description')}
+                  >
+                    Work Description
+                    {sortColumn === 'Work Description' && (
+                      sortDirection === 'asc'
+                        ? <ArrowUpwardIcon className="inline w-4 h-4 ml-1" />
+                        : <ArrowDownwardIcon className="inline w-4 h-4 ml-1" />
+                    )}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -393,7 +560,20 @@ export default function ReportsPage() {
                     <TableCell colSpan={6} className="text-center">Loading...</TableCell>
                   </TableRow>
                 ) : (
-                  dailyReports?.map((report) => (
+                  sortData(
+                    dailyReports ?? [],
+                    (r) => {
+                      switch (sortColumn) {
+                        case 'Date': return r.date;
+                        case 'Total Hours': return r.hours;
+                        case 'Working': return r.workingHours;
+                        case 'Traveling': return r.travelingHours;
+                        case 'Standby': return r.standbyHours;
+                        case 'Work Description': return r.workDescription;
+                        default: return r.date;
+                      }
+                    }
+                  ).map((report) => (
                     <TableRow key={report.timesheetId}>
                       <TableCell>{format(new Date(report.date), 'MMM dd, yyyy')}</TableCell>
                       <TableCell>{report.hours.toFixed(1)} hrs</TableCell>

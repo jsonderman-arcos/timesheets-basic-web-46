@@ -11,29 +11,12 @@ import {
   Divider,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-} from 'recharts';
+import { PieChart } from '@mui/x-charts/PieChart';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { LineChart } from '@mui/x-charts/LineChart';
+import type { PieValueType } from '@mui/x-charts/models';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import GroupIcon from '@mui/icons-material/Group';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import { useTheme } from '@mui/material/styles';
-import { useToast } from '@/hooks/use-toast';
 import { showErrorToast } from '@/lib/toast-utils';
 
 interface DashboardStats {
@@ -73,10 +56,15 @@ interface DailyCostData {
 
 const COST_PER_HOUR = 150;
 
-const UTILITY_COLORS = ['#2563eb', '#dc2626', '#16a34a', '#ca8a04', '#9333ea'];
+const UTILITY_COLORS = [
+  'var(--theme-base-primary-main)',
+  'var(--theme-base-feedback-error-main)',
+  'var(--theme-base-feedback-success-main)',
+  'var(--theme-base-feedback-warning-main)',
+  'var(--theme-base-secondary-main)',
+];
 
 export function Dashboard() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalHours: 0,
@@ -93,7 +81,6 @@ export function Dashboard() {
   const [hoursByType, setHoursByType] = useState<HoursByType[]>([]);
   const [dailyCostData, setDailyCostData] = useState<DailyCostData[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchDashboardData();
@@ -235,17 +222,17 @@ export function Dashboard() {
         {
           type: 'Working',
           hours: workingHours,
-          color: '#16a34a', // green
+          color: 'var(--theme-base-feedback-success-main)',
         },
         {
           type: 'Traveling', 
           hours: travelingHours,
-          color: '#dc2626', // red
+          color: 'var(--theme-base-feedback-error-main)',
         },
         {
           type: 'Standby',
           hours: standbyHours,
-          color: '#ca8a04', // amber
+          color: 'var(--theme-base-feedback-warning-main)',
         },
       ].filter(item => item.hours > 0); // Only show types with hours > 0
 
@@ -299,24 +286,34 @@ export function Dashboard() {
     }
   };
 
-  const handleBarClick = (data: any) => {
-    if (data && data.activeLabel) {
-      navigate('/timesheets');
+  const handleUtilitySliceClick = (
+    _event: unknown,
+    item: { dataIndex?: number | null } | null
+  ) => {
+    if (item?.dataIndex == null) {
+      return;
+    }
+
+    const slice = hoursByUtility[item.dataIndex];
+    if (slice?.fullName) {
+      navigate(`/timesheets?company=${encodeURIComponent(slice.fullName)}`);
     }
   };
 
-  const handlePieClick = (data: any) => {
-    if (data && data.fullName) {
-      navigate(`/timesheets?company=${encodeURIComponent(data.fullName)}`);
-    }
+  const handleHoursBarClick = () => {
+    navigate('/timesheets');
   };
+
+
+  const totalUtilityHours = hoursByUtility.reduce((sum, d) => sum + (d.hours || 0), 0);
+  const totalTypeHours = hoursByType.reduce((sum, d) => sum + (d.hours || 0), 0);
 
   if (loading) {
     return (
       <Box>
         <Grid container spacing={3}>
           {Array.from({ length: 4 }).map((_, i) => (
-            <Grid size={{ xs: 12, md: 6, lg: 3 }} key={i}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={i}>
               <Card>
                 <CardContent sx={{ p: 3 }}>
                   <Skeleton variant="text" width="75%" sx={{ mb: 1 }} />
@@ -331,25 +328,24 @@ export function Dashboard() {
   }
 
   return (
-    <Box>
+    <Box sx={{ width: '100%' }}>
       {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
-          <Card>
+      <Grid container sx={{ mb: 4, gap: 'clamp(8px, 2vw, 24px)' }} columns={{ xs: 12, md: 12, lg: 20 }}>
+        <Grid size={{ xs: 'auto' }}>
+          <Card sx={{ minWidth: 'max-content' }}>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
                   <Typography variant="body2" color="text.secondary">Total Hours</Typography>
                   <Typography variant="h4" fontWeight={700}>{stats.totalHours.toFixed(1)}</Typography>
                 </Box>
-                <AccessTimeIcon sx={{ fontSize: 32, color: 'primary.main' }} />
               </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
-          <Card>
+        <Grid size={{ xs: 'auto' }}>
+          <Card sx={{ minWidth: 'max-content' }}>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
@@ -361,8 +357,8 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
-          <Card>
+        <Grid size={{ xs: 'auto' }}>
+          <Card sx={{ minWidth: 'max-content' }}>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
@@ -374,8 +370,8 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
-          <Card>
+        <Grid size={{ xs: 'auto' }}>
+          <Card sx={{ minWidth: 'max-content' }}>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
@@ -387,15 +383,14 @@ export function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 2.4 }}>
-          <Card>
+        <Grid size={{ xs: 'auto' }}>
+          <Card sx={{ minWidth: 'max-content' }}>
             <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
                   <Typography variant="body2" color="text.secondary">Pending Exceptions</Typography>
                   <Typography variant="h4" fontWeight={700}>{stats.pendingExceptions}</Typography>
                 </Box>
-                <WarningAmberIcon sx={{ fontSize: 32, color: 'warning.main' }} />
               </Box>
             </CardContent>
           </Card>
@@ -403,79 +398,78 @@ export function Dashboard() {
       </Grid>
 
       {/* Charts */}
-      <Grid container spacing={3} sx={{ mt: 0 }}>
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
+     <Grid container spacing={3} sx={{ mt: 0, width: '100%' }} columns={{ xs: 12, md: 12, lg: 12 }}>
+        <Grid size={{xs:12, md:6, lg:6}} sx={{ display: 'flex' }}>
+          <Card sx={{ height: '100%', width: '100%' }}>
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByUtility}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => {
-                        const name = d.utility;
-                        const maxChars = 20;
-                        let wrappedName = name;
-                        
-                        if (name.length > maxChars) {
-                          const firstLine = name.substring(0, maxChars);
-                          const secondLine = name.substring(maxChars);
-                          wrappedName = `${firstLine}\n${secondLine}`;
-                        }
-                        
-                        return `${wrappedName}\n${(d.percent * 100).toFixed(0)}%`;
-                      }}
-                      outerRadius={80}
-                      dataKey="hours"
-                      onClick={handlePieClick}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {hoursByUtility.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip 
-                      formatter={(value: any, name: any, props: any) => [
-                        `${value} hours`, 
-                        props.payload.fullName
-                      ]} 
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart
+                  series={[
+                    {
+                      id: 'hours-by-utility',
+                      data: hoursByUtility.map((item) => ({
+                        id: item.utility,
+                        value: item.hours,
+                        label: item.utility,
+                        color: item.color,
+                        data: { fullName: item.fullName },
+                      })),
+                      outerRadius: '65%',
+                    },
+                  ]}
+                  height={300}
+                  slotProps={{
+                    legend: { hidden: false },
+                    tooltip: {
+                      trigger: 'item',
+                      valueFormatter: (value: PieValueType, context) => {
+                        const numericValue = value == null ? 0 : Number(value);
+                        const fullName = (context?.data as { fullName?: string } | undefined)?.fullName;
+                        const suffix = fullName ? ` - ${fullName}` : '';
+                        return `${numericValue.toLocaleString()} hours${suffix}`;
+                      },
+                    },
+                  }}
+                  onItemClick={handleUtilitySliceClick as any}
+                />
               </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
+         <Grid size={{xs:12, md:6, lg:6}} sx={{ display: 'flex' }}>
+          <Card sx={{ height: '100%', width: '100%' }}>
             <CardHeader title={<Typography variant="h6">Hours by Work Type</Typography>} />
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hoursByType}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(d: any) => `${d.type} ${(d.percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      dataKey="hours"
-                    >
-                      {hoursByType.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart
+                  series={[
+                    {
+                      id: 'hours-by-type',
+                      data: hoursByType.map((item) => ({
+                        id: item.type,
+                        value: item.hours,
+                        label: item.type,
+                        color: item.color,
+                      })),
+                      outerRadius: '65%',
+                    },
+                  ]}
+                  height={300}
+                  slotProps={{
+                    legend: { hidden: false },
+                    tooltip: {
+                      trigger: 'item',
+                      valueFormatter: (value: PieValueType) => {
+                        const numericValue = value == null ? 0 : Number(value);
+                        return `${numericValue.toLocaleString()} hours`;
+                      },
+                    },
+                  }}
+                />
               </Box>
             </CardContent>
           </Card>
@@ -484,21 +478,37 @@ export function Dashboard() {
 
       {/* Daily Hours Chart */}
       <Grid container spacing={3} sx={{ mt: 3 }}>
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{xs:12}}>
           <Card>
             <CardHeader title={<Typography variant="h6">Daily Hours</Typography>} />
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hoursByDay} onClick={handleBarClick}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                    <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart
+                  height={400}
+                  xAxis={[{ scaleType: 'band', data: hoursByDay.map((item) => item.date) }]}
+                  yAxis={[{ valueFormatter: (value) => `${value == null ? 0 : Number(value)} h` }]}
+                  series={[
+                    {
+                      id: 'daily-hours',
+                      data: hoursByDay.map((item) => item.hours),
+                      label: 'Total Hours',
+                      color: 'var(--theme-base-primary-main)',
+                    },
+                  ]}
+                  slotProps={{
+                    legend: { hidden: true },
+                    tooltip: {
+                      trigger: 'item',
+                      valueFormatter: (value) => {
+                        const n = value == null ? 0 : Number(value);
+                        return `${n.toLocaleString()} hours`;
+                      },
+                    },
+                  }}
+                  onItemClick={handleHoursBarClick as any}
+                  sx={{ cursor: 'pointer' }}
+                />
               </Box>
             </CardContent>
           </Card>
@@ -507,32 +517,48 @@ export function Dashboard() {
 
       {/* Daily Cost History Chart */}
       <Grid container spacing={3} sx={{ mt: 3 }}>
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{xs:12}}>
           <Card>
             <CardHeader title={<Typography variant="h6">Daily Cost History (Running Total)</Typography>} />
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={dailyCostData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis 
-                      tickFormatter={(value: any) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <RechartsTooltip 
-                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Running Total Cost']}
-                      labelFormatter={(label: any) => `Date: ${label}`}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="cost" 
-                      stroke={theme.palette.success.main} 
-                      fill={theme.palette.success.main}
-                      fillOpacity={0.3}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <LineChart
+                  height={400}
+                  xAxis={[{ data: dailyCostData.map((item) => item.date), scaleType: 'point' }]}
+                  yAxis={[{
+                    valueFormatter: (value) => {
+                      const n = value == null ? 0 : Number(value);
+                      return `$${(n / 1000).toFixed(0)}k`;
+                    },
+                  }]}
+                  series={[
+                    {
+                      id: 'running-cost',
+                      data: dailyCostData.map((item) => item.cost),
+                      label: 'Running Total Cost',
+                      color: 'var(--theme-base-feedback-success-main)',
+                      area: true,
+                      showMark: false,
+                    },
+                  ]}
+                  slotProps={{
+                    legend: { hidden: true },
+                    tooltip: {
+                      trigger: 'item',
+                      valueFormatter: (value, _context) => {
+                        const n = value == null ? 0 : Number(value);
+                        return `$${n.toLocaleString()}`;
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiAreaElement-root': {
+                      fill: 'var(--theme-base-feedback-success-main)',
+                      fillOpacity: 0.3,
+                    },
+                  }}
+                />
               </Box>
             </CardContent>
           </Card>

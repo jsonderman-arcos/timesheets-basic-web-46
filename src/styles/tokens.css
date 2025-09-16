@@ -1275,7 +1275,7 @@
   --theme-component-navigation-sidebar-label-fill-selected: var(--theme-component-navigation-sidebar-icon-fill-selected);
   --theme-component-navigation-sidebar-stroke-selected: var(--theme-component-navigation-sidebar-icon-fill-selected);
   --theme-component-navigation-topbar-action-element-fill: var(--core-lighthouse-colors-neutrals-white-alpha-56);
-  --theme-component-navigation-topbar-background-fill: var(--theme-base-background-brand-dark-tone, rgba(87, 2, 19, 1));
+  --theme-component-navigation-topbar-background-fill: var(--theme-base-background-brand-dark-tone);
   --theme-component-navigation-topbar-form-outline-default: var(--core-lighthouse-colors-neutrals-white-alpha-23);
   --theme-component-navigation-topbar-icon-fill-default: var(--core-lighthouse-colors-neutrals-white-100);
   --theme-component-navigation-topbar-text-fill-default: var(--core-lighthouse-colors-neutrals-white-100);

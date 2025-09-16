@@ -1,6 +1,6 @@
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
-import { Dot } from "lucide-react"
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 
 import { cn } from "@/lib/utils"
 
@@ -61,7 +61,7 @@ const InputOTPSeparator = React.forwardRef<
   React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
   <div ref={ref} role="separator" {...props}>
-    <Dot />
+    <FiberManualRecordIcon fontSize="inherit" />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"

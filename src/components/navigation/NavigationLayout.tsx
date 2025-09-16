@@ -77,7 +77,7 @@ function NavigationLayoutContent({
           component="main" 
           sx={{ 
             flex: 1, 
-            backgroundColor: 'var(--theme-base-background-default)',
+            backgroundColor: 'var(--theme-base-background-elevations-level-4)',
             minHeight: 'calc(100vh - 64px)',
             width: 0, // Forces flex item to shrink properly
           }}

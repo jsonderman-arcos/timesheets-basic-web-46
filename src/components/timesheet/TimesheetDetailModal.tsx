@@ -33,6 +33,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CloseIcon from '@mui/icons-material/Close';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import IconButton from '@mui/material/IconButton';
 import { supabase } from '@/integrations/supabase/client';
@@ -264,7 +265,8 @@ export function TimesheetDetailModal({
     return time.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
+      hourCycle: 'h23',
     });
   };
 
@@ -537,11 +539,18 @@ export function TimesheetDetailModal({
             >
               <ChevronRightIcon />
             </IconButton>
+            <IconButton
+              onClick={() => onOpenChange(false)}
+              size="small"
+              title="Close"
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </Box>
         </Box>
       </DialogTitle>
       
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ backgroundColor: 'var(--theme-base-background-elevations-level-3)' }}>
         <div className="space-y-6">
           {timesheet || isEditing ? (
             <Card variant="outlined">
@@ -567,7 +576,7 @@ export function TimesheetDetailModal({
                   </Box>
                 }
               />
-              <CardContent>
+              <CardContent >
                 {isEditing ? (
                   <Stack spacing={3}>
                     {/* Edit Mode Toggle */}
@@ -807,14 +816,15 @@ export function TimesheetDetailModal({
                       onClick={handleRemindCrewLead}
                       disabled={loading}
                     >
-                      Send Reminder
+                      Send reminder
                     </Button>
                     <Button
                       variant="contained"
+                      color="primary"
                       startIcon={<EditIcon />}
                       onClick={() => setIsEditing(true)}
                     >
-                      Create Timesheet
+                      Create timesheet
                     </Button>
                   </Box>
                 </div>
@@ -831,12 +841,15 @@ export function TimesheetDetailModal({
               onClick={handleCancel} 
               startIcon={<CancelIcon />}
               disabled={loading}
+              variant="outlined"
+              color="secondary"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleSave} 
               variant="contained" 
+              color="primary"
               startIcon={<SaveIcon />}
               disabled={loading}
             >
@@ -847,6 +860,7 @@ export function TimesheetDetailModal({
           <Button 
             onClick={() => onOpenChange(false)}
             variant="outlined"
+            color="secondary"
           >
             Close
           </Button>

@@ -277,52 +277,52 @@ export function TimesheetGrid() {
   return (
     <>
       <Card>
-        <CardHeader 
+        <CardHeader
           title={
-            <Box className="flex items-center gap-3">
-              <Box>
-                <Typography variant="h6">Timesheet Overview</Typography>
+            <Box className="flex items-center justify-between w-full">
+              <Box className="flex items-center gap-3">
+                <Chip 
+                  icon={<FilterListIcon />} 
+                  label={`${crews.length} crews`} 
+                  size="small" 
+                  variant="outlined" 
+                />
                 {getActiveFiltersCount() > 0 && (
                   <Typography variant="body2" color="text.secondary">
                     {getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? 's' : ''} applied
                   </Typography>
                 )}
               </Box>
-              <Chip 
-                icon={<FilterListIcon />} 
-                label={`${crews.length} crews`} 
-                size="small" 
-                variant="outlined" 
-              />
-            </Box>
-          }
-          action={
-            <Box className="flex items-center gap-2">
-              <IconButton onClick={goToPreviousWeek} size="small">
-                <ChevronLeftIcon />
-              </IconButton>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={goToCurrentWeek}
-                startIcon={<TodayIcon />}
-                className="min-w-[140px]"
-              >
-                This Week
-              </Button>
-              <IconButton onClick={goToNextWeek} size="small">
-                <ChevronRightIcon />
-              </IconButton>
+              <Box className="flex items-center flex-1">
+                <Box className="flex-1 flex items-center justify-center">
+                  <Typography variant="subtitle1" className="font-medium">
+                    {getWeekRange()}
+                  </Typography>
+                </Box>
+                <Box className="flex items-center gap-2">
+                  <IconButton onClick={goToPreviousWeek} size="small">
+                    <ChevronLeftIcon />
+                  </IconButton>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={goToCurrentWeek}
+                    startIcon={<TodayIcon />}
+                    className="min-w-[140px]"
+                  >
+                    This Week
+                  </Button>
+                  <IconButton onClick={goToNextWeek} size="small">
+                    <ChevronRightIcon />
+                  </IconButton>
+                </Box>
+                
+              </Box>
             </Box>
           }
         />
         <CardContent>
-          {/* Week Display */}
-          <Box className="mb-4">
-            <Typography variant="subtitle1" className="text-center font-medium">
-              {getWeekRange()}
-            </Typography>
-          </Box>
+
 
           {/* Filters and Sorting */}
           <Box className="mb-6">
@@ -333,6 +333,18 @@ export function TimesheetGrid() {
                   value={selectedCompany}
                   label="Company"
                   onChange={(e) => setSelectedCompany(e.target.value)}
+                  MenuProps={{
+                    disablePortal: false,
+                    container: document.body,
+                    anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                    transformOrigin: { vertical: 'top', horizontal: 'left' },
+                    keepMounted: true,
+                    PaperProps: {
+                      style: {
+                        maxHeight: 400,
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="">All Companies</MenuItem>
                   {companies.map((company) => (
@@ -349,6 +361,18 @@ export function TimesheetGrid() {
                   value={selectedCrewFilter}
                   label="Crew"
                   onChange={(e) => setSelectedCrewFilter(e.target.value)}
+                  MenuProps={{
+                    disablePortal: false,
+                    container: document.body,
+                    anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                    transformOrigin: { vertical: 'top', horizontal: 'left' },
+                    keepMounted: true,
+                    PaperProps: {
+                      style: {
+                        maxHeight: 400,
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="">All Crews</MenuItem>
                   {allCrews
@@ -368,6 +392,18 @@ export function TimesheetGrid() {
                   label="Sort By"
                   onChange={(e) => setSortBy(e.target.value)}
                   startAdornment={<SortIcon sx={{ mr: 1, fontSize: 16 }} />}
+                  MenuProps={{
+                    disablePortal: false,
+                    container: document.body,
+                    anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                    transformOrigin: { vertical: 'top', horizontal: 'left' },
+                    keepMounted: true,
+                    PaperProps: {
+                      style: {
+                        maxHeight: 400,
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="crew_name_asc">Crew Name (A-Z)</MenuItem>
                   <MenuItem value="crew_name_desc">Crew Name (Z-A)</MenuItem>
@@ -384,14 +420,14 @@ export function TimesheetGrid() {
                   onClick={clearFilters}
                   sx={{ minWidth: 120 }}
                 >
-                  Clear Filters
+                  Clear filters
                 </Button>
               )}
             </Stack>
           </Box>
           <TableContainer component={Paper} className="overflow-x-auto">
             <Table size="small">
-              <TableHead sx={{ backgroundColor: 'hsl(var(--table-header))' }}>
+              <TableHead sx={{ backgroundColor: 'var(--table-header)' }}>
                 <TableRow>
                   <TableCell className="w-48"><Typography variant="subtitle2">Crew</Typography></TableCell>
                   {dates.map((date) => (
@@ -408,10 +444,10 @@ export function TimesheetGrid() {
                     hover
                     sx={{
                       backgroundColor: index % 2 === 0 
-                        ? 'hsl(var(--table-row-odd))' 
-                        : 'hsl(var(--table-row-even))',
+                        ? 'var(--table-row-odd)' 
+                        : 'var(--table-row-even)',
                       '&:hover': {
-                        backgroundColor: 'hsl(var(--table-cell-hover))',
+                        backgroundColor: 'var(--table-cell-hover)',
                       }
                     }}
                   >
@@ -436,7 +472,7 @@ export function TimesheetGrid() {
                           className="cursor-pointer transition-colors"
                           sx={{
                             '&:hover': {
-                              backgroundColor: 'hsl(var(--table-cell-hover)) !important',
+                              backgroundColor: 'var(--table-cell-hover) !important',
                             }
                           }}
                           onClick={() => handleCellClick(crew, date)}

@@ -11,15 +11,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { 
-  BarChart3, 
-  Grid3x3, 
-  Download, 
-  AlertTriangle, 
-  Navigation,
-  FileBarChart,
-  Users
-} from 'lucide-react';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import DownloadIcon from '@mui/icons-material/Download';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import NavigationIcon from '@mui/icons-material/Navigation';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
@@ -27,32 +24,32 @@ const menuItems = [
   {
     title: 'Dashboard',
     url: '/',
-    icon: BarChart3,
+    icon: BarChartIcon,
   },
   {
     title: 'Timesheet Grid',
     url: '/timesheets',
-    icon: Grid3x3,
+    icon: AccessTimeIcon,
   },
   {
     title: 'Export Data',
     url: '/export',
-    icon: Download,
+    icon: DownloadIcon,
   },
   {
     title: 'Exceptions',
     url: '/exceptions',
-    icon: AlertTriangle,
+    icon: WarningAmberIcon,
   },
   {
     title: 'GPS Tracking',
     url: '/gps',
-    icon: Navigation,
+    icon: NavigationIcon,
   },
   {
     title: 'Reports',
     url: '/reports',
-    icon: FileBarChart,
+    icon: AssessmentIcon,
   },
 ];
 

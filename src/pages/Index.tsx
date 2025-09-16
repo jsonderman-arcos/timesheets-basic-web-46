@@ -210,12 +210,8 @@ const Index = () => {
             </Typography>
             <Button 
               variant="contained" 
+              color="primary"
               size="large" 
-              sx={{ 
-                backgroundColor: 'white', 
-                color: '#1976d2',
-                '&:hover': { backgroundColor: '#f5f5f5' }
-              }}
               onClick={() => navigate('/dashboard')}
             >
               Go to Dashboard
