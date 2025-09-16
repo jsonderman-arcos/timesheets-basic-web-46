@@ -163,11 +163,19 @@ export function Dashboard() {
         totalCost,
       });
 
-      // Hours by actual date (last 7 days)
+      // Hours by actual date (from first timesheet to today)
+      const { data: firstTimesheetData } = await supabase
+        .from('time_entries')
+        .select('date')
+        .order('date', { ascending: true })
+        .limit(1);
+
+      const firstDate = firstTimesheetData?.[0]?.date || lastWeekDate;
+
       const { data: dailyHours } = await supabase
         .from('time_entries')
         .select('date, hours_regular, hours_overtime')
-        .gte('date', lastWeekDate)
+        .gte('date', firstDate)
         .order('date');
 
       const dateMap: { [key: string]: number } = {};
@@ -183,7 +191,6 @@ export function Dashboard() {
       // Convert to array and format dates for display
       const dayData = Object.entries(dateMap)
         .sort(([a], [b]) => a.localeCompare(b))
-        .slice(-7) // Show last 7 days with data
         .map(([date, hours]) => ({
           date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
           hours,
@@ -400,26 +407,6 @@ export function Dashboard() {
       <Grid container spacing={3} sx={{ mt: 0 }}>
         <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
-            <CardHeader title={<Typography variant="h6">Daily Hours</Typography>} />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hoursByDay} onClick={handleBarClick}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
-                    <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card>
             <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
             <Divider />
             <CardContent>
@@ -489,6 +476,29 @@ export function Dashboard() {
                     </Pie>
                     <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
                   </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Daily Hours Chart */}
+      <Grid container spacing={3} sx={{ mt: 3 }}>
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardHeader title={<Typography variant="h6">Daily Hours</Typography>} />
+            <Divider />
+            <CardContent>
+              <Box sx={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={hoursByDay} onClick={handleBarClick}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <RechartsTooltip formatter={(value: any) => [`${value} hours`, 'Total Hours']} />
+                    <Bar dataKey="hours" fill={theme.palette.primary.main} style={{ cursor: 'pointer' }} />
+                  </BarChart>
                 </ResponsiveContainer>
               </Box>
             </CardContent>
