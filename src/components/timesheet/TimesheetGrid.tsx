@@ -256,9 +256,19 @@ export function TimesheetGrid() {
     setSelectedDate(date);
   };
 
+  // Ensure we interpret Supabase date strings as calendar days in local time.
+  const parseToLocalDate = (dateString: string) => {
+    if (!dateString) return null;
+    const normalized = dateString.split('T')[0];
+    const [year, month, day] = normalized.split('-').map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  };
+
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const date = parseToLocalDate(dateString);
+    if (!date) return dateString;
+    return format(date, 'EEE, MMM d');
   };
 
   const goToPreviousWeek = () => {

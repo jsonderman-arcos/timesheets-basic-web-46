@@ -249,8 +249,18 @@ export function TimesheetDetailModal({
 
   if (!crew) return null;
 
+  // Treat stored date strings as plain calendar days to avoid timezone shifts.
+  const parseToLocalDate = (dateString: string) => {
+    if (!dateString) return null;
+    const normalized = dateString.split('T')[0];
+    const [year, month, day] = normalized.split('-').map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  };
+
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseToLocalDate(dateString);
+    if (!date) return dateString;
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
