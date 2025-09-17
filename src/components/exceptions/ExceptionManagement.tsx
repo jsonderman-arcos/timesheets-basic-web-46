@@ -22,6 +22,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import IconButton from '@mui/material/IconButton';
 import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
@@ -54,6 +55,15 @@ export function ExceptionManagement() {
 
   useEffect(() => {
     fetchExceptions();
+  }, []);
+
+  // Auto refresh every 2 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshData(true);
+    }, 2 * 60 * 1000); // 2 minutes
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchExceptions = async () => {
@@ -90,6 +100,16 @@ export function ExceptionManagement() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshData = (showToast = false) => {
+    fetchExceptions();
+    if (showToast) {
+      showSuccessToast(
+        "Data refreshed",
+        "Exception data has been updated."
+      );
     }
   };
 
@@ -191,7 +211,18 @@ export function ExceptionManagement() {
   return (
     <>
       <Card>
-  
+        <CardHeader
+          title="Exception Management"
+          action={
+            <IconButton 
+              onClick={() => refreshData(true)} 
+              size="small"
+              title="Refresh data"
+            >
+              <RefreshIcon />
+            </IconButton>
+          }
+        />
         <CardContent>
           {exceptions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">

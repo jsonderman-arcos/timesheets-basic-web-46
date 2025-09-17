@@ -33,9 +33,10 @@ import TodayIcon from '@mui/icons-material/Today';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SortIcon from '@mui/icons-material/Sort';
 import ClearIcon from '@mui/icons-material/Clear';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { TimesheetDetailModal } from './TimesheetDetailModal';
 import { useToast } from '@/hooks/use-toast';
-import { showErrorToast } from '@/lib/toast-utils';
+import { showErrorToast, showSuccessToast } from '@/lib/toast-utils';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 
 interface Crew {
@@ -107,6 +108,16 @@ export function TimesheetGrid() {
     fetchInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto refresh every 2 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshData(true);
+    }, 2 * 60 * 1000); // 2 minutes
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [crews]);
 
   useEffect(() => {
     if (companyFilter) {
@@ -227,9 +238,15 @@ export function TimesheetGrid() {
     setSortBy('crew_name_asc');
   };
 
-  const refreshData = () => {
+  const refreshData = (showToast = false) => {
     console.log('refreshData called, about to fetchTimesheets');
     fetchTimesheets();
+    if (showToast) {
+      showSuccessToast(
+        "Data refreshed",
+        "Timesheet data has been updated."
+      );
+    }
   };
 
   const handleCellClick = (crew: Crew, date: string) => {
@@ -314,6 +331,13 @@ export function TimesheetGrid() {
                   </Button>
                   <IconButton onClick={goToNextWeek} size="small">
                     <ChevronRightIcon />
+                  </IconButton>
+                  <IconButton 
+                    onClick={() => refreshData(true)} 
+                    size="small"
+                    title="Refresh data"
+                  >
+                    <RefreshIcon />
                   </IconButton>
                 </Box>
                 

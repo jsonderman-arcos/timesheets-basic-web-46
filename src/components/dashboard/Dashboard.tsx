@@ -417,24 +417,12 @@ export function Dashboard() {
                         data: { fullName: item.fullName },
                       })),
                       outerRadius: '65%',
-                    },
-                  ]}
-                  height={300}
-                  slotProps={{
-                    legend: { hidden: false },
-                    tooltip: {
-                      trigger: 'item',
-                      valueFormatter: (value: PieValueType, context) => {
-                        const numericValue = value == null ? 0 : Number(value);
-                        const fullName = (context?.data as { fullName?: string } | undefined)?.fullName;
-                        const suffix = fullName ? ` - ${fullName}` : '';
-                        return `${numericValue.toLocaleString()} hours${suffix}`;
-                      },
-                    },
-                  }}
-                  onItemClick={handleUtilitySliceClick as any}
-                />
-              </Box>
+                     },
+                   ]}
+                   height={300}
+                   onItemClick={handleUtilitySliceClick as any}
+                 />
+               </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -457,20 +445,10 @@ export function Dashboard() {
                       })),
                       outerRadius: '65%',
                     },
-                  ]}
-                  height={300}
-                  slotProps={{
-                    legend: { hidden: false },
-                    tooltip: {
-                      trigger: 'item',
-                      valueFormatter: (value: PieValueType) => {
-                        const numericValue = value == null ? 0 : Number(value);
-                        return `${numericValue.toLocaleString()} hours`;
-                      },
-                    },
-                  }}
-                />
-              </Box>
+                   ]}
+                   height={300}
+                 />
+               </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -495,21 +473,11 @@ export function Dashboard() {
                       label: 'Total Hours',
                       color: 'var(--theme-base-primary-main)',
                     },
-                  ]}
-                  slotProps={{
-                    legend: { hidden: true },
-                    tooltip: {
-                      trigger: 'item',
-                      valueFormatter: (value) => {
-                        const n = value == null ? 0 : Number(value);
-                        return `${n.toLocaleString()} hours`;
-                      },
-                    },
-                  }}
-                  onItemClick={handleHoursBarClick as any}
-                  sx={{ cursor: 'pointer' }}
-                />
-              </Box>
+                   ]}
+                   onItemClick={handleHoursBarClick as any}
+                   sx={{ cursor: 'pointer' }}
+                 />
+               </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -540,21 +508,11 @@ export function Dashboard() {
                       color: 'var(--theme-base-feedback-success-main)',
                       area: true,
                       showMark: false,
-                    },
-                  ]}
-                  slotProps={{
-                    legend: { hidden: true },
-                    tooltip: {
-                      trigger: 'item',
-                      valueFormatter: (value, _context) => {
-                        const n = value == null ? 0 : Number(value);
-                        return `$${n.toLocaleString()}`;
-                      },
-                    },
-                  }}
-                  sx={{
-                    '& .MuiAreaElement-root': {
-                      fill: 'var(--theme-base-feedback-success-main)',
+                     },
+                   ]}
+                   sx={{
+                     '& .MuiAreaElement-root': {
+                       fill: 'var(--theme-base-feedback-success-main)',
                       fillOpacity: 0.3,
                     },
                   }}
