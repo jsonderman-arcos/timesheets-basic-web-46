@@ -24,8 +24,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import IconButton from '@mui/material/IconButton';
-import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
+import { DATE_TIME_FORMAT, formatDateTimeValue } from '@/lib/time';
 
 interface Exception {
   id: string;
@@ -51,7 +51,6 @@ export function ExceptionManagement() {
   const [exceptions, setExceptions] = useState<Exception[]>([]);
   const [selectedException, setSelectedException] = useState<Exception | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchExceptions();
@@ -186,15 +185,7 @@ export function ExceptionManagement() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      hourCycle: 'h23',
-    });
+    return formatDateTimeValue(dateString, DATE_TIME_FORMAT, dateString);
   };
 
   if (loading) {

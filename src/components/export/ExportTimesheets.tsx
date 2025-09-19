@@ -16,7 +16,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import TableViewIcon from '@mui/icons-material/TableView';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 export function ExportTimesheets() {
@@ -30,7 +29,6 @@ export function ExportTimesheets() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [crews, setCrews] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     const fetchCompanies = async () => {

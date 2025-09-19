@@ -1,18 +1,29 @@
-import { useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Tab,
+  TextField,
+  Typography,
+} from '@mui/material';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
 
 export default function Auth() {
   const { user, signIn, signUp } = useAuth();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState<'signin' | 'signup'>('signin');
+
+  const handleTabChange = (_event: SyntheticEvent, value: string) => {
+    setTab(value as 'signin' | 'signup');
+  };
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -65,87 +76,118 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Timesheet Management</CardTitle>
-          <CardDescription>Sign in to access your timesheet dashboard</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Enter your password"
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign In"}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'background.default',
+        p: 2,
+      }}
+    >
+      <Card sx={{ width: '100%', maxWidth: 420 }}>
+        <CardHeader
+          title={
+            <Typography variant="h5" component="h1" fontWeight={600}>
+              Timesheet Management
+            </Typography>
+          }
+          subheader="Sign in to access your timesheet dashboard"
+          subheaderTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
+        />
+        <CardContent sx={{ pt: 0 }}>
+          <TabContext value={tab}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+              <TabList onChange={handleTabChange} variant="fullWidth">
+                <Tab label="Sign In" value="signin" />
+                <Tab label="Sign Up" value="signup" />
+              </TabList>
+            </Box>
+
+            <TabPanel value="signin" sx={{ p: 0 }}>
+              <Box
+                component="form"
+                onSubmit={handleSignIn}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+              >
+                <TextField
+                  id="signin-email"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  required
+                  placeholder="Enter your email"
+                  fullWidth
+                />
+                <TextField
+                  id="signin-password"
+                  name="password"
+                  label="Password"
+                  type="password"
+                  required
+                  placeholder="Enter your password"
+                  fullWidth
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  fullWidth
+                  sx={{ textTransform: 'none' }}
+                >
+                  {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
-                  <Input
-                    id="signup-name"
-                    name="fullName"
-                    type="text"
-                    required
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Enter your password"
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Sign Up"}
+              </Box>
+            </TabPanel>
+
+            <TabPanel value="signup" sx={{ p: 0 }}>
+              <Box
+                component="form"
+                onSubmit={handleSignUp}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+              >
+                <TextField
+                  id="signup-name"
+                  name="fullName"
+                  label="Full Name"
+                  type="text"
+                  required
+                  placeholder="Enter your full name"
+                  fullWidth
+                />
+                <TextField
+                  id="signup-email"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  required
+                  placeholder="Enter your email"
+                  fullWidth
+                />
+                <TextField
+                  id="signup-password"
+                  name="password"
+                  label="Password"
+                  type="password"
+                  required
+                  placeholder="Enter your password"
+                  fullWidth
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  fullWidth
+                  sx={{ textTransform: 'none' }}
+                >
+                  {loading ? 'Creating account...' : 'Sign Up'}
                 </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+              </Box>
+            </TabPanel>
+          </TabContext>
         </CardContent>
       </Card>
-    </div>
+    </Box>
   );
 }

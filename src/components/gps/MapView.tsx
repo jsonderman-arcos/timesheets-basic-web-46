@@ -12,8 +12,8 @@ import {
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CloseIcon from '@mui/icons-material/Close';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
+import { DATE_TIME_WITH_SECONDS_FORMAT, formatDateTimeValue } from '@/lib/time';
 
 interface GpsPoint {
   id: string;
@@ -42,8 +42,6 @@ export function MapView({ gpsPoints }: MapViewProps) {
   const [isTokenSet, setIsTokenSet] = useState<boolean>(false);
   const [selectedLocation, setSelectedLocation] = useState<LocationDetails | null>(null);
   const [loadingAddress, setLoadingAddress] = useState<boolean>(false);
-  const { toast } = useToast();
-
   // Load token on component mount
   useEffect(() => {
     const loadMapboxToken = async () => {
@@ -102,7 +100,7 @@ export function MapView({ gpsPoints }: MapViewProps) {
     
     // Set initial data while loading address
     setSelectedLocation({
-      timestamp: new Date(point.timestamp).toLocaleString(),
+      timestamp: formatDateTimeValue(point.timestamp, DATE_TIME_WITH_SECONDS_FORMAT, point.timestamp),
       address: 'Loading address...',
       coordinates: `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`,
       position

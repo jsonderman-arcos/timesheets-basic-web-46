@@ -35,7 +35,6 @@ import SortIcon from '@mui/icons-material/Sort';
 import ClearIcon from '@mui/icons-material/Clear';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { TimesheetDetailModal } from './TimesheetDetailModal';
-import { useToast } from '@/hooks/use-toast';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-utils';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 
@@ -87,7 +86,6 @@ export function TimesheetGrid() {
   const [selectedCrewFilter, setSelectedCrewFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('crew_name_asc');
   
-  const { toast } = useToast();
   
   const companyFilter = searchParams.get('company');
 

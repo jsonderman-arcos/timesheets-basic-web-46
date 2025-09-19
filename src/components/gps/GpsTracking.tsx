@@ -18,9 +18,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
 import { showErrorToast } from '@/lib/toast-utils';
+import { TIME_FORMAT_WITH_SECONDS, TIME_LOCALE } from '@/lib/time';
 import { MapView } from './MapView';
 
 interface GpsPoint {
@@ -50,7 +49,6 @@ export function GpsTracking() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [gpsPoints, setGpsPoints] = useState<GpsPoint[]>([]);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchCompanies();
@@ -193,13 +191,7 @@ export function GpsTracking() {
   };
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      hourCycle: 'h23',
-    });
+    return new Date(timestamp).toLocaleTimeString(TIME_LOCALE, TIME_FORMAT_WITH_SECONDS);
   };
 
   return (

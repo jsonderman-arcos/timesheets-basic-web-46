@@ -37,11 +37,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import IconButton from '@mui/material/IconButton';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast-utils';
-import { Calendar } from '@/components/ui/calendar';
 import { format, addDays, subDays } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { formatTimeValue } from '@/lib/time';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { enGB } from 'date-fns/locale';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 interface Crew {
   id: string;
@@ -102,7 +105,6 @@ export function TimesheetDetailModal({
   onUpdate,
   onDateChange,
 }: TimesheetDetailModalProps) {
-  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState<'crew' | 'individual'>('crew');
@@ -162,8 +164,8 @@ export function TimesheetDetailModal({
   useEffect(() => {
     if (timesheet) {
       setFormData({
-        start_time: timesheet.start_time || '08:00',
-        end_time: timesheet.end_time || '17:00',
+        start_time: formatTimeValue(timesheet.start_time, '08:00'),
+        end_time: formatTimeValue(timesheet.end_time, '17:00'),
         work_description: timesheet.work_description || '',
         working_hours: 0,
         traveling_hours: 0,
@@ -226,7 +228,7 @@ export function TimesheetDetailModal({
     }
   };
 
-  const handleDateSelect = (date: Date | undefined) => {
+  const handleDateSelect = (date: Date | null) => {
     if (date) {
       try {
         const newDateString = format(date, 'yyyy-MM-dd');
@@ -258,6 +260,8 @@ export function TimesheetDetailModal({
     return new Date(year, month - 1, day);
   };
 
+  const modalParsedDate = parseToLocalDate(modalDate);
+
   const formatDate = (dateString: string) => {
     const date = parseToLocalDate(dateString);
     if (!date) return dateString;
@@ -270,14 +274,23 @@ export function TimesheetDetailModal({
   };
 
   const formatTime = (timeString: string) => {
-    if (!timeString) return 'Not recorded';
-    const time = new Date(`2000-01-01T${timeString}`);
-    return time.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      hourCycle: 'h23',
-    });
+    return formatTimeValue(timeString, 'Not recorded');
+  };
+
+  const timeStringToDate = (value: string | null | undefined) => {
+    if (!value) return null;
+    const [hours, minutes] = value.split(':').map(Number);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  };
+
+  const dateToTimeString = (value: Date | null) => {
+    if (!value || Number.isNaN(value.getTime())) return '';
+    const hours = String(value.getHours()).padStart(2, '0');
+    const minutes = String(value.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   const calculateTotalHours = (startTime: string, endTime: string) => {
@@ -443,8 +456,8 @@ export function TimesheetDetailModal({
   const handleCancel = () => {
     if (timesheet) {
       setFormData({
-        start_time: timesheet.start_time || '08:00',
-        end_time: timesheet.end_time || '17:00',
+        start_time: formatTimeValue(timesheet.start_time, '08:00'),
+        end_time: formatTimeValue(timesheet.end_time, '17:00'),
         work_description: timesheet.work_description || '',
         working_hours: 0,
         traveling_hours: 0,
@@ -475,7 +488,8 @@ export function TimesheetDetailModal({
   };
 
   return (
-    <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md" fullWidth>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enGB}>
+      <Dialog open={open} onClose={() => onOpenChange(false)} maxWidth="md" fullWidth>
       <DialogTitle>
         <Box className="flex items-center justify-between">
           <Box className="flex items-center gap-2">
@@ -520,7 +534,7 @@ export function TimesheetDetailModal({
               size="small"
             >
               <CalendarMonthIcon fontSize="small" sx={{ mr: 1 }} />
-              {format(new Date(modalDate), 'MMM d, yyyy')}
+                      {modalParsedDate ? format(modalParsedDate, 'MMM d, yyyy') : modalDate}
             </Button>
             
             <Menu
@@ -532,12 +546,10 @@ export function TimesheetDetailModal({
               }}
             >
               <Paper sx={{ p: 0 }}>
-                <Calendar
-                  mode="single"
-                  selected={new Date(modalDate)}
-                  onSelect={handleDateSelect}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
+                <DateCalendar
+                  value={modalParsedDate ?? null}
+                  onChange={handleDateSelect}
+                  sx={{ p: 1 }}
                 />
               </Paper>
             </Menu>
@@ -616,23 +628,31 @@ export function TimesheetDetailModal({
                       /* Crew-level editing form */
                       <>
                         <Box sx={{ display: 'flex', gap: 2 }}>
-                          <TextField
-                            fullWidth
+                          <TimePicker
                             label="Start Time"
-                            type="time"
-                            size="small"
-                            value={formData.start_time}
-                            onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
-                            InputLabelProps={{ shrink: true }}
+                            ampm={false}
+                            format="HH:mm"
+                            value={timeStringToDate(formData.start_time)}
+                            onChange={(date) =>
+                              setFormData(prev => ({
+                                ...prev,
+                                start_time: date ? dateToTimeString(date) : '',
+                              }))
+                            }
+                            slotProps={{ textField: { fullWidth: true, size: 'small' } }}
                           />
-                          <TextField
-                            fullWidth
+                          <TimePicker
                             label="End Time"
-                            type="time"
-                            size="small"
-                            value={formData.end_time}
-                            onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
-                            InputLabelProps={{ shrink: true }}
+                            ampm={false}
+                            format="HH:mm"
+                            value={timeStringToDate(formData.end_time)}
+                            onChange={(date) =>
+                              setFormData(prev => ({
+                                ...prev,
+                                end_time: date ? dateToTimeString(date) : '',
+                              }))
+                            }
+                            slotProps={{ textField: { fullWidth: true, size: 'small' } }}
                           />
                         </Box>
                         
@@ -706,23 +726,33 @@ export function TimesheetDetailModal({
                                 </Box>
                                 
                                 <Box sx={{ display: 'flex', gap: 2 }}>
-                                  <TextField
-                                    fullWidth
+                                  <TimePicker
                                     label="Start Time"
-                                    type="time"
-                                    size="small"
-                                    value={memberData.start_time}
-                                    onChange={(e) => updateMemberFormData(memberIndex, 'start_time', e.target.value)}
-                                    InputLabelProps={{ shrink: true }}
+                                    ampm={false}
+                                    format="HH:mm"
+                                    value={timeStringToDate(memberData.start_time)}
+                                    onChange={(date) =>
+                                      updateMemberFormData(
+                                        memberIndex,
+                                        'start_time',
+                                        date ? dateToTimeString(date) : ''
+                                      )
+                                    }
+                                    slotProps={{ textField: { fullWidth: true, size: 'small' } }}
                                   />
-                                  <TextField
-                                    fullWidth
+                                  <TimePicker
                                     label="End Time"
-                                    type="time"
-                                    size="small"
-                                    value={memberData.end_time}
-                                    onChange={(e) => updateMemberFormData(memberIndex, 'end_time', e.target.value)}
-                                    InputLabelProps={{ shrink: true }}
+                                    ampm={false}
+                                    format="HH:mm"
+                                    value={timeStringToDate(memberData.end_time)}
+                                    onChange={(date) =>
+                                      updateMemberFormData(
+                                        memberIndex,
+                                        'end_time',
+                                        date ? dateToTimeString(date) : ''
+                                      )
+                                    }
+                                    slotProps={{ textField: { fullWidth: true, size: 'small' } }}
                                   />
                                 </Box>
                                 
@@ -876,6 +906,7 @@ export function TimesheetDetailModal({
           </Button>
         )}
       </DialogActions>
-    </Dialog>
+      </Dialog>
+    </LocalizationProvider>
   );
 }

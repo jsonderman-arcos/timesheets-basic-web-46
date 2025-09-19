@@ -1,6 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { MuiToaster } from "@/components/feedback/MuiToaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { NavigationLayout } from "@/components/navigation/NavigationLayout";
@@ -27,26 +25,23 @@ const theme = createMuiThemeFromTokens();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <SafeStyledEngineProvider>
-        <SafeThemeProvider theme={theme}>
-          {/* Keep Tailwind Preflight; omit CssBaseline */}
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<NavigationLayout><DashboardPage /></NavigationLayout>} />
-              <Route path="/timesheets" element={<NavigationLayout><TimesheetPage /></NavigationLayout>} />
-              <Route path="/export" element={<NavigationLayout><ExportPage /></NavigationLayout>} />
-              <Route path="/exceptions" element={<NavigationLayout><ExceptionsPage /></NavigationLayout>} />
-              <Route path="/gps" element={<NavigationLayout><GpsPage /></NavigationLayout>} />
-              <Route path="/reports" element={<NavigationLayout><ReportsPage /></NavigationLayout>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </SafeThemeProvider>
-      </SafeStyledEngineProvider>
-    </TooltipProvider>
+    <SafeStyledEngineProvider>
+      <SafeThemeProvider theme={theme}>
+        <MuiToaster />
+        {/* Keep Tailwind Preflight; omit CssBaseline */}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<NavigationLayout><DashboardPage /></NavigationLayout>} />
+            <Route path="/timesheets" element={<NavigationLayout><TimesheetPage /></NavigationLayout>} />
+            <Route path="/export" element={<NavigationLayout><ExportPage /></NavigationLayout>} />
+            <Route path="/exceptions" element={<NavigationLayout><ExceptionsPage /></NavigationLayout>} />
+            <Route path="/gps" element={<NavigationLayout><GpsPage /></NavigationLayout>} />
+            <Route path="/reports" element={<NavigationLayout><ReportsPage /></NavigationLayout>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </SafeThemeProvider>
+    </SafeStyledEngineProvider>
   </QueryClientProvider>
 );
 
