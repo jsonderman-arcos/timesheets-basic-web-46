@@ -71,3 +71,15 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Demo data refresh
+
+The Supabase database now includes a weekly maintenance job that advances every record in the `time_entries` table by 7 days to keep the demo timesheet view fresh. The job uses `pg_cron` and runs every Sunday at 00:01 (UTC) by calling the stored procedure `public.shift_time_entries_week()`.
+
+If you ever need to refresh the demo data manually—for example, on a staging instance—run the following SQL from the Supabase SQL Editor or CLI:
+
+```sql
+call public.shift_time_entries_week();
+```
+
+To change the cadence or timing, update the entry named `weekly_time_entries_rollover` in the `cron.job` catalog table.
