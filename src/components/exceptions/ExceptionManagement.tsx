@@ -91,7 +91,12 @@ export function ExceptionManagement() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setExceptions(data || []);
+      // Ensure default status is 'submitted' if missing
+      const mapped = (data || []).map(ex => ({
+        ...ex,
+        status: ex.status || 'submitted',
+      }));
+      setExceptions(mapped);
     } catch (error: any) {
       showErrorToast(
         "Error loading exceptions",
@@ -112,7 +117,7 @@ export function ExceptionManagement() {
     }
   };
 
-  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined' | 'pending') => {
+  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined' | 'under_review' | 'submitted') => {
     try {
       const { error } = await supabase
         .from('exceptions')
@@ -150,17 +155,24 @@ export function ExceptionManagement() {
   const getStatusChip = (status: string) => {
     switch (status) {
       case 'submitted':
-      case 'pending':
         return (
           <Chip
-            label="Pending"
+            label="Submitted"
+            variant="outlined"
+            className="bg-default/10 text-default border-default"
+            size="small"
+          />
+        );
+      case 'under_review':
+        return (
+          <Chip
+            label="Under Review"
             variant="outlined"
             className="bg-warning/10 text-warning border-warning"
             size="small"
           />
         );
       case 'accepted':
-      case 'approved':
         return (
           <Chip
             label="Approved"
@@ -170,7 +182,6 @@ export function ExceptionManagement() {
           />
         );
       case 'declined':
-      case 'denied':
         return (
           <Chip
             label="Declined"
@@ -180,7 +191,7 @@ export function ExceptionManagement() {
           />
         );
       default:
-        return <Chip label="Submitted" variant="outlined" size="small" />;
+        return <Chip label={status} variant="outlined" size="small" />;
     }
   };
 
@@ -260,24 +271,8 @@ export function ExceptionManagement() {
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={async () => {
-                            if (exception.status === 'submitted') {
-                              try {
-                                await supabase
-                                  .from('exceptions')
-                                  .update({ status: 'pending' })
-                                  .eq('id', exception.id);
-                                setExceptions(prev => prev.map(ex =>
-                                  ex.id === exception.id ? { ...ex, status: 'pending' } : ex
-                                ));
-                                setSelectedException({ ...exception, status: 'pending' });
-                              } catch (error) {
-                                // Optionally handle error
-                                setSelectedException(exception);
-                              }
-                            } else {
-                              setSelectedException(exception);
-                            }
+                          onClick={() => {
+                            setSelectedException(exception);
                           }}
                           startIcon={<VisibilityIcon fontSize="small" />}
                         >
@@ -361,12 +356,12 @@ export function ExceptionManagement() {
                 <div className="flex gap-3 pt-4 justify-end">
                   <Button
                     onClick={async () => {
-                      await updateExceptionStatus(selectedException.id, 'pending');
+                      await updateExceptionStatus(selectedException.id, 'under_review');
                     }}
                     variant="outlined"
                     color="warning"
                   >
-                    Pending
+                    Under Review
                   </Button>
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
