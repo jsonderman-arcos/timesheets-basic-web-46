@@ -180,7 +180,7 @@ export function ExceptionManagement() {
           />
         );
       default:
-        return <Chip label={status} variant="outlined" size="small" />;
+        return <Chip label="Submitted" variant="outlined" size="small" />;
     }
   };
 
