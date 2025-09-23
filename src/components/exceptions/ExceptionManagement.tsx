@@ -112,7 +112,7 @@ export function ExceptionManagement() {
     }
   };
 
-  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined') => {
+  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined' | 'pending') => {
     try {
       const { error } = await supabase
         .from('exceptions')
@@ -260,7 +260,25 @@ export function ExceptionManagement() {
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() => setSelectedException(exception)}
+                          onClick={async () => {
+                            if (exception.status === 'submitted') {
+                              try {
+                                await supabase
+                                  .from('exceptions')
+                                  .update({ status: 'pending' })
+                                  .eq('id', exception.id);
+                                setExceptions(prev => prev.map(ex =>
+                                  ex.id === exception.id ? { ...ex, status: 'pending' } : ex
+                                ));
+                                setSelectedException({ ...exception, status: 'pending' });
+                              } catch (error) {
+                                // Optionally handle error
+                                setSelectedException(exception);
+                              }
+                            } else {
+                              setSelectedException(exception);
+                            }
+                          }}
                           startIcon={<VisibilityIcon fontSize="small" />}
                         >
                           Review
@@ -340,20 +358,15 @@ export function ExceptionManagement() {
               </div>
 
               {(selectedException.status === 'submitted' || selectedException.status === 'under_review') && (
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 pt-4 justify-end">
                   <Button
-                    onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
-                    sx={{
-                      backgroundColor: 'var(--theme-base-feedback-success-main)',
-                      color: 'var(--theme-base-feedback-success-contrast-text)',
-                      '&:hover': {
-                        backgroundColor: 'var(--theme-base-feedback-success-dark)',
-                      },
+                    onClick={async () => {
+                      await updateExceptionStatus(selectedException.id, 'pending');
                     }}
-                    variant="contained"
-                    startIcon={<CheckCircleIcon fontSize="small" />}
+                    variant="outlined"
+                    color="warning"
                   >
-                    Approve
+                    Pending
                   </Button>
                   <Button
                     onClick={() => updateExceptionStatus(selectedException.id, 'declined')}
@@ -368,6 +381,20 @@ export function ExceptionManagement() {
                     startIcon={<CancelIcon fontSize="small" />}
                   >
                     Decline
+                  </Button>
+                  <Button
+                    onClick={() => updateExceptionStatus(selectedException.id, 'accepted')}
+                    sx={{
+                      backgroundColor: 'var(--theme-base-feedback-success-main)',
+                      color: 'var(--theme-base-feedback-success-contrast-text)',
+                      '&:hover': {
+                        backgroundColor: 'var(--theme-base-feedback-success-dark)',
+                      },
+                    }}
+                    variant="contained"
+                    startIcon={<CheckCircleIcon fontSize="small" />}
+                  >
+                    Approve
                   </Button>
                 </div>
               )}
