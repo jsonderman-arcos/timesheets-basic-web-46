@@ -220,11 +220,11 @@ export function TimesheetGrid() {
         organized[t.crew_id][t.date] = t;
       });
 
-      console.log('Timesheets fetched and organized:', organized);
+      console.log('Timecards fetched and organized:', organized);
       setTimesheets(organized);
     } catch (error: any) {
       showErrorToast(
-        'Error loading timesheets',
+        'Error loading timecards',
         error.message
       );
     }
@@ -237,12 +237,12 @@ export function TimesheetGrid() {
   };
 
   const refreshData = (showToast = false) => {
-    console.log('refreshData called, about to fetchTimesheets');
+    console.log('refreshData called, about to fetchTimecards');
     fetchTimesheets();
     if (showToast) {
       showSuccessToast(
         "Data refreshed",
-        "Timesheet data has been updated."
+        "Timecard data has been updated."
       );
     }
   };
@@ -292,7 +292,7 @@ export function TimesheetGrid() {
         <CardContent className="p-6">
           <Box className="flex items-center justify-center">
             <CircularProgress size={24} className="mr-2" />
-            <Typography>Loading timesheet data...</Typography>
+            <Typography>Loading timecard data...</Typography>
           </Box>
         </CardContent>
       </Card>
@@ -546,7 +546,7 @@ export function TimesheetGrid() {
         onUpdate={refreshData}
         onDateChange={(newDate) => {
           setSelectedDate(newDate);
-          // Find timesheet for the new date
+          // Find timecard for the new date
           const newTimesheet = selectedCrew ? timesheets[selectedCrew.id]?.[newDate] || null : null;
           setSelectedTimesheet(newTimesheet);
         }}

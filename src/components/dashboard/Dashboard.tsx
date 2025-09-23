@@ -401,7 +401,7 @@ export function Dashboard() {
      <Grid container spacing={3} sx={{ mt: 0, width: '100%' }} columns={{ xs: 12, md: 12, lg: 12 }}>
         <Grid size={{xs:12, md:6, lg:6}} sx={{ display: 'flex' }}>
           <Card sx={{ height: '100%', width: '100%' }}>
-            <CardHeader title={<Typography variant="h6">Hours by Utility</Typography>} />
+            <CardHeader title={<Typography variant="h6">Hours by Provider</Typography>} />
             <Divider />
             <CardContent>
               <Box sx={{ width: '100%', height: 300 }}>

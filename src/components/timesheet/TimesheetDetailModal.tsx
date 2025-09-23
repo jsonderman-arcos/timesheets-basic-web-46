@@ -346,10 +346,10 @@ export function TimesheetDetailModal({
           
           showSuccessToast(
             'Success',
-            'Timesheet updated successfully.'
+            'Timecard updated successfully.'
           );
         } else {
-          // Create new timesheet
+          // Create new timecard
           const { error } = await supabase
             .from('time_entries')
             .insert(timesheetData);
@@ -358,11 +358,11 @@ export function TimesheetDetailModal({
           
           showSuccessToast(
             'Success',
-            'Timesheet created successfully.'
+            'Timecard created successfully.'
           );
         }
-        
-        console.log('Timesheet saved successfully, calling onUpdate');
+
+        console.log('Timecard saved successfully, calling onUpdate');
         setIsEditing(false);
         onUpdate();
         console.log('onUpdate called, closing modal');
@@ -409,7 +409,7 @@ export function TimesheetDetailModal({
           };
         });
 
-        // Delete existing member timesheets for this date
+        // Delete existing member timecards for this date
         await supabase
           .from('time_entries')
           .delete()
@@ -417,7 +417,7 @@ export function TimesheetDetailModal({
           .eq('date', modalDate)
           .not('member_id', 'is', null);
 
-        // Insert new member timesheets
+        // Insert new member timecards
         const { error } = await supabase
           .from('time_entries')
           .insert(timesheetEntries);
@@ -426,10 +426,10 @@ export function TimesheetDetailModal({
 
         showSuccessToast(
           'Success',
-          'Member timesheets saved successfully.'
+          'Member timecards saved successfully.'
         );
-        
-        console.log('Member timesheets saved successfully, calling onUpdate');
+
+        console.log('Member timecards saved successfully, calling onUpdate');
         setIsEditing(false);
         onUpdate();
         console.log('onUpdate called, closing modal');
@@ -474,7 +474,7 @@ export function TimesheetDetailModal({
       // For now, we'll show a success message
       showSuccessToast(
         'Reminder Sent',
-        `A reminder has been sent to ${crew.crew_name} to submit their timesheet for ${formatDate(modalDate)}.`
+        `A reminder has been sent to ${crew.crew_name} to submit their timecard for ${formatDate(modalDate)}.`
       );
       onOpenChange(false); // Close the modal
     } catch (error: any) {
@@ -582,7 +582,7 @@ export function TimesheetDetailModal({
                     <Box className="flex items-center gap-2">
                       <AccessTimeIcon fontSize="small" />
                       <Typography variant="subtitle1">
-                        {isEditing ? 'Edit Timesheet' : 'Timesheet Details'}
+                        {isEditing ? 'Edit Timecard' : 'Timecard Details'}
                       </Typography>
                     </Box>
                     {timesheet && !isEditing && (
@@ -844,9 +844,9 @@ export function TimesheetDetailModal({
                     <CalendarMonthIcon sx={{ color: 'rgba(211, 47, 47, 1)' }} fontSize="large" />
                   </Box>
                   <div>
-                    <Typography variant="subtitle1" fontWeight={600}>No Timesheet Submitted</Typography>
+                    <Typography variant="subtitle1" fontWeight={600}>No Timecard Submitted</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {crew.crew_name} has not submitted a timesheet for {formatDate(modalDate)}.
+                      {crew.crew_name} has not submitted a timecard for {formatDate(modalDate)}.
                     </Typography>
                   </div>
                   <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
@@ -864,7 +864,7 @@ export function TimesheetDetailModal({
                       startIcon={<EditIcon />}
                       onClick={() => setIsEditing(true)}
                     >
-                      Create timesheet
+                      Create timecard
                     </Button>
                   </Box>
                 </div>

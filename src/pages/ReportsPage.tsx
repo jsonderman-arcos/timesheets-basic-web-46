@@ -422,12 +422,12 @@ export default function ReportsPage() {
               </Box>
             </TableCell>
             <TableCell
-              onClick={() => handleSort('Timesheets')}
+              onClick={() => handleSort('TimeCards')}
               sx={sortableHeaderSx}
             >
               <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
-                Timesheets
-                {renderSortIcon('Timesheets')}
+                TimeCards
+                {renderSortIcon('TimeCards')}
               </Box>
             </TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Action</TableCell>
@@ -447,7 +447,7 @@ export default function ReportsPage() {
                   return report.crewName;
                 case 'Total Hours':
                   return report.totalHours;
-                case 'Timesheets':
+                case 'TimeCards':
                   return report.timesheetCount;
                 default:
                   return report.crewName;

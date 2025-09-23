@@ -6,7 +6,7 @@ export default function ExceptionsPage() {
       <div>
         <h1 className="text-3xl font-bold">Exception Management</h1>
         <p className="text-muted-foreground">
-          Review and approve or deny timesheet exceptions submitted by USP Admins.
+          Review and approve or deny timecard exceptions submitted by USP Admins.
         </p>
       </div>
       <ExceptionManagement />
