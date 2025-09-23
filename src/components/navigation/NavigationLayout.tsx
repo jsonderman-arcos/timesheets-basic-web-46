@@ -5,6 +5,10 @@ import {
   Toolbar, 
   Typography, 
   IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import { Menu as MenuIcon, ArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { MuiAppSidebar } from '@/components/layout/MuiAppSidebar';
@@ -19,11 +23,19 @@ interface NavigationLayoutContentProps {
 
 function NavigationLayoutContent({ 
   children, 
-  title = "Timesheet Management System",
-  showMobileToggle = true 
+  title = "Timecard Management System",
+  showMobileToggle = false 
 }: NavigationLayoutContentProps) {
   const { collapsed, toggleCollapsed } = useNavigation();
   const theme = useTheme();
+
+  // Storm event select state
+  const stormEvents = [
+    'Northern California Wildfire',
+    'Bomb Cyclone 042025',
+    'El Niño Windstorm N135'
+  ];
+  const [stormEvent, setStormEvent] = React.useState(stormEvents[0]);
 
   return (
     <>
@@ -39,7 +51,7 @@ function NavigationLayoutContent({
         }}
       >
         <Toolbar sx={{ minHeight: '64px !important' }} className="min-h-16">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
             {showMobileToggle && (
               <IconButton
                 edge="start"
@@ -57,11 +69,36 @@ function NavigationLayoutContent({
               component="h1"
               sx={{ 
                 fontWeight: 600,
-                color: 'white'
+                color: 'white',
+                mr: 3,
+                flexShrink: 0
               }}
             >
               {title}
             </Typography>
+            <Box sx={{ flex: 1 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+              <FormControl variant="standard" size="small" sx={{ minWidth: 220 }}>
+                <Select
+                  id="storm-event-select"
+                  value={stormEvent}
+                  variant="standard"
+                  onChange={e => setStormEvent(e.target.value)}
+                  sx={{
+                    '& .MuiSelect-select': { color: 'white' },
+                    '&:before, &:after': { borderBottomColor: 'white' },
+                    '& .MuiSvgIcon-root': { color: 'white' },
+                    px: 1,
+                  }}
+                  disableUnderline={false}
+                >
+                  {stormEvents.map(event => (
+                    <MenuItem key={event} value={event}>{event}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>
