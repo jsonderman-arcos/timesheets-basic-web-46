@@ -465,7 +465,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      shift_time_entry_dates: {
+        Args: { days_to_add: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
