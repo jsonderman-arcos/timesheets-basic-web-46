@@ -10,11 +10,10 @@ import {
 import { Fragment } from 'react';
 import { ToasterToast, ToastVariant, useToast } from '@/hooks/use-toast';
 
-const variantToSeverity: Record<ToastVariant | undefined, AlertColor> = {
+const variantToSeverity: Record<ToastVariant, AlertColor> = {
   default: 'info',
   destructive: 'error',
   success: 'success',
-  undefined: 'info',
 };
 
 const autoHideDefault = 6000;
@@ -41,7 +40,7 @@ export function MuiToaster() {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert
-            severity={variantToSeverity[toast.variant]}
+            severity={variantToSeverity[toast.variant || 'default']}
             variant="filled"
             action={
               toast.action ?? (

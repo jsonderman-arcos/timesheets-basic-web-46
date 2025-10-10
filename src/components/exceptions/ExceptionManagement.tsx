@@ -112,7 +112,7 @@ export function ExceptionManagement() {
     }
   };
 
-  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined' | 'pending') => {
+  const updateExceptionStatus = async (exceptionId: string, status: 'accepted' | 'declined' | 'under_review') => {
     try {
       const { error } = await supabase
         .from('exceptions')
@@ -151,6 +151,7 @@ export function ExceptionManagement() {
     switch (status) {
       case 'submitted':
       case 'pending':
+      case 'under_review':
         return (
           <Chip
             label="Pending"
@@ -265,12 +266,12 @@ export function ExceptionManagement() {
                               try {
                                 await supabase
                                   .from('exceptions')
-                                  .update({ status: 'pending' })
+                                  .update({ status: 'under_review' })
                                   .eq('id', exception.id);
                                 setExceptions(prev => prev.map(ex =>
-                                  ex.id === exception.id ? { ...ex, status: 'pending' } : ex
+                                  ex.id === exception.id ? { ...ex, status: 'under_review' } : ex
                                 ));
-                                setSelectedException({ ...exception, status: 'pending' });
+                                setSelectedException({ ...exception, status: 'under_review' });
                               } catch (error) {
                                 // Optionally handle error
                                 setSelectedException(exception);
@@ -361,7 +362,7 @@ export function ExceptionManagement() {
                 <div className="flex gap-3 pt-4 justify-end">
                   <Button
                     onClick={async () => {
-                      await updateExceptionStatus(selectedException.id, 'pending');
+                      await updateExceptionStatus(selectedException.id, 'under_review');
                     }}
                     variant="outlined"
                     color="warning"
