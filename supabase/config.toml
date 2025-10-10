@@ -1,1 +1,4 @@
 project_id = "sgkomeuwuomcjfxwhydk"
+
+[functions.refresh-demo-data]
+verify_jwt = false
