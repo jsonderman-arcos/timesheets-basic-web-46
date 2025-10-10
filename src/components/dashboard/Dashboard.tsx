@@ -308,10 +308,12 @@ export function Dashboard() {
     navigate('/timesheets');
   };
 
-  const handleRefreshDemoData = async () => {
+  const handleRefreshDemoData = async (manualDays?: number) => {
     setRefreshing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('refresh-demo-data');
+      const { data, error } = await supabase.functions.invoke('refresh-demo-data', {
+        body: manualDays ? { daysToShift: manualDays } : {}
+      });
       
       if (error) {
         showErrorToast('Failed to refresh demo data', error.message);
@@ -353,14 +355,22 @@ export function Dashboard() {
   return (
     <Box sx={{ width: '100%' }}>
       {/* Refresh Demo Data Button */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
         <Button
           variant="outlined"
           startIcon={refreshing ? <CircularProgress size={20} /> : <RefreshIcon />}
-          onClick={handleRefreshDemoData}
+          onClick={() => handleRefreshDemoData()}
           disabled={refreshing}
         >
-          {refreshing ? 'Refreshing...' : 'Refresh Demo Data'}
+          {refreshing ? 'Refreshing...' : 'Auto Refresh'}
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={refreshing ? <CircularProgress size={20} /> : <RefreshIcon />}
+          onClick={() => handleRefreshDemoData(14)}
+          disabled={refreshing}
+        >
+          {refreshing ? 'Shifting...' : '+14 Days'}
         </Button>
       </Box>
 

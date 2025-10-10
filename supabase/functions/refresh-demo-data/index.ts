@@ -18,44 +18,64 @@ Deno.serve(async (req) => {
 
     console.log('Starting demo data refresh...');
 
-    // Get the most recent time entry date
-    const { data: latestEntry, error: latestError } = await supabase
-      .from('time_entries')
-      .select('date')
-      .order('date', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (latestError) {
-      console.error('Error fetching latest entry:', latestError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to fetch latest entry' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Parse request body to check for manual daysToShift parameter
+    let manualDays: number | null = null;
+    try {
+      const body = await req.json();
+      if (body.daysToShift && typeof body.daysToShift === 'number') {
+        manualDays = body.daysToShift;
+        console.log(`Manual shift requested: ${manualDays} days`);
+      }
+    } catch {
+      // No body or invalid JSON, proceed with automatic calculation
     }
 
-    if (!latestEntry) {
-      console.log('No time entries found');
-      return new Response(
-        JSON.stringify({ message: 'No time entries to update' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    let daysToShift: number;
 
-    // Calculate days to shift (to make the most recent entry from this week)
-    const latestDate = new Date(latestEntry.date);
-    const today = new Date();
-    const daysToShift = Math.floor((today.getTime() - latestDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (manualDays !== null) {
+      // Use manual override
+      daysToShift = manualDays;
+      console.log(`Using manual days: ${daysToShift}`);
+    } else {
+      // Get the most recent time entry date
+      const { data: latestEntry, error: latestError } = await supabase
+        .from('time_entries')
+        .select('date')
+        .order('date', { ascending: false })
+        .limit(1)
+        .single();
 
-    console.log(`Latest entry date: ${latestDate.toISOString()}`);
-    console.log(`Days to shift forward: ${daysToShift}`);
+      if (latestError) {
+        console.error('Error fetching latest entry:', latestError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch latest entry' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
-    if (daysToShift <= 0) {
-      console.log('Data is already current');
-      return new Response(
-        JSON.stringify({ message: 'Data is already current', daysToShift: 0 }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      if (!latestEntry) {
+        console.log('No time entries found');
+        return new Response(
+          JSON.stringify({ message: 'No time entries to update' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Calculate days to shift (to make the most recent entry from this week)
+      const latestDate = new Date(latestEntry.date);
+      const today = new Date();
+      daysToShift = Math.floor((today.getTime() - latestDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      console.log(`Latest entry date: ${latestDate.toISOString()}`);
+      console.log(`Days to shift forward: ${daysToShift}`);
+
+      if (daysToShift <= 0) {
+        console.log('Data is already current');
+        return new Response(
+          JSON.stringify({ message: 'Data is already current', daysToShift: 0 }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Update all time entries by shifting dates forward
@@ -77,8 +97,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         message: `Time entries updated successfully`,
-        daysShifted: daysToShift,
-        newLatestDate: new Date(latestDate.getTime() + daysToShift * 24 * 60 * 60 * 1000).toISOString()
+        daysShifted: daysToShift
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
