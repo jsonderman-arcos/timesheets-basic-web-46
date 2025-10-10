@@ -9,6 +9,8 @@ import {
   Box,
   Skeleton,
   Divider,
+  Button,
+  CircularProgress,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { PieChart } from '@mui/x-charts/PieChart';
@@ -17,7 +19,8 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import type { PieValueType } from '@mui/x-charts/models';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { showErrorToast } from '@/lib/toast-utils';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { showErrorToast, showSuccessToast } from '@/lib/toast-utils';
 
 interface DashboardStats {
   totalHours: number;
@@ -81,6 +84,7 @@ export function Dashboard() {
   const [hoursByType, setHoursByType] = useState<HoursByType[]>([]);
   const [dailyCostData, setDailyCostData] = useState<DailyCostData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -304,6 +308,25 @@ export function Dashboard() {
     navigate('/timesheets');
   };
 
+  const handleRefreshDemoData = async () => {
+    setRefreshing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('refresh-demo-data');
+      
+      if (error) {
+        showErrorToast('Failed to refresh demo data', error.message);
+      } else {
+        showSuccessToast('Demo data refreshed successfully', `Shifted ${data.daysShifted} days forward`);
+        // Refresh the dashboard data
+        await fetchDashboardData();
+      }
+    } catch (error: any) {
+      showErrorToast('Failed to refresh demo data', error.message);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
 
   const totalUtilityHours = hoursByUtility.reduce((sum, d) => sum + (d.hours || 0), 0);
   const totalTypeHours = hoursByType.reduce((sum, d) => sum + (d.hours || 0), 0);
@@ -329,6 +352,18 @@ export function Dashboard() {
 
   return (
     <Box sx={{ width: '100%' }}>
+      {/* Refresh Demo Data Button */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="outlined"
+          startIcon={refreshing ? <CircularProgress size={20} /> : <RefreshIcon />}
+          onClick={handleRefreshDemoData}
+          disabled={refreshing}
+        >
+          {refreshing ? 'Refreshing...' : 'Refresh Demo Data'}
+        </Button>
+      </Box>
+
       {/* Stats Cards */}
       <Grid container sx={{ mb: 4, gap: 'clamp(8px, 2vw, 24px)' }} columns={{ xs: 12, md: 12, lg: 20 }}>
         <Grid size={{ xs: 'auto' }}>
